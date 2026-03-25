@@ -10,10 +10,16 @@ algorithmic problem-solving, game logic, and search-based reasoning.
 - Win detection across rows, columns, and diagonals
 - Simulated coin-drop animation using time delays
 
-### N-Queens
-- Recursive backtracking solution to the N-Queens problem
-- Constraint checks across rows, columns, and diagonals
-- Outputs a visual board representation in the console
+## N-Queens
+
+Comparative study of three constraint-solving algorithms on the N-Queens problem.
+
+**Algorithms implemented:**
+- Backtracking — exhaustive recursive search
+- Forward Checking — backtracking with constraint propagation  
+- Minimum Conflicts — local search heuristic (averaged over 100 trials)
+
+**[Live Visualizer →](https://rachitagrawal146.github.io/game-algorithms-java/Visualizer/NQueensVisualizer.html)**
 
 ### 21-Card Trick
 - Deterministic card-guessing algorithm
