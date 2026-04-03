@@ -1,22 +1,48 @@
-package Mastermind;
 import java.util.Scanner;
-public class Play
-{
-    int compScore = 0;
-    int personScore = 0;
-    Scanner sc = new Scanner (System.in);
-    String guess = "";
 
-    public static void main (String [] args)//main method to play mastermind
+/**
+ * Mastermind game — human play or AI solver mode.
+ * The secret code is 4 distinct digits from 1-6.
+ * The player has 10 guesses to crack the code.
+ */
+public class Mastermind
+{
+    public static void main (String [] args)
     {
-        String code; 
-        Scanner sc = new Scanner (System.in);
-        Play p = new Play ();
-        Guess g = new Guess();
-        Board b = new Board();
-        CodeGen c = new CodeGen();
-        code = c.codeGenNoRep();
-        System.out.println(code);
+        Scanner sc = new Scanner(System.in);
+        Guess g    = new Guess();
+        Board b    = new Board();
+        CodeGen c  = new CodeGen();
+        String code = c.codeGenNoRep();
+
+        System.out.println("=== Mastermind ===");
+        System.out.println("Select mode:");
+        System.out.println("  1 — Human player");
+        System.out.println("  2 — AI solver (watch the computer crack the code)");
+        System.out.print("Choice: ");
+        String modeInput = sc.nextLine().trim();
+
+        if (modeInput.equals("2"))
+        {
+            playAI(code, g, b);
+        }
+        else
+        {
+            playHuman(code, g, b, sc);
+        }
+
+        sc.close();
+    }
+
+    // ----------------------------------------------------------------
+    // Human player mode
+    // ----------------------------------------------------------------
+
+    /**
+     * Lets a human player guess the code with up to 10 attempts.
+     */
+    static void playHuman (String code, Guess g, Board b, Scanner sc)
+    {
         System.out.println("Enter your guess in numbers where :");
         System.out.println("1 => RED :");
         System.out.println("2 => GREEN :");
@@ -24,61 +50,76 @@ public class Play
         System.out.println("4 => BLUE :");
         System.out.println("5 => PURPLE :");
         System.out.println("6 => CYAN :");
-        for (int n = 0 ; n < 10 ; n ++)
+
+        boolean solved = false;
+        for (int n = 0 ; n < 10 ; n += 1)
         {
-            String guess = sc.next();
-            g.black = 0;
-            g.white = 0;
-            g.checkGuess(guess, code);
-            if (g.black==4)
+            String guess = sc.nextLine().trim();
+            int [] result = g.checkGuess(guess, code);
+            int black = result[0];
+            int white = result[1];
+
+            b.printBoard(black, white, guess);
+
+            if (black == 4)
             {
-                b.printBoard(g.black,g.white, guess);
                 System.out.println("Congratulations, You have cracked the code!!");
+                solved = true;
                 break;
             }
-            b.printBoard(g.black,g.white, guess);
         }
-        if (g.black!=4)
+
+        if (!solved)
         {
             System.out.println("Oops, Better luck next time :( ");
             System.out.println("The correct code was " + code);
         }
     }
 
-    // Enter your guess in numbers where :
-    // 1 => RED :
-    // 2 => GREEN :
-    // 3 => YELLOW :
-    // 4 => BLUE :
-    // 5 => PURPLE :
-    // 6 => CYAN :
-    // 1234
-    // -----------------------------------
-    // | ●  ●  ●  ● |  1    2    3    4  |
-    // -----------------------------------
-    // 3456
-    // -----------------------------------
-    // | ●  ●  ●  ● |  3    4    5    6  |
-    // -----------------------------------
-    // 2345
-    // -----------------------------------
-    // | ●  ●  ●  ● |  2    3    4    5  |
-    // -----------------------------------
-    // 3541
-    // -----------------------------------
-    // | ●  ●  ●  ● |  3    5    4    1  |
-    // -----------------------------------
-    // 1465
-    // -----------------------------------
-    // | ●  ●  ●  ● |  1    4    6    5  |
-    // -----------------------------------
-    // 5462
-    // -----------------------------------
-    // | ●  ●  ●  ● |  5    4    6    2  |
-    // -----------------------------------
+    // ----------------------------------------------------------------
+    // AI solver mode
+    // ----------------------------------------------------------------
 
-    
-    // cd ~/class_11                   
-    // javac Mastermind/*.java         
-    // java Mastermind.Play
+    /**
+     * Runs the constraint-elimination AI solver against the secret code.
+     * Displays each guess and the feedback received.
+     */
+    static void playAI (String code, Guess g, Board b)
+    {
+        CodeBreaker cb = new CodeBreaker();
+        cb.initializeSet();
+
+        System.out.println("AI is solving...");
+        System.out.println();
+
+        for (int n = 0 ; n < 10 ; n += 1)
+        {
+            int guessInt = cb.getNextGuess();
+            if (guessInt == -1)
+            {
+                System.out.println("AI ran out of candidates — something went wrong.");
+                break;
+            }
+
+            String guess = String.valueOf(guessInt);
+            int [] result = g.checkGuess(guess, code);
+            int black = result[0];
+            int white = result[1];
+
+            System.out.println("Guess " + (n + 1) + ": " + guess
+                    + "  (" + cb.remainingCount() + " candidates remaining)");
+            b.printBoard(black, white, guess);
+
+            if (black == 4)
+            {
+                System.out.println("AI cracked the code in " + (n + 1) + " guesses!");
+                return;
+            }
+
+            cb.remove(black, white, guessInt);
+        }
+
+        System.out.println("AI could not crack the code within 10 guesses.");
+        System.out.println("The correct code was " + code);
+    }
 }
