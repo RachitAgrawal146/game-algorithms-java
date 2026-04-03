@@ -1,5 +1,3 @@
-package CardTrick;
-
 public class Card
 {
     int rank;
@@ -14,6 +12,8 @@ public class Card
         this.rank = rank;
         if (suit == 'D' || suit == 'C' || suit == 'H' || suit == 'S')
             this.suit = suit;
+        else
+            this.suit = 'S';
     }
     void display ()//prints the rank and suit of a card
     {

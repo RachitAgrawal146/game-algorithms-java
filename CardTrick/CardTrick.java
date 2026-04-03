@@ -1,5 +1,3 @@
-package CardTrick;
-
 import java.util.*;
 public class CardTrick
 {

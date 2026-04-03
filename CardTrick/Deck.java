@@ -1,5 +1,3 @@
-package CardTrick;
-
 public class Deck
 {
     Card [] deck = new Card [52];
@@ -30,7 +28,7 @@ public class Deck
 
     int getRandom(int x, int y)//returns a random integer btween two limits
     {
-        return ((int)(Math.random()*10000)%(y-x))+x ;
+        return x + (int)(Math.random() * (y - x));
     }
 
     void shuffle()//shuffles 52 cards ramdomly
