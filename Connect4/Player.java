@@ -7,9 +7,9 @@
  */
 public class Player
 {
-    String name;
-    int piece;          // 1 = player one, 2 = player two
-    boolean isAI;
+    private String name;
+    private int piece;          // 1 = player one, 2 = player two
+    private boolean isAI;
 
     /** Creates a human player. */
     public Player (String name, int piece)
@@ -25,5 +25,23 @@ public class Player
         this.name  = name;
         this.piece = piece;
         this.isAI  = isAI;
+    }
+
+    /** Returns the player's display name. */
+    public String getName ()
+    {
+        return name;
+    }
+
+    /** Returns the player's piece number (1 or 2). */
+    public int getPiece ()
+    {
+        return piece;
+    }
+
+    /** Returns true if this player is an AI. */
+    public boolean isAI ()
+    {
+        return isAI;
     }
 }

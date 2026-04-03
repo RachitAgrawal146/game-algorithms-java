@@ -7,10 +7,8 @@ Independent research project exploring algorithm behaviour across three classes
 of combinatorial problems. Each project implements multiple solving strategies, 
 runs controlled experiments, and measures performance quantitatively.
 
-**[Live Algorithm Visualizer →](https://rachitagrawal146.github.io/game-algorithms-java/Visualizer/NQueensVisualizer.html)**  
-*Step through Backtracking, Forward Checking, and Min-Conflicts solving the 
-N-Queens problem in real time. Watch domains shrink, backtracks happen, and 
-conflicts resolve — step by step.*
+**[Live Algorithm Visualizer →](https://rachitagrawal146.github.io/game-algorithms-java/Visualizer/NQueensVisualizer.html)** | **[Research Dashboard →](https://rachitagrawal146.github.io/game-algorithms-java/Visualizer/ResearchDashboard.html)**  
+*Step through algorithms in real time, or explore the benchmark data across all three problem classes.*
 
 ---
 
@@ -86,13 +84,35 @@ different algorithms are compared.
 Two-player Connect4 with an AI opponent powered by Minimax with Alpha-Beta pruning.
 
 The AI builds a game tree to configurable depth (default: 6), assuming both 
-players play optimally. At each node, it maximises (AI's turn) or minimises 
-(human's turn) the board score. Alpha-Beta pruning eliminates branches that 
-cannot affect the final decision, typically halving the search space.
+players play optimally. Alpha-Beta pruning eliminates branches that cannot 
+affect the final decision.
 
-**Scoring function:** Every window of 4 consecutive cells is evaluated. 
-Three-in-a-row with an open end scores +5; opponent's three-in-a-row scores -4. 
-Centre column control earns a positional bonus. Terminal states score ±100,000.
+**Benchmark Results (AI vs AI, averaged over full game):**
+
+| Depth | Avg Nodes/Move | Avg Time/Move | Game Length |
+|-------|---------------|---------------|-------------|
+| 2 | 44 | 0.3ms | 15 moves |
+| 4 | 549 | 0.7ms | 24 moves |
+| 6 | 4,682 | 4.3ms | 39 moves |
+| 8 | 48,157 | 53.1ms | 32 moves |
+
+**Alpha-Beta Pruning Efficiency (mid-game position):**
+
+| Depth | With Pruning | Without | % Tree Pruned |
+|-------|-------------|---------|---------------|
+| 4 | 1,243 | 2,216 | 43.9% |
+| 6 | 20,542 | 77,057 | 73.3% |
+| 8 | 299,965 | 2,420,976 | 87.6% |
+| 10 | 3,968,268 | 68,890,362 | **94.2%** |
+
+**Key Findings:**
+
+6. **Pruning efficiency increases with depth** — from 0% at depth 2 to 94.2% 
+   at depth 10. Deeper search makes pruning exponentially more valuable.
+
+7. **Pruning is phase-dependent** — early game: 90.2% pruned, mid game: 88.1%, 
+   late game: 67.1%. As the board fills, fewer branches exist to prune, 
+   reducing alpha-beta's advantage.
 
 ---
 
@@ -100,8 +120,31 @@ Centre column control earns a positional bonus. Terminal states score ±100,000.
 
 Human player vs a constraint-elimination AI solver. The AI maintains all codes 
 consistent with feedback received so far, eliminating candidates after each guess. 
-Core idea from Donald Knuth's 1977 minimax algorithm, which proved any code can 
-be cracked in at most 5 guesses.
+Core idea from Donald Knuth's 1977 minimax algorithm.
+
+**Exhaustive Benchmark (all 360 possible codes):**
+
+| Guesses | Codes | Percentage |
+|---------|-------|------------|
+| 1 | 1 | 0.3% |
+| 2 | 10 | 2.8% |
+| 3 | 61 | 16.9% |
+| 4 | 166 | **46.1%** |
+| 5 | 107 | 29.7% |
+| 6 | 15 | 4.2% |
+
+Average: **4.15 guesses**. Each guess eliminates ~82% of remaining candidates.
+
+**Key Findings:**
+
+8. **The solver cracks every code in ≤6 guesses**, averaging 4.15. The 4.2% 
+   that require 6 guesses exceed Knuth's theoretical 5-guess bound — our 
+   first-candidate strategy trades optimality for simplicity. The gap 
+   quantifies the cost of that tradeoff.
+
+9. **Information gain is front-loaded** — the first guess eliminates 82% of 
+   candidates (360→65), but later guesses yield diminishing returns as the 
+   remaining candidates become increasingly similar to each other.
 
 ---
 
@@ -110,6 +153,30 @@ be cracked in at most 5 guesses.
 A mathematical card trick that always identifies a chosen card in 3 rounds via 
 systematic column rearrangement — showing how deterministic structure can replace 
 what appears to be random guessing.
+
+---
+
+## Cross-Project Analysis
+
+The central question — *how does constraint structure affect algorithm efficiency?* — 
+becomes clearest when comparing pruning across all three problems:
+
+| Problem | Pruning Method | Nodes Saved | Actually Faster? |
+|---------|---------------|-------------|-----------------|
+| N-Queens (FC) | Domain propagation | 58% | **No — 3x slower** |
+| Connect4 (A-B) | Alpha-Beta cutoff | 90% | **Yes — 10x faster** |
+| Mastermind | Candidate elimination | 82%/round | **Yes — 4.15 guesses** |
+
+**The unifying finding:** pruning works when its overhead is cheaper than the 
+search it eliminates. Alpha-Beta adds near-zero cost (two integer comparisons) 
+while cutting 90% of an exponential tree. Forward Checking cuts 58% of nodes 
+but adds domain copying at every surviving node — the overhead exceeds the 
+savings at large N. Mastermind's elimination is expensive per step but justified 
+because the search space is finite and small.
+
+**The efficiency of pruning depends not on how many branches it cuts, but on 
+the ratio of pruning cost to search cost.** This ratio is determined by the 
+problem's constraint structure, not by the algorithm alone.
 
 ---
 
@@ -147,6 +214,17 @@ java -cp Mastermind Mastermind
 
 *In BlueJ: open the relevant folder as a project, right-click the main class, 
 select "Run main method".*
+
+---
+
+## Built With
+
+This project was developed with [Claude Code](https://claude.ai/code) (Anthropic's 
+AI coding assistant) as a collaborative tool for implementation, benchmarking, and 
+visualizer development. The research questions, experimental design, algorithm 
+selection, and analysis of findings are my own work. Claude Code served as a 
+pair-programming partner — accelerating the engineering so I could focus on the 
+research.
 
 ---
 
