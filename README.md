@@ -3,12 +3,19 @@
 Independent research project exploring how algorithm choice affects
 performance across three classes of combinatorial problems.
 
-## Live Demo
+## Live Demos
 
 **[N-Queens Algorithm Visualizer →](https://rachitagrawal146.github.io/game-algorithms-java/Visualizer/NQueensVisualizer.html)**
+Step through Backtracking, Forward Checking, and Min-Conflicts solving the same board in real time.
 
-Step through Backtracking, Forward Checking, and Min-Conflicts
-solving the same board in real time.
+**[Connect4 Minimax AI →](https://rachitagrawal146.github.io/game-algorithms-java/Visualizer/Connect4Visualizer.html)**
+Play against the AI and watch it search the game tree with Alpha-Beta pruning.
+
+**[Mastermind Constraint Solver →](https://rachitagrawal146.github.io/game-algorithms-java/Visualizer/MastermindVisualizer.html)**
+Crack the code yourself or watch the AI eliminate candidates in real time.
+
+**[21-Card Trick →](https://rachitagrawal146.github.io/game-algorithms-java/Visualizer/CardTrickVisualizer.html)**
+Pick a card and watch the deterministic algorithm find it in exactly 3 rounds.
 
 ## Research Question
 
