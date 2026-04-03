@@ -1,4 +1,4 @@
-public class NQueensBenchmarkLarge {
+public class NQueensLargeBenchmark {
 
     public static void main(String[] args) {
 
