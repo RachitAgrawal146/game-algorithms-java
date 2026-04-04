@@ -4,6 +4,13 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Rachit Agrawal</title>
+<meta name="description" content="I build systems, perform on stage, and try to make the complex feel human. CS researcher, theatre actor, builder." />
+<meta property="og:title" content="Rachit Agrawal" />
+<meta property="og:description" content="I build systems, perform on stage, and try to make the complex feel human. From Ranchi, shaped by silence, working on things that matter." />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="Rachit Agrawal" />
+<meta name="twitter:description" content="CS researcher, theatre actor, builder. Shaped by silence, working on things that matter." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -270,11 +277,19 @@ tailwind.config = {
         I build systems, perform on stage, and try to make the complex feel human. From Ranchi, shaped by silence, working on things that matter.
       </p>
 
-      <div class="flex flex-wrap gap-3">
+      <div class="flex flex-wrap gap-3 mb-12">
         <span class="tag">CS Researcher</span>
         <span class="tag">Theatre Actor</span>
         <span class="tag">Builder</span>
         <span class="tag">Sahyadri School KFI</span>
+      </div>
+
+      <!-- Portrait — RACHIT: replace src with your photo -->
+      <div class="w-full max-w-[280px]">
+        <div class="aspect-[3/4] bg-surface2 border border-border flex items-center justify-center overflow-hidden">
+          <!-- Replace this div with: <img src="your-photo.webp" alt="Rachit Agrawal" class="w-full h-full object-cover" /> -->
+          <span class="font-mono text-[9px] uppercase tracking-[0.2em] text-text-dim text-center px-4">Photo<br/>needed</span>
+        </div>
       </div>
     </div>
   </section>
@@ -308,21 +323,19 @@ tailwind.config = {
 
   <hr class="section-divider" />
 
-  <!-- Academics highlight — woven into the narrative -->
+  <!-- Credentials — understated, woven into narrative flow -->
   <section class="py-24 md:py-32">
     <div class="reveal">
-      <div class="flex flex-col md:flex-row gap-8 md:gap-16">
-        <div class="flex-1">
-          <p class="font-mono text-[9px] uppercase tracking-[0.2em] text-text-dim mb-3">ICSE Board &middot; 2024</p>
-          <p class="font-display text-6xl text-text-primary" style="font-weight: 300;">99<span class="text-2xl text-gold">%</span></p>
-          <p class="text-text-dim text-xs mt-2">Physics 100 &middot; Biology 100 &middot; Maths 99 &middot; CS 99</p>
-        </div>
-        <div class="flex-1">
-          <p class="font-mono text-[9px] uppercase tracking-[0.2em] text-text-dim mb-3">Current &middot; Grade 11</p>
-          <p class="text-text-muted text-sm" style="font-weight: 300;">Sahyadri School (KFI), Pune</p>
-          <p class="text-text-muted text-sm mt-1" style="font-weight: 300;">AP Calculus BC &middot; AP Physics C &middot; AP CS A</p>
-          <p class="text-text-dim text-xs mt-3">Ashoka Young Scholars Programme &middot; 2025</p>
-        </div>
+      <p class="text-text-muted" style="font-weight: 300;">
+        Currently in Grade 11 at Sahyadri, taking AP Calculus BC, AP Physics C: Mechanics, and AP Computer Science A. Scored 99% on the ICSE board in 2024, with centums in Physics and Biology. Selected for Ashoka University&rsquo;s Young Scholars Programme (2025) &mdash; a competitive residential programme in the Tech, Data &amp; Computer Science track.
+      </p>
+
+      <!-- Ashoka expanded -->
+      <div class="mt-8 pl-6 border-l border-teal/20">
+        <p class="font-mono text-[9px] uppercase tracking-[0.2em] text-teal mb-4">Ashoka Young Scholars &middot; April&ndash;May 2025</p>
+        <p class="text-text-muted text-sm" style="font-weight: 300;">
+          Ten days in Gurgaon. Hands-on projects in MakerSpace Labs &mdash; AI, automation, IoT, 3D modelling. Faculty seminars on AI &amp; society, digital privacy, data-driven decision-making. Met Prof. Sudheendra Hangal (Stanford CS), who recommended <em class="text-text-primary not-italic">Thinking Fast and Slow</em> and <em class="text-text-primary not-italic">How to Solve It</em> &mdash; two books that reframed how I think about problem-solving.
+        </p>
       </div>
     </div>
   </section>
@@ -348,9 +361,7 @@ tailwind.config = {
           Trust is the most fragile infrastructure in any system. This research gives it mathematics. Using Kuhn Poker as a formal environment, I studied how trust emerges and collapses when eight different types of agents &mdash; from pure cooperators to chronic bluffers &mdash; interact across repeated games. The question underneath it: what does it actually take to build a reputation when you can&rsquo;t verify who you&rsquo;re playing against?
         </p>
 
-        <a href="#" class="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-gold hover:text-text-primary transition-colors duration-300">
-          Read Paper <span class="text-sm">&rarr;</span>
-        </a>
+        <span class="font-mono text-[10px] uppercase tracking-[0.2em] text-text-dim">Paper forthcoming</span>
       </div>
 
       <p class="text-text-muted text-sm" style="font-weight: 300;">
@@ -391,16 +402,17 @@ tailwind.config = {
         </div>
         <h3 class="font-display text-2xl text-text-primary mb-3" style="font-weight: 400;">Game Algorithm Repository</h3>
         <p class="text-text-muted text-sm" style="font-weight: 300;">
-          A collection of algorithms for adversarial game-playing, search, and strategic decision-making. Games are the cleanest environment for studying how intelligence actually works &mdash; they make explicit what real systems often obscure.
+          Implementations of minimax with alpha-beta pruning (Connect 4), constraint satisfaction solvers (N-Queens, Mastermind), and adversarial search strategies &mdash; each with interactive HTML visualisers and empirical benchmarks. Games are the cleanest environment for studying how intelligence actually works. The most interesting finding: how dramatically pruning depth affects decision quality under time constraints.
         </p>
       </div>
 
       <!-- Sage -->
-      <div class="project-card">
+      <div class="project-card" style="border-bottom: none;">
         <div class="flex flex-wrap gap-2 mb-4">
           <span class="tag">Android</span>
           <span class="tag">Accessibility</span>
           <span class="tag">UX</span>
+          <span class="tag" style="border-color: rgba(201,169,110,0.3); color: #c9a96e;">Concept</span>
         </div>
         <h3 class="font-display text-2xl text-text-primary mb-3" style="font-weight: 400;">Sage &mdash; Senior Smartphone App</h3>
         <p class="text-text-muted text-sm" style="font-weight: 300;">
@@ -408,17 +420,7 @@ tailwind.config = {
         </p>
       </div>
 
-      <!-- Almabase -->
-      <div class="project-card" style="border-bottom: none;">
-        <div class="flex flex-wrap gap-2 mb-4">
-          <span class="tag">Community</span>
-          <span class="tag">Platform Design</span>
-        </div>
-        <h3 class="font-display text-2xl text-text-primary mb-3" style="font-weight: 400;">Almabase Alumni Platform</h3>
-        <p class="text-text-muted text-sm" style="font-weight: 300;">
-          Led the initiative to build a digital platform connecting Sahyadri alumni with the current school community. Facilitating mentorship and institutional memory across generations.
-        </p>
-      </div>
+      <!-- Sage is last project card -->
     </div>
   </section>
 
@@ -490,9 +492,53 @@ tailwind.config = {
         <p class="text-text-muted text-sm mb-4" style="font-weight: 300;">
           A father watches his son turn into a tree. He grieves. The tree produces gold. The family gets rich. They expand their house. The building plans conflict with the tree. They cut it down. Only the granddaughter is human enough to realise what they&rsquo;ve done.
         </p>
-        <p class="text-text-muted text-sm italic" style="font-weight: 300;">
+        <p class="text-text-muted text-sm italic mb-8" style="font-weight: 300;">
           Half the audience was in tears. The question they went home with: does greed get in the way of human connection?
         </p>
+
+        <!-- Vriksha video embed -->
+        <div class="aspect-video w-full max-w-[560px]">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/GBrrRnUvKd4"
+            title="Vriksha — Full Performance"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+            loading="lazy"
+            class="w-full h-full border border-border"
+          ></iframe>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- =============================== -->
+  <!-- LEADERSHIP — woven between theatre and beyond -->
+  <!-- =============================== -->
+  <section class="py-24 md:py-32">
+    <div class="reveal">
+      <div class="section-label">04b &mdash; School Life</div>
+
+      <div class="space-y-6">
+        <div class="flex gap-4 items-baseline">
+          <span class="font-mono text-[9px] uppercase tracking-[0.2em] text-text-dim w-20 shrink-0">Editorial</span>
+          <p class="text-text-muted text-sm" style="font-weight: 300;">
+            Lead Editor of <em class="text-text-primary not-italic">Tiwai Tales</em> (school newsletter) and <em class="text-text-primary not-italic">Ninad &rsquo;26</em> (annual magazine). Oversaw content, coordinated student editorial teams, managed design and publication.
+          </p>
+        </div>
+        <div class="flex gap-4 items-baseline">
+          <span class="font-mono text-[9px] uppercase tracking-[0.2em] text-text-dim w-20 shrink-0">Stage</span>
+          <p class="text-text-muted text-sm" style="font-weight: 300;">
+            Emcee for Farewell &rsquo;24. Interviewed <em class="text-text-primary not-italic">Master Manjunath</em> &mdash; known for his role as Swami in <em>Malgudi Days</em> &mdash; on stage before the entire school. A conversation about craft, memory, and what it means to inhabit a character for decades.
+          </p>
+        </div>
+        <div class="flex gap-4 items-baseline">
+          <span class="font-mono text-[9px] uppercase tracking-[0.2em] text-text-dim w-20 shrink-0">Community</span>
+          <p class="text-text-muted text-sm" style="font-weight: 300;">
+            Anchor of the Almabase Committee &mdash; led the initiative to build a digital platform connecting Sahyadri alumni with current students.
+          </p>
+        </div>
       </div>
     </div>
   </section>
@@ -525,7 +571,6 @@ tailwind.config = {
               <p class="font-mono text-[10px] text-text-dim">April 2023</p>
             </div>
           </div>
-          <p class="text-text-dim text-xs mt-4 italic">These are serious high-altitude expeditions, not weekend hikes.</p>
         </div>
 
         <!-- Community -->
@@ -663,7 +708,7 @@ tailwind.config = {
 <footer class="border-t border-border mt-8">
   <div class="max-w-content mx-auto px-6 py-12 flex flex-col md:flex-row justify-between items-center gap-4">
     <p class="font-display italic text-sm text-text-primary">Rachit Agrawal</p>
-    <p class="font-mono text-[9px] uppercase tracking-[0.2em] text-text-dim">&copy; 2024 &middot; All rights reserved</p>
+    <p class="font-mono text-[9px] uppercase tracking-[0.2em] text-text-dim">&copy; 2025 &middot; All rights reserved</p>
   </div>
 </footer>
 
