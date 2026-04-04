@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Rachit Agrawal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        bg: "#0c0c0b",
+        surface: "#141413",
+        surface2: "#1c1c1a",
+        border: "rgba(255,255,255,0.07)",
+        "border-active": "rgba(255,255,255,0.12)",
+        "text-primary": "#e8e6df",
+        "text-muted": "#8a887f",
+        "text-dim": "#4a4844",
+        gold: "#c9a96e",
+        teal: "#7ab0a8",
+      },
+      fontFamily: {
+        display: ["Cormorant Garamond", "serif"],
+        mono: ["DM Mono", "monospace"],
+        body: ["Inter", "sans-serif"],
+      },
+      maxWidth: {
+        content: "760px",
+      },
+    },
+  },
+};
+</script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background-color: #0c0c0b;
+    color: #e8e6df;
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Noise texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 256px 256px;
+  }
+
+  /* Section label with extending line */
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: #c9a96e;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 0.5px;
+    background: rgba(255,255,255,0.07);
+  }
+
+  /* Section divider */
+  .section-divider {
+    border: none;
+    border-top: 0.5px solid rgba(255,255,255,0.07);
+  }
+
+  /* Scroll reveal */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+    html { scroll-behavior: auto; }
+  }
+
+  /* Nav */
+  .nav-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(12, 12, 11, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 0.5px solid rgba(255,255,255,0.05);
+    transition: transform 0.4s ease;
+  }
+  .nav-bar.hidden { transform: translateY(-100%); }
+
+  /* Links */
+  a { color: inherit; text-decoration: none; }
+
+  /* Selection */
+  ::selection { background: rgba(201, 169, 110, 0.3); color: #e8e6df; }
+
+  /* Tag pill */
+  .tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    padding: 0.35rem 0.75rem;
+    border: 0.5px solid rgba(255,255,255,0.1);
+    color: #8a887f;
+    display: inline-block;
+  }
+
+  /* Project card */
+  .project-card {
+    padding: 2.5rem 0;
+    border-bottom: 0.5px solid rgba(255,255,255,0.07);
+    transition: background 0.4s ease;
+  }
+  .project-card:hover {
+    background: rgba(255,255,255,0.015);
+  }
+
+  /* Theatre table */
+  .theatre-table { width: 100%; border-collapse: collapse; }
+  .theatre-table th {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: #4a4844;
+    text-align: left;
+    padding: 0.75rem 0;
+    border-bottom: 0.5px solid rgba(255,255,255,0.07);
+  }
+  .theatre-table td {
+    padding: 1rem 0;
+    border-bottom: 0.5px solid rgba(255,255,255,0.04);
+    vertical-align: top;
+  }
+  .theatre-table tr:hover td { color: #c9a96e; }
+
+  /* Currently section */
+  .currently-box {
+    border: 0.5px dashed rgba(201, 169, 110, 0.3);
+    padding: 2.5rem;
+    position: relative;
+  }
+  .currently-box::before {
+    content: 'pinned';
+    position: absolute;
+    top: -8px;
+    left: 1.5rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: #c9a96e;
+    background: #0c0c0b;
+    padding: 0 0.5rem;
+  }
+
+  /* Writing piece */
+  .writing-piece {
+    padding: 1.5rem 0;
+    border-bottom: 0.5px solid rgba(255,255,255,0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 2rem;
+  }
+
+  /* Mobile nav */
+  .mobile-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(12, 12, 11, 0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 0.5px solid rgba(255,255,255,0.07);
+    padding: 0.75rem 0;
+    display: none;
+  }
+  @media (max-width: 768px) {
+    .mobile-nav { display: flex; justify-content: space-around; }
+    .desktop-nav { display: none; }
+    .nav-name { font-size: 1.125rem; }
+  }
+  .mobile-nav a {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #8a887f;
+    padding: 0.5rem;
+    transition: color 0.3s;
+  }
+  .mobile-nav a:hover, .mobile-nav a.active { color: #c9a96e; }
+</style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="nav-bar" id="navbar">
+  <div class="max-w-content mx-auto px-6 py-5 flex justify-between items-center">
+    <a href="#" class="nav-name font-display italic text-xl text-text-primary tracking-tight">Rachit Agrawal</a>
+    <div class="desktop-nav flex items-center gap-10">
+      <a href="#research" class="font-mono text-[10px] uppercase tracking-[0.2em] text-text-muted hover:text-gold transition-colors duration-300">Research</a>
+      <a href="#projects" class="font-mono text-[10px] uppercase tracking-[0.2em] text-text-muted hover:text-gold transition-colors duration-300">Projects</a>
+      <a href="#theatre" class="font-mono text-[10px] uppercase tracking-[0.2em] text-text-muted hover:text-gold transition-colors duration-300">Theatre</a>
+      <a href="#writing" class="font-mono text-[10px] uppercase tracking-[0.2em] text-text-muted hover:text-gold transition-colors duration-300">Writing</a>
+      <a href="#contact" class="font-mono text-[10px] uppercase tracking-[0.2em] text-text-muted hover:text-gold transition-colors duration-300">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile bottom nav -->
+<div class="mobile-nav" id="mobilenav">
+  <a href="#research">Research</a>
+  <a href="#projects">Projects</a>
+  <a href="#theatre">Theatre</a>
+  <a href="#writing">Writing</a>
+  <a href="#contact">Contact</a>
+</div>
+
+<main class="max-w-content mx-auto px-6">
+
+  <!-- =============================== -->
+  <!-- HERO -->
+  <!-- =============================== -->
+  <section class="min-h-screen flex flex-col justify-center pt-24 pb-16">
+    <div class="reveal">
+      <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-gold mb-8">Ranchi &rarr; Sahyadri &rarr; The World</p>
+
+      <h1 class="font-display italic text-[clamp(2.8rem,8vw,5.5rem)] leading-[1.05] tracking-tight text-text-primary mb-10" style="font-weight: 300;">
+        I grew up learning to sit with things I didn&rsquo;t understand yet. I still do.
+      </h1>
+
+      <p class="text-lg text-text-muted leading-relaxed max-w-[600px] mb-10" style="font-weight: 300;">
+        I build systems, perform on stage, and try to make the complex feel human. From Ranchi, shaped by silence, working on things that matter.
+      </p>
+
+      <div class="flex flex-wrap gap-3">
+        <span class="tag">CS Researcher</span>
+        <span class="tag">Theatre Actor</span>
+        <span class="tag">Builder</span>
+        <span class="tag">Sahyadri School KFI</span>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- =============================== -->
+  <!-- 01 — ORIGIN -->
+  <!-- =============================== -->
+  <section class="py-24 md:py-32" id="origin">
+    <div class="reveal">
+      <div class="section-label">01 &mdash; Origin</div>
+
+      <blockquote class="font-display italic text-[clamp(1.8rem,4vw,2.8rem)] leading-[1.2] text-text-primary mb-12" style="font-weight: 300;">
+        &ldquo;Most people learn in straight lines. I learned under trees.&rdquo;
+      </blockquote>
+
+      <div class="space-y-6 text-text-muted" style="font-weight: 300;">
+        <p>
+          I grew up in Ranchi, where the best school in the city had no interest in what its students actually thought. At nine years old, without fear, I left for Sahyadri School (KFI) in Pune &mdash; built on the philosophy of Jiddu Krishnamurti, where learning is not a narrow road and growth is not only academic.
+        </p>
+        <p>
+          Every day in the second term, the whole school assembles on a hill at sunset. We sit on rocks and stay completely quiet for twenty minutes. The objective isn&rsquo;t to think or reflect &mdash; just to observe. This is called <em class="text-gold not-italic">Astachal</em>. It is the most important thing I&rsquo;ve ever been taught, and it wasn&rsquo;t taught to me. It was just made possible.
+        </p>
+        <p>
+          When I go back to Ranchi for holidays, I feel the noise of the outside world like a physical thing &mdash; people not present in their own lives, constantly rushing toward something without quite knowing what. Sahyadri made me allergic to shallowness. Not because I&rsquo;m better than the world outside. Because I&rsquo;ve tasted what slowness feels like.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Academics highlight — woven into the narrative -->
+  <section class="py-24 md:py-32">
+    <div class="reveal">
+      <div class="flex flex-col md:flex-row gap-8 md:gap-16">
+        <div class="flex-1">
+          <p class="font-mono text-[9px] uppercase tracking-[0.2em] text-text-dim mb-3">ICSE Board &middot; 2024</p>
+          <p class="font-display text-6xl text-text-primary" style="font-weight: 300;">99<span class="text-2xl text-gold">%</span></p>
+          <p class="text-text-dim text-xs mt-2">Physics 100 &middot; Biology 100 &middot; Maths 99 &middot; CS 99</p>
+        </div>
+        <div class="flex-1">
+          <p class="font-mono text-[9px] uppercase tracking-[0.2em] text-text-dim mb-3">Current &middot; Grade 11</p>
+          <p class="text-text-muted text-sm" style="font-weight: 300;">Sahyadri School (KFI), Pune</p>
+          <p class="text-text-muted text-sm mt-1" style="font-weight: 300;">AP Calculus BC &middot; AP Physics C &middot; AP CS A</p>
+          <p class="text-text-dim text-xs mt-3">Ashoka Young Scholars Programme &middot; 2025</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- =============================== -->
+  <!-- 02 — RESEARCH -->
+  <!-- =============================== -->
+  <section class="py-24 md:py-32" id="research">
+    <div class="reveal">
+      <div class="section-label">02 &mdash; Research</div>
+
+      <!-- Paper card -->
+      <div class="bg-surface p-8 md:p-10 border border-border mb-10">
+        <p class="font-mono text-[9px] uppercase tracking-[0.2em] text-gold mb-6">Published Research &middot; Polygence &middot; 2024&ndash;25</p>
+
+        <h2 class="font-display italic text-2xl md:text-3xl leading-snug text-text-primary mb-8" style="font-weight: 400;">
+          From Game-Theoretic Poker to the Collapse of Trust: Modelling Strategic Behaviour in Multi-Agent Systems
+        </h2>
+
+        <p class="text-text-muted mb-8" style="font-weight: 300;">
+          Trust is the most fragile infrastructure in any system. This research gives it mathematics. Using Kuhn Poker as a formal environment, I studied how trust emerges and collapses when eight different types of agents &mdash; from pure cooperators to chronic bluffers &mdash; interact across repeated games. The question underneath it: what does it actually take to build a reputation when you can&rsquo;t verify who you&rsquo;re playing against?
+        </p>
+
+        <a href="#" class="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-gold hover:text-text-primary transition-colors duration-300">
+          Read Paper <span class="text-sm">&rarr;</span>
+        </a>
+      </div>
+
+      <p class="text-text-muted text-sm" style="font-weight: 300;">
+        Research conducted through Polygence, mentored by domain experts. The ideas connect directly to live questions in AI safety and multi-agent systems &mdash; what happens when AI agents with different objectives interact repeatedly, and whether cooperation is ever stable.
+      </p>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- =============================== -->
+  <!-- 03 — PROJECTS -->
+  <!-- =============================== -->
+  <section class="py-24 md:py-32" id="projects">
+    <div class="reveal">
+      <div class="section-label">03 &mdash; Projects</div>
+
+      <!-- Lifeline -->
+      <div class="project-card">
+        <div class="flex flex-wrap gap-2 mb-4">
+          <span class="tag">Winner, Hilltop Entrepreneur</span>
+          <span class="tag">Flutter</span>
+          <span class="tag">Dart</span>
+          <span class="tag">2024</span>
+        </div>
+        <h3 class="font-display text-2xl text-text-primary mb-3" style="font-weight: 400;">Lifeline &mdash; Refugee Communication App</h3>
+        <p class="text-text-muted text-sm" style="font-weight: 300;">
+          An AI-equipped cross-platform application for people in conflict zones. Built around one question: what does a person actually need in the first hour after everything has been taken from them? Designed communication and resource-access tools for refugees in war-stricken zones. Won Sahyadri&rsquo;s school Shark Tank. Presented before the entire school assembly.
+        </p>
+      </div>
+
+      <!-- Game Algorithm Repo -->
+      <div class="project-card">
+        <div class="flex flex-wrap gap-2 mb-4">
+          <span class="tag">Python</span>
+          <span class="tag">Algorithms</span>
+          <span class="tag">AI</span>
+        </div>
+        <h3 class="font-display text-2xl text-text-primary mb-3" style="font-weight: 400;">Game Algorithm Repository</h3>
+        <p class="text-text-muted text-sm" style="font-weight: 300;">
+          A collection of algorithms for adversarial game-playing, search, and strategic decision-making. Games are the cleanest environment for studying how intelligence actually works &mdash; they make explicit what real systems often obscure.
+        </p>
+      </div>
+
+      <!-- Sage -->
+      <div class="project-card">
+        <div class="flex flex-wrap gap-2 mb-4">
+          <span class="tag">Android</span>
+          <span class="tag">Accessibility</span>
+          <span class="tag">UX</span>
+        </div>
+        <h3 class="font-display text-2xl text-text-primary mb-3" style="font-weight: 400;">Sage &mdash; Senior Smartphone App</h3>
+        <p class="text-text-muted text-sm" style="font-weight: 300;">
+          Instead of teaching older users to navigate smartphones, Sage uses Android&rsquo;s Accessibility Service API to operate the phone on their behalf. The core insight: technology should adapt to people, not the other way around.
+        </p>
+      </div>
+
+      <!-- Almabase -->
+      <div class="project-card" style="border-bottom: none;">
+        <div class="flex flex-wrap gap-2 mb-4">
+          <span class="tag">Community</span>
+          <span class="tag">Platform Design</span>
+        </div>
+        <h3 class="font-display text-2xl text-text-primary mb-3" style="font-weight: 400;">Almabase Alumni Platform</h3>
+        <p class="text-text-muted text-sm" style="font-weight: 300;">
+          Led the initiative to build a digital platform connecting Sahyadri alumni with the current school community. Facilitating mentorship and institutional memory across generations.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- =============================== -->
+  <!-- 04 — THEATRE -->
+  <!-- =============================== -->
+  <section class="py-24 md:py-32" id="theatre">
+    <div class="reveal">
+      <div class="section-label">04 &mdash; Theatre</div>
+
+      <p class="text-text-primary text-lg mb-8" style="font-weight: 300;">
+        This is not a hobby. Each play was chosen because it had something to say. The stage as a social tool &mdash; for ideas that wouldn&rsquo;t otherwise reach the people who needed to hear them.
+      </p>
+
+      <div class="bg-surface p-8 md:p-10 border border-border mb-12">
+        <p class="font-mono text-[9px] uppercase tracking-[0.2em] text-text-dim mb-5">The Origin</p>
+        <p class="text-text-muted" style="font-weight: 300;">
+          In 9th grade, I was cast as an old man &mdash; partly because my Hindi was strong enough. In one rehearsal, something clicked. I realised the character was exactly like someone I&rsquo;d spent years watching closely: wise and childish at the same time. I started crying in the middle of a sad scene. My teacher, who was directing, started crying too. That was the day I became the old man of the school.
+        </p>
+      </div>
+
+      <!-- Productions table -->
+      <table class="theatre-table">
+        <thead>
+          <tr>
+            <th>Play</th>
+            <th>Role</th>
+            <th>Genre</th>
+            <th class="text-right">Watch</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="font-display text-lg text-text-primary" style="font-weight: 400;">Vriksha</td>
+            <td class="text-sm text-text-muted">Lead: Pandya Ji</td>
+            <td class="text-sm text-text-muted">Dramatic Hindi</td>
+            <td class="text-right">
+              <a href="https://youtu.be/GBrrRnUvKd4?si=LMiIi-zYoKtlLzdv" target="_blank" rel="noopener noreferrer" class="font-mono text-[10px] uppercase tracking-[0.15em] text-gold hover:text-text-primary transition-colors">YouTube &nearr;</a>
+            </td>
+          </tr>
+          <tr>
+            <td class="font-display text-lg text-text-primary" style="font-weight: 400;">Anyaay</td>
+            <td class="text-sm text-text-muted">Lead: The Farmer</td>
+            <td class="text-sm text-text-muted">Tragic Hindi</td>
+            <td class="text-right"><span class="text-text-dim text-sm">&mdash;</span></td>
+          </tr>
+          <tr>
+            <td class="font-display text-lg text-text-primary" style="font-weight: 400;">Rehearsal</td>
+            <td class="text-sm text-text-muted">Bhojpuri Farmer</td>
+            <td class="text-sm text-text-muted">Comedy Hindi</td>
+            <td class="text-right"><span class="text-text-dim text-sm">&mdash;</span></td>
+          </tr>
+          <tr>
+            <td class="font-display text-lg text-text-primary" style="font-weight: 400;">Twelve Angry Jurors</td>
+            <td class="text-sm text-text-muted">Juror #9</td>
+            <td class="text-sm text-text-muted">Bilingual Thriller</td>
+            <td class="text-right">
+              <a href="https://youtu.be/AY7zaDn7RCo" target="_blank" rel="noopener noreferrer" class="font-mono text-[10px] uppercase tracking-[0.15em] text-gold hover:text-text-primary transition-colors">YouTube &nearr;</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Vriksha expanded -->
+      <div class="mt-12 pl-6 border-l border-gold/20">
+        <p class="font-mono text-[9px] uppercase tracking-[0.2em] text-gold mb-4">Vriksha &mdash; The Full Story</p>
+        <p class="text-text-muted text-sm mb-4" style="font-weight: 300;">
+          A father watches his son turn into a tree. He grieves. The tree produces gold. The family gets rich. They expand their house. The building plans conflict with the tree. They cut it down. Only the granddaughter is human enough to realise what they&rsquo;ve done.
+        </p>
+        <p class="text-text-muted text-sm italic" style="font-weight: 300;">
+          Half the audience was in tears. The question they went home with: does greed get in the way of human connection?
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- =============================== -->
+  <!-- 05 — BEYOND -->
+  <!-- =============================== -->
+  <section class="py-24 md:py-32" id="beyond">
+    <div class="reveal">
+      <div class="section-label">05 &mdash; Beyond the Screen</div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+
+        <!-- Treks -->
+        <div>
+          <p class="font-mono text-[10px] uppercase tracking-[0.2em] text-gold mb-6">Treks</p>
+          <div class="space-y-5">
+            <div>
+              <p class="text-text-primary text-sm" style="font-weight: 400;">Bali Pass, Uttarakhand</p>
+              <p class="font-mono text-[10px] text-text-dim">16,000 ft &middot; May 2024</p>
+            </div>
+            <div>
+              <p class="text-text-primary text-sm" style="font-weight: 400;">Pandav Patthar</p>
+              <p class="font-mono text-[10px] text-text-dim">12,500 ft &middot; May 2023</p>
+            </div>
+            <div>
+              <p class="text-text-primary text-sm" style="font-weight: 400;">Inme Tons, Uttarakhand</p>
+              <p class="font-mono text-[10px] text-text-dim">April 2023</p>
+            </div>
+          </div>
+          <p class="text-text-dim text-xs mt-4 italic">These are serious high-altitude expeditions, not weekend hikes.</p>
+        </div>
+
+        <!-- Community -->
+        <div>
+          <p class="font-mono text-[10px] uppercase tracking-[0.2em] text-gold mb-6">Community</p>
+          <div class="space-y-5">
+            <div>
+              <p class="text-text-primary text-sm" style="font-weight: 400;">Lok Biradari Prakalp, Hemalkasa</p>
+              <p class="text-text-dim text-xs">Volunteered at tribal school</p>
+            </div>
+            <div>
+              <p class="text-text-primary text-sm" style="font-weight: 400;">Anandvan Ashram</p>
+              <p class="text-text-dim text-xs">Taught visually impaired students</p>
+            </div>
+            <div>
+              <p class="text-text-primary text-sm" style="font-weight: 400;">UNESCO ESD Certification</p>
+            </div>
+            <div>
+              <p class="text-text-primary text-sm" style="font-weight: 400;">Hunnarshala Foundation, Bhuj</p>
+              <p class="text-text-dim text-xs">Sustainable earthen construction</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sports -->
+        <div>
+          <p class="font-mono text-[10px] uppercase tracking-[0.2em] text-gold mb-6">Sports</p>
+          <div class="space-y-5">
+            <div>
+              <p class="text-text-primary text-sm" style="font-weight: 400;">Handball Team Captain</p>
+            </div>
+            <div>
+              <p class="text-text-primary text-sm" style="font-weight: 400;">Basketball Camp Conductor</p>
+              <p class="text-text-dim text-xs">Mentored younger students</p>
+            </div>
+            <div>
+              <p class="text-text-primary text-sm" style="font-weight: 400;">Volleyball &amp; Athletics</p>
+              <p class="text-text-dim text-xs">School representation</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- =============================== -->
+  <!-- 06 — CURRENTLY -->
+  <!-- =============================== -->
+  <section class="py-24 md:py-32" id="currently">
+    <div class="reveal">
+      <div class="section-label">06 &mdash; Currently</div>
+
+      <div class="currently-box">
+        <p class="text-text-muted italic" style="font-weight: 300;">
+          <!-- WRITE THIS YOURSELF — what question are you currently turning over? -->
+          <span class="text-text-dim">[This space is waiting for Rachit. Write what question you&rsquo;re currently turning over &mdash; not polished, not academic, just honest thinking.]</span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- =============================== -->
+  <!-- 07 — WRITING -->
+  <!-- =============================== -->
+  <section class="py-24 md:py-32" id="writing">
+    <div class="reveal">
+      <div class="section-label">07 &mdash; Writing</div>
+
+      <div class="writing-piece">
+        <div>
+          <p class="text-text-primary mb-1" style="font-weight: 400;">I spent a year studying how trust breaks down. Here&rsquo;s what I found.</p>
+          <p class="text-text-dim text-xs">Plain-language version of the research paper</p>
+        </div>
+        <span class="font-mono text-[9px] uppercase tracking-[0.15em] text-text-dim whitespace-nowrap">Coming</span>
+      </div>
+
+      <div class="writing-piece">
+        <div>
+          <p class="text-text-primary mb-1" style="font-weight: 400;">A play I performed made half the audience cry. I&rsquo;m still thinking about why.</p>
+          <p class="text-text-dim text-xs">Vriksha, greed, and the question it leaves unanswered</p>
+        </div>
+        <span class="font-mono text-[9px] uppercase tracking-[0.15em] text-text-dim whitespace-nowrap">Coming</span>
+      </div>
+
+      <div class="writing-piece" style="border-bottom: none;">
+        <div>
+          <p class="text-text-primary mb-1" style="font-weight: 400;">What Sahyadri taught me that no school could.</p>
+          <p class="text-text-dim text-xs">Astachal, Krishnamurti, and attention as a practice</p>
+        </div>
+        <span class="font-mono text-[9px] uppercase tracking-[0.15em] text-text-dim whitespace-nowrap">Coming</span>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- =============================== -->
+  <!-- 08 — CONTACT -->
+  <!-- =============================== -->
+  <section class="py-24 md:py-32" id="contact">
+    <div class="reveal">
+      <div class="section-label">08 &mdash; Contact</div>
+
+      <h2 class="font-display italic text-[clamp(2.5rem,6vw,4rem)] leading-[1.1] text-text-primary mb-6" style="font-weight: 300;">
+        Let&rsquo;s talk.
+      </h2>
+
+      <p class="text-text-muted text-lg mb-12" style="font-weight: 300;">
+        I&rsquo;m always interested in research collaborations, interesting problems, and conversations that don&rsquo;t have easy answers.
+      </p>
+
+      <div class="space-y-4">
+        <a href="mailto:agrawalrachit146@gmail.com" class="flex items-center gap-3 text-gold hover:text-text-primary transition-colors duration-300 group">
+          <span class="font-mono text-[9px] uppercase tracking-[0.2em] text-text-dim w-12">Email</span>
+          <span class="text-sm" style="font-weight: 300;">agrawalrachit146@gmail.com</span>
+          <span class="text-xs opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
+        </a>
+        <a href="https://youtu.be/GBrrRnUvKd4?si=LMiIi-zYoKtlLzdv" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 text-text-muted hover:text-gold transition-colors duration-300 group">
+          <span class="font-mono text-[9px] uppercase tracking-[0.2em] text-text-dim w-12">Watch</span>
+          <span class="text-sm" style="font-weight: 300;">Vriksha &middot; Twelve Angry Jurors</span>
+          <span class="text-xs opacity-0 group-hover:opacity-100 transition-opacity">&nearr;</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Footer -->
+<footer class="border-t border-border mt-8">
+  <div class="max-w-content mx-auto px-6 py-12 flex flex-col md:flex-row justify-between items-center gap-4">
+    <p class="font-display italic text-sm text-text-primary">Rachit Agrawal</p>
+    <p class="font-mono text-[9px] uppercase tracking-[0.2em] text-text-dim">&copy; 2024 &middot; All rights reserved</p>
+  </div>
+</footer>
+
+<!-- Spacer for mobile nav -->
+<div class="h-16 md:hidden"></div>
+
+<!-- =============================== -->
+<!-- JAVASCRIPT -->
+<!-- =============================== -->
+<script>
+(function() {
+  'use strict';
+
+  // --- Nav hide/show on scroll ---
+  const navbar = document.getElementById('navbar');
+  let lastScroll = 0;
+  let ticking = false;
+
+  function updateNav() {
+    const currentScroll = window.scrollY;
+    if (currentScroll <= 80) {
+      navbar.classList.remove('hidden');
+    } else if (currentScroll > lastScroll && currentScroll > 200) {
+      navbar.classList.add('hidden');
+    } else if (currentScroll < lastScroll - 5) {
+      navbar.classList.remove('hidden');
+    }
+    lastScroll = currentScroll;
+    ticking = false;
+  }
+
+  window.addEventListener('scroll', function() {
+    if (!ticking) {
+      requestAnimationFrame(updateNav);
+      ticking = true;
+    }
+  }, { passive: true });
+
+  // --- Scroll reveal with IntersectionObserver ---
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (!prefersReducedMotion) {
+    const observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.1,
+      rootMargin: '0px 0px -60px 0px'
+    });
+
+    document.querySelectorAll('.reveal').forEach(function(el) {
+      observer.observe(el);
+    });
+  } else {
+    document.querySelectorAll('.reveal').forEach(function(el) {
+      el.classList.add('visible');
+    });
+  }
+
+  // --- Active nav link highlight ---
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.desktop-nav a, .mobile-nav a');
+
+  function setActiveLink() {
+    let current = '';
+    sections.forEach(function(section) {
+      const rect = section.getBoundingClientRect();
+      if (rect.top <= 200) {
+        current = section.getAttribute('id');
+      }
+    });
+    navLinks.forEach(function(link) {
+      link.style.color = '';
+      if (link.getAttribute('href') === '#' + current) {
+        link.style.color = '#c9a96e';
+      }
+    });
+  }
+
+  window.addEventListener('scroll', function() {
+    requestAnimationFrame(setActiveLink);
+  }, { passive: true });
+
+  // --- Smooth scroll for anchor links ---
+  document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
+    anchor.addEventListener('click', function(e) {
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
