@@ -307,24 +307,44 @@ tailwind.config = {
     position: fixed;
     top: 0;
     left: 0;
-    width: 600px;
-    height: 600px;
+    width: 280px;
+    height: 280px;
     pointer-events: none;
     z-index: 1;
-    transform: translate(-50%, -50%);
-    background: radial-gradient(circle, rgba(201,169,110,0.10) 0%, rgba(201,169,110,0.04) 25%, transparent 60%);
+    background: radial-gradient(circle, rgba(201,169,110,0.14) 0%, rgba(201,169,110,0.05) 30%, transparent 65%);
     border-radius: 50%;
-    filter: blur(40px);
+    filter: blur(28px);
     opacity: 0;
     transition: opacity 0.6s ease;
     will-change: transform;
   }
   .cursor-glow.cursor-glow-active { opacity: 1; }
+
+  /* Trail dots — small fading particles left behind cursor */
+  .cursor-trail {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(201,169,110,0.5) 0%, rgba(201,169,110,0) 70%);
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0;
+    animation: trailFade 0.9s ease-out forwards;
+    will-change: transform, opacity;
+  }
+  @keyframes trailFade {
+    0%   { opacity: 0.7; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 0;   transform: translate(-50%, -50%) scale(0.3); }
+  }
+
   @media (hover: none) {
-    .cursor-glow { display: none; }
+    .cursor-glow, .cursor-trail { display: none; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .cursor-glow { display: none; }
+    .cursor-glow, .cursor-trail { display: none; }
   }
   @keyframes glowDrift {
     0% { transform: translate(0, 0) scale(1); opacity: 0.6; }
@@ -959,10 +979,29 @@ tailwind.config = {
         </p>
 
         <!-- Vriksha video embed -->
-        <div class="aspect-video w-full max-w-[560px]">
+        <div class="aspect-video w-full max-w-[560px] mb-10">
           <iframe
             src="https://www.youtube-nocookie.com/embed/GBrrRnUvKd4"
             title="Vriksha — Full Performance"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+            loading="lazy"
+            class="w-full h-full border border-border"
+          ></iframe>
+        </div>
+      </div>
+
+      <!-- Twelve Angry Jurors expanded -->
+      <div class="mt-12 pl-6 border-l border-gold/20">
+        <p class="font-mono text-[9px] uppercase tracking-[0.2em] text-gold mb-4">Twelve Angry Jurors &mdash; Full Performance</p>
+        <p class="text-text-muted text-sm mb-8" style="font-weight: 300;">
+          A bilingual adaptation of Reginald Rose&rsquo;s courtroom drama. Twelve jurors deliberating a single boy&rsquo;s life &mdash; the only place in theatre where conviction and doubt are the entire stage. I played Juror #9: the old man who sees what nobody else is willing to see.
+        </p>
+
+        <div class="aspect-video w-full max-w-[560px]">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/AY7zaDn7RCo"
+            title="Twelve Angry Jurors — Full Performance"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowfullscreen
             loading="lazy"
@@ -1272,45 +1311,68 @@ tailwind.config = {
     }, { passive: true });
   }
 
-  // --- Portrait subtle parallax + cursor-following gold glow ---
+  // --- Portrait parallax + cursor glow + trailing particles ---
   const portraitWrap = document.getElementById('portraitWrap');
   const cursorGlow = document.getElementById('cursorGlow');
 
   if (!prefersReducedMotion) {
+    const GLOW_SIZE = 280;
     let glowX = window.innerWidth / 2;
     let glowY = window.innerHeight / 2;
     let targetX = glowX;
     let targetY = glowY;
     let glowActive = false;
+    let lastTrailTime = 0;
+    let lastTrailX = 0;
+    let lastTrailY = 0;
+
+    function spawnTrail(x, y) {
+      const dot = document.createElement('div');
+      dot.className = 'cursor-trail';
+      dot.style.transform = 'translate(' + (x - 4) + 'px, ' + (y - 4) + 'px)';
+      document.body.appendChild(dot);
+      // Cleanup after animation completes
+      setTimeout(function() { dot.remove(); }, 950);
+    }
 
     document.addEventListener('mousemove', function(e) {
       // Portrait parallax
       if (portraitWrap) {
-        const x = (e.clientX / window.innerWidth - 0.5) * 8;
-        const y = (e.clientY / window.innerHeight - 0.5) * 8;
-        portraitWrap.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+        const px = (e.clientX / window.innerWidth - 0.5) * 8;
+        const py = (e.clientY / window.innerHeight - 0.5) * 8;
+        portraitWrap.style.transform = 'translate(' + px + 'px, ' + py + 'px)';
       }
-      // Glow target follows cursor
+      // Glow target
       targetX = e.clientX;
       targetY = e.clientY;
       if (!glowActive && cursorGlow) {
         cursorGlow.classList.add('cursor-glow-active');
         glowActive = true;
       }
+      // Spawn trail particle (throttled by distance + time)
+      const now = performance.now();
+      const dx = e.clientX - lastTrailX;
+      const dy = e.clientY - lastTrailY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (now - lastTrailTime > 28 && dist > 12) {
+        spawnTrail(e.clientX, e.clientY);
+        lastTrailTime = now;
+        lastTrailX = e.clientX;
+        lastTrailY = e.clientY;
+      }
     });
 
-    // Glow position lerps toward target for smooth trailing
+    // Glow lerps toward target for smooth trailing
     function animateGlow() {
-      glowX += (targetX - glowX) * 0.12;
-      glowY += (targetY - glowY) * 0.12;
+      glowX += (targetX - glowX) * 0.15;
+      glowY += (targetY - glowY) * 0.15;
       if (cursorGlow) {
-        cursorGlow.style.transform = 'translate(' + (glowX - 300) + 'px, ' + (glowY - 300) + 'px)';
+        cursorGlow.style.transform = 'translate(' + (glowX - GLOW_SIZE / 2) + 'px, ' + (glowY - GLOW_SIZE / 2) + 'px)';
       }
       requestAnimationFrame(animateGlow);
     }
     if (cursorGlow) animateGlow();
 
-    // Hide on mouse leave window
     document.addEventListener('mouseleave', function() {
       if (cursorGlow) cursorGlow.classList.remove('cursor-glow-active');
       glowActive = false;
