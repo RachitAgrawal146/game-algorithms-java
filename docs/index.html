@@ -246,19 +246,35 @@ tailwind.config = {
     transition: none;
   }
 
-  /* ===== HERO AMBIENT GLOW ===== */
-  .hero-glow {
+  /* ===== HERO AMBIENT GOLD PARTICLES ===== */
+  .hero-particles {
     position: absolute;
-    top: 20%;
-    left: -10%;
-    width: 500px;
-    height: 500px;
-    background: radial-gradient(circle, rgba(201,169,110,0.06) 0%, transparent 70%);
-    border-radius: 50%;
+    inset: 0;
     pointer-events: none;
-    filter: blur(60px);
-    animation: glowDrift 8s ease-in-out infinite alternate;
+    overflow: hidden;
+    z-index: 0;
   }
+  .hero-particles canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  /* Subtle directional gold light from the upper-right (like Equinox reference) */
+  .hero-particles::before {
+    content: '';
+    position: absolute;
+    top: -10%;
+    right: -15%;
+    width: 65%;
+    height: 90%;
+    background: radial-gradient(ellipse at center,
+      rgba(201, 169, 110, 0.07) 0%,
+      rgba(201, 169, 110, 0.025) 35%,
+      transparent 65%);
+    filter: blur(50px);
+    pointer-events: none;
+  }
+  .hero-wrap, .hero-wrap > * { position: relative; z-index: 1; }
 
   /* ===== HERO TEXT-WRAP AROUND PORTRAIT ===== */
   .hero-wrap {
@@ -279,29 +295,6 @@ tailwind.config = {
     object-position: top;
     position: relative;
     z-index: 1;
-    /* Multi-layer warm glow that radiates outward in all directions */
-    filter:
-      drop-shadow(0 0 30px rgba(255, 220, 150, 0.18))
-      drop-shadow(0 0 60px rgba(201, 169, 110, 0.22))
-      drop-shadow(0 0 110px rgba(201, 169, 110, 0.18))
-      drop-shadow(0 0 180px rgba(201, 169, 110, 0.10));
-    animation: portraitBreath 6s ease-in-out infinite alternate;
-  }
-  @keyframes portraitBreath {
-    0%   {
-      filter:
-        drop-shadow(0 0 25px rgba(255, 220, 150, 0.14))
-        drop-shadow(0 0 55px rgba(201, 169, 110, 0.18))
-        drop-shadow(0 0 100px rgba(201, 169, 110, 0.14))
-        drop-shadow(0 0 170px rgba(201, 169, 110, 0.08));
-    }
-    100% {
-      filter:
-        drop-shadow(0 0 35px rgba(255, 220, 150, 0.22))
-        drop-shadow(0 0 70px rgba(201, 169, 110, 0.28))
-        drop-shadow(0 0 120px rgba(201, 169, 110, 0.22))
-        drop-shadow(0 0 200px rgba(201, 169, 110, 0.12));
-    }
   }
   .hero-headline {
     font-size: clamp(2.4rem, 5.8vw, 4.2rem);
@@ -464,7 +457,7 @@ tailwind.config = {
   /* ===== REDUCED MOTION ===== */
   @media (prefers-reduced-motion: reduce) {
     .scroll-progress { display: none; }
-    .hero-glow { animation: none; }
+    .hero-particles canvas { display: none; }
     .hero-load { opacity: 1; transform: none; animation: none; }
     .reveal-stagger > * { opacity: 1; transform: none; transition: none; }
     .thought-item { transition: none; }
@@ -507,7 +500,7 @@ tailwind.config = {
   <!-- HERO -->
   <!-- =============================== -->
   <section class="min-h-screen flex flex-col justify-center pt-24 pb-16 relative">
-    <div class="hero-glow"></div>
+    <div class="hero-particles"><canvas id="heroParticleCanvas"></canvas></div>
     <div class="reveal">
 
       <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-gold mb-8 hero-load">Ranchi &rarr; Sahyadri &rarr; The World</p>
@@ -1309,7 +1302,7 @@ tailwind.config = {
     }, { passive: true });
   }
 
-  // --- Portrait parallax + fluid golden splash cursor ---
+  // --- Portrait parallax + lighter golden splash cursor ---
   const portraitWrap = document.getElementById('portraitWrap');
   const splashCanvas = document.getElementById('splashCanvas');
 
@@ -1328,9 +1321,9 @@ tailwind.config = {
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    // Particle pool — fluid blobs that follow + dissipate
+    // Particle pool — gentle gold motes
     const particles = [];
-    const MAX_PARTICLES = 220;
+    const MAX_PARTICLES = 90;
     let mouseX = window.innerWidth / 2;
     let mouseY = window.innerHeight / 2;
     let prevX = mouseX;
@@ -1341,17 +1334,16 @@ tailwind.config = {
       for (let i = 0; i < count; i++) {
         if (particles.length >= MAX_PARTICLES) particles.shift();
         const angle = Math.random() * Math.PI * 2;
-        const speed = Math.random() * 0.6 + 0.2;
+        const speed = Math.random() * 0.4 + 0.15;
         particles.push({
-          x: x + (Math.random() - 0.5) * 6,
-          y: y + (Math.random() - 0.5) * 6,
-          vx: vx * 0.18 + Math.cos(angle) * speed,
-          vy: vy * 0.18 + Math.sin(angle) * speed,
-          radius: Math.random() * 18 + 14,
-          maxRadius: Math.random() * 30 + 28,
-          life: 0,
-          maxLife: Math.random() * 700 + 600,
-          born: performance.now()
+          x: x + (Math.random() - 0.5) * 4,
+          y: y + (Math.random() - 0.5) * 4,
+          vx: vx * 0.10 + Math.cos(angle) * speed,
+          vy: vy * 0.10 + Math.sin(angle) * speed,
+          radius: Math.random() * 8 + 6,
+          maxRadius: Math.random() * 14 + 12,
+          born: performance.now(),
+          maxLife: Math.random() * 500 + 450
         });
       }
     }
@@ -1367,15 +1359,13 @@ tailwind.config = {
         portraitWrap.style.transform = 'translate(' + px + 'px, ' + py + 'px)';
       }
 
-      // Velocity from delta
       const vx = mouseX - prevX;
       const vy = mouseY - prevY;
       const speed = Math.sqrt(vx * vx + vy * vy);
 
-      // Throttle spawn rate based on speed (more particles when moving fast)
       const now = performance.now();
-      if (now - lastSpawn > 12) {
-        const count = Math.min(4, Math.max(1, Math.floor(speed / 6)));
+      if (now - lastSpawn > 18) {
+        const count = Math.min(2, Math.max(1, Math.floor(speed / 14)));
         spawnParticles(mouseX, mouseY, vx, vy, count);
         lastSpawn = now;
       }
@@ -1384,33 +1374,27 @@ tailwind.config = {
       prevY = mouseY;
     });
 
-    // Continuously emit a small bright core at the cursor position
     function renderSplash() {
       const now = performance.now();
       ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
-      // Update + draw particles
       for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i];
         const age = (now - p.born) / p.maxLife;
         if (age >= 1) { particles.splice(i, 1); continue; }
 
-        // Physics: drift + slight outward expansion
         p.x += p.vx;
         p.y += p.vy;
-        p.vx *= 0.94;
-        p.vy *= 0.94;
-        // Radius eases from start to maxRadius then holds
-        const r = p.radius + (p.maxRadius - p.radius) * Math.min(1, age * 2.2);
+        p.vx *= 0.93;
+        p.vy *= 0.93;
+        const r = p.radius + (p.maxRadius - p.radius) * Math.min(1, age * 2);
 
-        // Alpha curve: rises fast, fades slow (gives "splash" look)
-        const alpha = Math.sin((1 - age) * Math.PI * 0.65) * 0.55;
+        // Lighter alpha curve
+        const alpha = Math.sin((1 - age) * Math.PI * 0.6) * 0.22;
 
-        // Radial gold gradient
         const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
         grad.addColorStop(0,    'rgba(255, 235, 180, ' + alpha + ')');
-        grad.addColorStop(0.25, 'rgba(255, 200, 120, ' + (alpha * 0.7) + ')');
-        grad.addColorStop(0.55, 'rgba(201, 169, 110, ' + (alpha * 0.35) + ')');
+        grad.addColorStop(0.4,  'rgba(201, 169, 110, ' + (alpha * 0.5) + ')');
         grad.addColorStop(1,    'rgba(201, 169, 110, 0)');
 
         ctx.fillStyle = grad;
@@ -1419,19 +1403,92 @@ tailwind.config = {
         ctx.fill();
       }
 
-      // Bright core at the actual cursor position
-      const coreGrad = ctx.createRadialGradient(mouseX, mouseY, 0, mouseX, mouseY, 14);
-      coreGrad.addColorStop(0,   'rgba(255, 245, 215, 0.9)');
-      coreGrad.addColorStop(0.4, 'rgba(255, 210, 130, 0.5)');
+      // Small soft core at cursor (much lighter)
+      const coreGrad = ctx.createRadialGradient(mouseX, mouseY, 0, mouseX, mouseY, 9);
+      coreGrad.addColorStop(0,   'rgba(255, 240, 200, 0.45)');
+      coreGrad.addColorStop(0.5, 'rgba(255, 210, 130, 0.18)');
       coreGrad.addColorStop(1,   'rgba(255, 210, 130, 0)');
       ctx.fillStyle = coreGrad;
       ctx.beginPath();
-      ctx.arc(mouseX, mouseY, 14, 0, Math.PI * 2);
+      ctx.arc(mouseX, mouseY, 9, 0, Math.PI * 2);
       ctx.fill();
 
       requestAnimationFrame(renderSplash);
     }
     renderSplash();
+  }
+
+  // --- Hero ambient gold particles (slow-drifting motes) ---
+  const heroCanvas = document.getElementById('heroParticleCanvas');
+  if (heroCanvas && !prefersReducedMotion) {
+    const hctx = heroCanvas.getContext('2d');
+    const heroSection = heroCanvas.parentElement.parentElement;
+    let hw = 0, hh = 0;
+    const dpr2 = Math.min(window.devicePixelRatio || 1, 2);
+
+    function sizeHero() {
+      const rect = heroSection.getBoundingClientRect();
+      hw = rect.width;
+      hh = rect.height;
+      heroCanvas.width = hw * dpr2;
+      heroCanvas.height = hh * dpr2;
+      heroCanvas.style.width = hw + 'px';
+      heroCanvas.style.height = hh + 'px';
+      hctx.setTransform(1, 0, 0, 1, 0, 0);
+      hctx.scale(dpr2, dpr2);
+    }
+
+    // Slow-drifting motes — like dust catching gold light
+    const motes = [];
+    function initMotes() {
+      motes.length = 0;
+      const count = Math.floor((hw * hh) / 22000); // density-scaled
+      for (let i = 0; i < count; i++) {
+        motes.push({
+          x: Math.random() * hw,
+          y: Math.random() * hh,
+          vx: (Math.random() - 0.5) * 0.15,
+          vy: (Math.random() - 0.3) * 0.12, // slight upward drift
+          r: Math.random() * 1.4 + 0.4,
+          alpha: Math.random() * 0.35 + 0.1,
+          flickerSpeed: Math.random() * 0.002 + 0.001,
+          flickerOffset: Math.random() * Math.PI * 2
+        });
+      }
+    }
+
+    sizeHero();
+    initMotes();
+    window.addEventListener('resize', function() { sizeHero(); initMotes(); });
+
+    function renderHero() {
+      hctx.clearRect(0, 0, hw, hh);
+      const t = performance.now();
+      for (let i = 0; i < motes.length; i++) {
+        const m = motes[i];
+        m.x += m.vx;
+        m.y += m.vy;
+        // Wrap edges
+        if (m.x < -10) m.x = hw + 10;
+        if (m.x > hw + 10) m.x = -10;
+        if (m.y < -10) m.y = hh + 10;
+        if (m.y > hh + 10) m.y = -10;
+
+        const flicker = (Math.sin(t * m.flickerSpeed + m.flickerOffset) + 1) * 0.5;
+        const a = m.alpha * (0.5 + flicker * 0.5);
+
+        const grad = hctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, m.r * 4);
+        grad.addColorStop(0,   'rgba(255, 220, 150, ' + a + ')');
+        grad.addColorStop(0.5, 'rgba(201, 169, 110, ' + (a * 0.4) + ')');
+        grad.addColorStop(1,   'rgba(201, 169, 110, 0)');
+        hctx.fillStyle = grad;
+        hctx.beginPath();
+        hctx.arc(m.x, m.y, m.r * 4, 0, Math.PI * 2);
+        hctx.fill();
+      }
+      requestAnimationFrame(renderHero);
+    }
+    renderHero();
   }
 
   // --- Stagger children observer ---
