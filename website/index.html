@@ -318,17 +318,18 @@ tailwind.config = {
     isolation: isolate;
   }
   /*
-    Source image is 1024x1476 (aspect 0.694, taller than square).
+    Source image is 1024x1536 (aspect 0.667, taller 2:3 portrait).
     With object-fit: cover in a square container, the image scales so width
-    matches container; height overflows by ~44%. object-position 50% 5% drops
-    just 5% of that overflow from the top — keeping the entire hair + face
-    visible inside the inscribed circle, with shoulders filling the bottom.
+    matches container; height overflows by ~50%. object-position 50% 0%
+    aligns the top of the image to the top of the container — keeping the
+    entire hair + face fully visible inside the inscribed circle.
+    Verified at 500/400/320px containers — hair top fits with 80+px chord margin.
   */
   .portrait-frame img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: 50% 5%;
+    object-position: 50% 0%;
     display: block;
     position: relative;
     z-index: 2;
@@ -839,7 +840,7 @@ tailwind.config = {
           <div class="portrait-frame">
             <div class="portrait-frame-glow"></div>
             <div class="portrait-frame-ring"></div>
-            <img src="images/portrait.png" alt="Rachit Agrawal" loading="eager" />
+            <img src="images/portrait-bw.png" alt="Rachit Agrawal" loading="eager" />
           </div>
         </div>
 
