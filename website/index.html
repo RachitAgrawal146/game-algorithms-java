@@ -271,30 +271,6 @@ tailwind.config = {
     shape-outside: ellipse(45% 50% at 50% 45%);
     shape-margin: 12px;
     position: relative;
-    isolation: isolate;
-  }
-  /* Golden backlight glow behind the portrait */
-  .portrait-float::before {
-    content: '';
-    position: absolute;
-    top: 8%;
-    left: 50%;
-    width: 130%;
-    height: 80%;
-    transform: translateX(-50%);
-    background: radial-gradient(ellipse at center,
-      rgba(255, 220, 150, 0.32) 0%,
-      rgba(201, 169, 110, 0.18) 25%,
-      rgba(201, 169, 110, 0.06) 50%,
-      transparent 75%);
-    filter: blur(40px);
-    z-index: -1;
-    pointer-events: none;
-    animation: portraitBreath 6s ease-in-out infinite alternate;
-  }
-  @keyframes portraitBreath {
-    0%   { opacity: 0.75; transform: translateX(-50%) scale(1); }
-    100% { opacity: 1;    transform: translateX(-50%) scale(1.08); }
   }
   .portrait-float img {
     width: 100%;
@@ -303,6 +279,29 @@ tailwind.config = {
     object-position: top;
     position: relative;
     z-index: 1;
+    /* Multi-layer warm glow that radiates outward in all directions */
+    filter:
+      drop-shadow(0 0 30px rgba(255, 220, 150, 0.18))
+      drop-shadow(0 0 60px rgba(201, 169, 110, 0.22))
+      drop-shadow(0 0 110px rgba(201, 169, 110, 0.18))
+      drop-shadow(0 0 180px rgba(201, 169, 110, 0.10));
+    animation: portraitBreath 6s ease-in-out infinite alternate;
+  }
+  @keyframes portraitBreath {
+    0%   {
+      filter:
+        drop-shadow(0 0 25px rgba(255, 220, 150, 0.14))
+        drop-shadow(0 0 55px rgba(201, 169, 110, 0.18))
+        drop-shadow(0 0 100px rgba(201, 169, 110, 0.14))
+        drop-shadow(0 0 170px rgba(201, 169, 110, 0.08));
+    }
+    100% {
+      filter:
+        drop-shadow(0 0 35px rgba(255, 220, 150, 0.22))
+        drop-shadow(0 0 70px rgba(201, 169, 110, 0.28))
+        drop-shadow(0 0 120px rgba(201, 169, 110, 0.22))
+        drop-shadow(0 0 200px rgba(201, 169, 110, 0.12));
+    }
   }
   .hero-headline {
     font-size: clamp(2.4rem, 5.8vw, 4.2rem);
@@ -329,43 +328,21 @@ tailwind.config = {
     .hero-headline { text-align: center; font-size: clamp(2rem, 9vw, 3rem); }
   }
 
-  /* ===== CURSOR DOT + GOLDEN TRACE ===== */
-  .cursor-trail-canvas {
+  /* ===== FLUID GOLDEN SPLASH CURSOR ===== */
+  .splash-canvas {
     position: fixed;
     inset: 0;
     width: 100vw;
     height: 100vh;
     pointer-events: none;
-    z-index: 1;
-    opacity: 0;
-    transition: opacity 0.5s ease;
-  }
-  .cursor-trail-canvas.cursor-active { opacity: 1; }
-
-  .cursor-dot {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 2;
-    background: radial-gradient(circle, #ffe9b8 0%, #c9a96e 45%, rgba(201,169,110,0) 75%);
-    box-shadow: 0 0 14px rgba(255,220,150,0.7), 0 0 30px rgba(201,169,110,0.4);
-    opacity: 0;
-    transform: translate(-50%, -50%);
-    transition: opacity 0.4s ease;
-    will-change: transform;
+    z-index: 9998;
     mix-blend-mode: screen;
   }
-  .cursor-dot.cursor-active { opacity: 1; }
-
   @media (hover: none) {
-    .cursor-trail-canvas, .cursor-dot { display: none; }
+    .splash-canvas { display: none; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .cursor-trail-canvas, .cursor-dot { display: none; }
+    .splash-canvas { display: none; }
   }
   @keyframes glowDrift {
     0% { transform: translate(0, 0) scale(1); opacity: 0.6; }
@@ -499,8 +476,7 @@ tailwind.config = {
 </head>
 <body>
 <div class="scroll-progress" id="scrollProgress"></div>
-<canvas class="cursor-trail-canvas" id="cursorTrailCanvas"></canvas>
-<div class="cursor-dot" id="cursorDot"></div>
+<canvas class="splash-canvas" id="splashCanvas"></canvas>
 
 <!-- Navigation -->
 <nav class="nav-bar" id="navbar">
@@ -530,7 +506,7 @@ tailwind.config = {
   <!-- =============================== -->
   <!-- HERO -->
   <!-- =============================== -->
-  <section class="min-h-screen flex flex-col justify-center pt-24 pb-16 relative overflow-hidden">
+  <section class="min-h-screen flex flex-col justify-center pt-24 pb-16 relative">
     <div class="hero-glow"></div>
     <div class="reveal">
 
@@ -1333,31 +1309,52 @@ tailwind.config = {
     }, { passive: true });
   }
 
-  // --- Portrait parallax + bright cursor dot + canvas trail ---
+  // --- Portrait parallax + fluid golden splash cursor ---
   const portraitWrap = document.getElementById('portraitWrap');
-  const cursorDot = document.getElementById('cursorDot');
-  const trailCanvas = document.getElementById('cursorTrailCanvas');
+  const splashCanvas = document.getElementById('splashCanvas');
 
-  if (!prefersReducedMotion && cursorDot && trailCanvas) {
-    const ctx = trailCanvas.getContext('2d');
-    const dpr = window.devicePixelRatio || 1;
+  if (!prefersReducedMotion && splashCanvas) {
+    const ctx = splashCanvas.getContext('2d');
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
     function resizeCanvas() {
-      trailCanvas.width = window.innerWidth * dpr;
-      trailCanvas.height = window.innerHeight * dpr;
-      trailCanvas.style.width = window.innerWidth + 'px';
-      trailCanvas.style.height = window.innerHeight + 'px';
+      splashCanvas.width = window.innerWidth * dpr;
+      splashCanvas.height = window.innerHeight * dpr;
+      splashCanvas.style.width = window.innerWidth + 'px';
+      splashCanvas.style.height = window.innerHeight + 'px';
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.scale(dpr, dpr);
     }
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    // Trail point ring buffer — each has x, y, life (0..1)
-    const points = [];
-    const MAX_AGE = 700; // ms
-    let mouseX = 0, mouseY = 0;
-    let prevX = 0, prevY = 0;
-    let active = false;
+    // Particle pool — fluid blobs that follow + dissipate
+    const particles = [];
+    const MAX_PARTICLES = 220;
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+    let prevX = mouseX;
+    let prevY = mouseY;
+    let lastSpawn = 0;
+
+    function spawnParticles(x, y, vx, vy, count) {
+      for (let i = 0; i < count; i++) {
+        if (particles.length >= MAX_PARTICLES) particles.shift();
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 0.6 + 0.2;
+        particles.push({
+          x: x + (Math.random() - 0.5) * 6,
+          y: y + (Math.random() - 0.5) * 6,
+          vx: vx * 0.18 + Math.cos(angle) * speed,
+          vy: vy * 0.18 + Math.sin(angle) * speed,
+          radius: Math.random() * 18 + 14,
+          maxRadius: Math.random() * 30 + 28,
+          life: 0,
+          maxLife: Math.random() * 700 + 600,
+          born: performance.now()
+        });
+      }
+    }
 
     document.addEventListener('mousemove', function(e) {
       mouseX = e.clientX;
@@ -1370,76 +1367,71 @@ tailwind.config = {
         portraitWrap.style.transform = 'translate(' + px + 'px, ' + py + 'px)';
       }
 
-      if (!active) {
-        cursorDot.classList.add('cursor-active');
-        trailCanvas.classList.add('cursor-active');
-        active = true;
-        prevX = mouseX;
-        prevY = mouseY;
+      // Velocity from delta
+      const vx = mouseX - prevX;
+      const vy = mouseY - prevY;
+      const speed = Math.sqrt(vx * vx + vy * vy);
+
+      // Throttle spawn rate based on speed (more particles when moving fast)
+      const now = performance.now();
+      if (now - lastSpawn > 12) {
+        const count = Math.min(4, Math.max(1, Math.floor(speed / 6)));
+        spawnParticles(mouseX, mouseY, vx, vy, count);
+        lastSpawn = now;
       }
 
-      // Sample points along the line from prev to current for smooth trace
-      const dx = mouseX - prevX;
-      const dy = mouseY - prevY;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      const steps = Math.max(1, Math.floor(dist / 4));
-      const now = performance.now();
-      for (let i = 1; i <= steps; i++) {
-        points.push({
-          x: prevX + (dx * i) / steps,
-          y: prevY + (dy * i) / steps,
-          t: now
-        });
-      }
       prevX = mouseX;
       prevY = mouseY;
-
-      // Move the bright dot instantly
-      cursorDot.style.transform = 'translate(' + mouseX + 'px, ' + mouseY + 'px)';
     });
 
-    document.addEventListener('mouseleave', function() {
-      cursorDot.classList.remove('cursor-active');
-      trailCanvas.classList.remove('cursor-active');
-      active = false;
-    });
-
-    // Render loop — draw the trail with fading segments
-    function renderTrail() {
-      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    // Continuously emit a small bright core at the cursor position
+    function renderSplash() {
       const now = performance.now();
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
-      // Drop expired points
-      while (points.length && now - points[0].t > MAX_AGE) {
-        points.shift();
+      // Update + draw particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        const age = (now - p.born) / p.maxLife;
+        if (age >= 1) { particles.splice(i, 1); continue; }
+
+        // Physics: drift + slight outward expansion
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vx *= 0.94;
+        p.vy *= 0.94;
+        // Radius eases from start to maxRadius then holds
+        const r = p.radius + (p.maxRadius - p.radius) * Math.min(1, age * 2.2);
+
+        // Alpha curve: rises fast, fades slow (gives "splash" look)
+        const alpha = Math.sin((1 - age) * Math.PI * 0.65) * 0.55;
+
+        // Radial gold gradient
+        const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
+        grad.addColorStop(0,    'rgba(255, 235, 180, ' + alpha + ')');
+        grad.addColorStop(0.25, 'rgba(255, 200, 120, ' + (alpha * 0.7) + ')');
+        grad.addColorStop(0.55, 'rgba(201, 169, 110, ' + (alpha * 0.35) + ')');
+        grad.addColorStop(1,    'rgba(201, 169, 110, 0)');
+
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+        ctx.fill();
       }
 
-      if (points.length > 1) {
-        // Draw as connected line segments with per-segment alpha
-        for (let i = 1; i < points.length; i++) {
-          const p0 = points[i - 1];
-          const p1 = points[i];
-          const age = (now - p1.t) / MAX_AGE; // 0 = fresh, 1 = expired
-          const alpha = (1 - age) * 0.85;
-          const width = (1 - age) * 3 + 0.5;
+      // Bright core at the actual cursor position
+      const coreGrad = ctx.createRadialGradient(mouseX, mouseY, 0, mouseX, mouseY, 14);
+      coreGrad.addColorStop(0,   'rgba(255, 245, 215, 0.9)');
+      coreGrad.addColorStop(0.4, 'rgba(255, 210, 130, 0.5)');
+      coreGrad.addColorStop(1,   'rgba(255, 210, 130, 0)');
+      ctx.fillStyle = coreGrad;
+      ctx.beginPath();
+      ctx.arc(mouseX, mouseY, 14, 0, Math.PI * 2);
+      ctx.fill();
 
-          ctx.strokeStyle = 'rgba(255, 220, 150, ' + alpha + ')';
-          ctx.lineWidth = width;
-          ctx.lineCap = 'round';
-          ctx.shadowColor = 'rgba(201, 169, 110, ' + (alpha * 0.8) + ')';
-          ctx.shadowBlur = 8;
-
-          ctx.beginPath();
-          ctx.moveTo(p0.x, p0.y);
-          ctx.lineTo(p1.x, p1.y);
-          ctx.stroke();
-        }
-        ctx.shadowBlur = 0;
-      }
-
-      requestAnimationFrame(renderTrail);
+      requestAnimationFrame(renderSplash);
     }
-    renderTrail();
+    renderSplash();
   }
 
   // --- Stagger children observer ---
