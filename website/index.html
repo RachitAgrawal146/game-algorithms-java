@@ -234,6 +234,53 @@ tailwind.config = {
   }
   .mobile-nav a:hover, .mobile-nav a.active { color: #c9a96e; }
 
+  /* ===== HERO NAME BANNER (slides up on scroll) ===== */
+  .name-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 90;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 14vh;
+    will-change: transform, opacity;
+    transition: transform 0.05s linear;
+  }
+  .name-banner h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(3.5rem, 13vw, 11rem);
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    background: linear-gradient(180deg,
+      #c9a96e 0%,
+      #e8c478 35%,
+      #fff0c8 50%,
+      #e8c478 65%,
+      #c9a96e 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    text-align: center;
+    margin: 0;
+    text-shadow: 0 0 60px rgba(201, 169, 110, 0.15);
+  }
+  /* Add space at top of body so the hero starts below the banner */
+  body.has-name-banner main { padding-top: 25vh; }
+  @media (max-width: 768px) {
+    .name-banner { padding-top: 12vh; }
+    body.has-name-banner main { padding-top: 18vh; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .name-banner { transition: none; }
+  }
+
   /* ===== SCROLL PROGRESS BAR ===== */
   .scroll-progress {
     position: fixed;
@@ -289,7 +336,9 @@ tailwind.config = {
   }
   .portrait-col {
     flex-shrink: 0;
-    width: clamp(220px, 28vw, 320px);
+    width: clamp(280px, 32vw, 380px);
+    padding: 30px;
+    margin-left: 1rem;
     transition: transform 0.3s ease;
     will-change: transform;
   }
@@ -304,12 +353,14 @@ tailwind.config = {
     isolation: isolate;
   }
   .portrait-frame img {
-    width: 100%;
-    height: 100%;
+    width: 130%;
+    height: 130%;
     object-fit: cover;
-    object-position: 50% 18%;
+    object-position: 50% 22%;
     display: block;
-    position: relative;
+    position: absolute;
+    left: -15%;
+    top: -15%;
     z-index: 2;
   }
   /* Thin gold ring border */
@@ -390,38 +441,33 @@ tailwind.config = {
     animation: shinySweep 5s linear infinite;
   }
 
-  /* ===== TYPING ANIMATION ===== */
-  .typing-caret {
-    display: inline-block;
-    width: 0.06em;
-    background: #c9a96e;
-    margin-left: 0.04em;
-    animation: caretBlink 0.9s steps(2) infinite;
-    vertical-align: baseline;
+  /* ===== TEXT-TYPE (reactbits-style) =====
+     - Uses an "invisible" full-text placeholder so layout never shifts
+     - A second visible layer types out / deletes characters
+     - Caret follows the visible text */
+  .text-type {
+    display: inline;
     position: relative;
-    top: 0.05em;
-    border-radius: 1px;
-    align-self: stretch;
   }
-  .typing-caret-inline {
+  .text-type-text {
+    display: inline;
+  }
+  .text-type-cursor {
     display: inline-block;
-    width: 0.06em;
+    width: 0.05em;
     height: 0.85em;
     background: #c9a96e;
-    margin-left: 0.04em;
-    animation: caretBlink 0.9s steps(2) infinite;
+    margin-left: 0.05em;
     vertical-align: text-bottom;
     border-radius: 1px;
+    animation: ttBlink 0.85s steps(2, start) infinite;
   }
-  @keyframes caretBlink {
+  @keyframes ttBlink {
     0%, 50%   { opacity: 1; }
-    50.01%, 100% { opacity: 0; }
+    51%, 100% { opacity: 0; }
   }
-  .typing-char {
-    opacity: 0;
-    transition: opacity 0.05s linear;
-  }
-  .typing-char.shown { opacity: 1; }
+  /* Hero headline still uses gold em color via inline class */
+  .typing-em { color: #c9a96e; }
 
   /* ===== MAGNET HOVER ===== */
   .magnet {
@@ -477,46 +523,46 @@ tailwind.config = {
     will-change: transform;
     pointer-events: none;
     background: #c9a96e;
-    box-shadow: 10px 10px 5px rgba(0,0,0,0.75);
+    box-shadow: 4px 4px 3px rgba(0,0,0,0.4);
   }
   .blob-1 {
-    width: 60px;
-    height: 60px;
-    opacity: 0.6;
+    width: 22px;
+    height: 22px;
+    opacity: 0.35;
   }
   .blob-2 {
-    width: 125px;
-    height: 125px;
-    opacity: 0.6;
+    width: 42px;
+    height: 42px;
+    opacity: 0.28;
   }
   .blob-3 {
-    width: 75px;
-    height: 75px;
-    opacity: 0.6;
+    width: 28px;
+    height: 28px;
+    opacity: 0.32;
   }
   .blob-inner {
     position: absolute;
     border-radius: 50%;
-    background: rgba(255, 240, 200, 0.85);
+    background: rgba(255, 240, 200, 0.7);
     pointer-events: none;
   }
   .blob-1 .blob-inner {
-    width: 20px;
-    height: 20px;
-    top: 20px;
-    left: 20px;
+    width: 8px;
+    height: 8px;
+    top: 7px;
+    left: 7px;
   }
   .blob-2 .blob-inner {
-    width: 35px;
-    height: 35px;
-    top: 45px;
-    left: 45px;
+    width: 12px;
+    height: 12px;
+    top: 15px;
+    left: 15px;
   }
   .blob-3 .blob-inner {
-    width: 25px;
-    height: 25px;
-    top: 25px;
-    left: 25px;
+    width: 9px;
+    height: 9px;
+    top: 9px;
+    left: 9px;
   }
   /* Hidden SVG filter for the goo */
   .blob-svg-filter {
@@ -661,7 +707,12 @@ tailwind.config = {
   }
 </style>
 </head>
-<body>
+<body class="has-name-banner">
+<!-- Big name banner — slides up as you scroll -->
+<div class="name-banner" id="nameBanner">
+  <h2>Rachit Agrawal</h2>
+</div>
+
 <div class="scroll-progress" id="scrollProgress"></div>
 <!-- Hidden SVG filter for gooey blob cursor -->
 <svg class="blob-svg-filter" xmlns="http://www.w3.org/2000/svg">
@@ -718,8 +769,8 @@ tailwind.config = {
       <!-- Side-by-side: text on left, framed portrait on right -->
       <div class="hero-wrap">
         <div class="hero-text-col">
-          <h1 class="hero-headline font-display italic hero-load hero-load-delay" id="typingHeadline">
-            <span class="typing-text" data-text="I grew up learning to sit with things I didn&rsquo;t understand yet. "></span><span class="typing-text typing-em hero-headline-em" data-text="I still do."></span><span class="typing-caret-inline" id="typingCaret"></span>
+          <h1 class="hero-headline font-display italic hero-load hero-load-delay" id="heroHeadline">
+            <span class="text-type" id="heroTypeWrap"><span class="text-type-text" id="heroTypeText"></span><span class="text-type-cursor" id="heroTypeCursor"></span></span>
           </h1>
 
           <p class="text-lg text-text-muted leading-relaxed mb-10 mt-10 hero-load hero-load-delay2" style="font-weight: 300;">
@@ -757,7 +808,7 @@ tailwind.config = {
       <div class="section-label"><span class="shiny-text">01 &mdash; Origin</span></div>
 
       <blockquote class="font-display italic text-[clamp(1.8rem,4vw,2.8rem)] leading-[1.2] text-text-primary mb-12" style="font-weight: 300;">
-        &ldquo;Most people learn in straight lines. I learned under trees.&rdquo;
+        <span class="text-type quote-typewriter" data-text="&ldquo;Most people learn in straight lines. I learned under trees.&rdquo;"><span class="text-type-text"></span><span class="text-type-cursor"></span></span>
       </blockquote>
 
       <div class="space-y-6 text-text-muted" style="font-weight: 300;">
@@ -997,8 +1048,8 @@ tailwind.config = {
       </p>
 
       <!-- Ashoka expanded -->
-      <div class="mt-8 pl-6 border-l border-teal/20">
-        <p class="font-mono text-[9px] uppercase tracking-[0.2em] text-teal mb-4">Ashoka Young Scholars &middot; April&ndash;May 2025</p>
+      <div class="mt-8 pl-6 border-l border-gold/20">
+        <p class="font-mono text-[9px] uppercase tracking-[0.2em] text-gold mb-4">Ashoka Young Scholars &middot; April&ndash;May 2025</p>
         <p class="text-text-muted text-sm" style="font-weight: 300;">
           Ten days in Gurgaon. Hands-on projects in MakerSpace Labs &mdash; AI, automation, IoT, 3D modelling. Faculty seminars on AI &amp; society, digital privacy, data-driven decision-making. Met Prof. Sudheendra Hangal (Stanford CS), who recommended <em class="text-text-primary not-italic">Thinking Fast and Slow</em> and <em class="text-text-primary not-italic">How to Solve It</em> &mdash; two books that reframed how I think about problem-solving.
         </p>
@@ -1012,7 +1063,7 @@ tailwind.config = {
   <section class="py-20 md:py-28">
     <div class="reveal">
       <blockquote class="font-display italic text-[clamp(1.4rem,3.5vw,2.2rem)] leading-[1.3] text-text-primary text-center max-w-[600px] mx-auto" style="font-weight: 300;">
-        &ldquo;Most systems don&rsquo;t fail because people act irrationally &mdash; they fail because rational choices don&rsquo;t lead to good outcomes.&rdquo;
+        <span class="text-type quote-typewriter" data-text="&ldquo;Most systems don&rsquo;t fail because people act irrationally &mdash; they fail because rational choices don&rsquo;t lead to good outcomes.&rdquo;"><span class="text-type-text"></span><span class="text-type-cursor"></span></span>
       </blockquote>
     </div>
   </section>
@@ -1503,6 +1554,30 @@ tailwind.config = {
     });
   });
 
+  // --- NAME BANNER: slide up on scroll, fade out ---
+  const nameBanner = document.getElementById('nameBanner');
+  if (nameBanner) {
+    let bannerTicking = false;
+    function updateBanner() {
+      const sy = window.scrollY;
+      const vh = window.innerHeight;
+      // Slide up at 1.6x scroll speed for parallax effect
+      const translate = -sy * 1.6;
+      // Fade out completely by 70% of viewport height
+      const opacity = Math.max(0, 1 - sy / (vh * 0.7));
+      nameBanner.style.transform = 'translate3d(0,' + translate + 'px,0)';
+      nameBanner.style.opacity = opacity;
+      bannerTicking = false;
+    }
+    window.addEventListener('scroll', function() {
+      if (!bannerTicking) {
+        requestAnimationFrame(updateBanner);
+        bannerTicking = true;
+      }
+    }, { passive: true });
+    updateBanner();
+  }
+
   // --- Scroll progress bar ---
   const progressBar = document.getElementById('scrollProgress');
   if (progressBar) {
@@ -1525,9 +1600,9 @@ tailwind.config = {
     // the others trail at progressively slower speeds, creating a
     // single morphing blob via the SVG goo filter
     const blobs = [
-      { el: document.getElementById('blob-1'), size: 60,  lerp: 0.32, x: 0, y: 0 },
-      { el: document.getElementById('blob-2'), size: 125, lerp: 0.18, x: 0, y: 0 },
-      { el: document.getElementById('blob-3'), size: 75,  lerp: 0.10, x: 0, y: 0 }
+      { el: document.getElementById('blob-1'), size: 22, lerp: 0.32, x: 0, y: 0 },
+      { el: document.getElementById('blob-2'), size: 42, lerp: 0.18, x: 0, y: 0 },
+      { el: document.getElementById('blob-3'), size: 28, lerp: 0.10, x: 0, y: 0 }
     ];
     let mouseX = window.innerWidth / 2;
     let mouseY = window.innerHeight / 2;
@@ -1570,63 +1645,130 @@ tailwind.config = {
     renderBlob();
   }
 
-  // --- TYPING ANIMATION on headline ---
+  // --- TEXT-TYPE: reactbits-style typewriter ---
+  // Decodes HTML entities, types char-by-char, supports rotating texts
+  function decodeHtml(html) {
+    const txt = document.createElement('textarea');
+    txt.innerHTML = html;
+    return txt.value;
+  }
+
+  function createTypewriter(textEl, cursorEl, opts) {
+    const texts = opts.texts || [opts.text || ''];
+    const typeSpeed = opts.typeSpeed || 45;
+    const deleteSpeed = opts.deleteSpeed || 25;
+    const pauseAfter = opts.pauseAfter || 2400;
+    const loop = opts.loop !== false;
+    const onComplete = opts.onComplete;
+
+    let textIdx = 0;
+    let charIdx = 0;
+    let deleting = false;
+
+    function tick() {
+      const current = texts[textIdx];
+      if (!deleting) {
+        charIdx++;
+        textEl.textContent = current.slice(0, charIdx);
+        if (charIdx >= current.length) {
+          if (texts.length === 1 && !loop) {
+            // Single text, done — fade cursor and exit
+            if (onComplete) onComplete();
+            return;
+          }
+          deleting = true;
+          setTimeout(tick, pauseAfter);
+          return;
+        }
+        // Slight pause on punctuation for natural rhythm
+        const ch = current[charIdx - 1];
+        const delay = (ch === '.' || ch === ',' || ch === ';' || ch === '?') ? typeSpeed + 150 : typeSpeed;
+        setTimeout(tick, delay);
+      } else {
+        charIdx--;
+        textEl.textContent = current.slice(0, charIdx);
+        if (charIdx <= 0) {
+          deleting = false;
+          textIdx = (textIdx + 1) % texts.length;
+          setTimeout(tick, 350);
+          return;
+        }
+        setTimeout(tick, deleteSpeed);
+      }
+    }
+    setTimeout(tick, opts.startDelay || 0);
+  }
+
+  // --- HERO: rotating idea statements with typewriter ---
   (function() {
-    const headline = document.getElementById('typingHeadline');
-    if (!headline) return;
+    const textEl = document.getElementById('heroTypeText');
+    const cursorEl = document.getElementById('heroTypeCursor');
+    if (!textEl || !cursorEl) return;
+
+    const ideas = [
+      'I grew up learning to sit with things I didn\u2019t understand yet. I still do.',
+      'Most systems don\u2019t fail because people act irrationally \u2014 they fail because rational choices don\u2019t lead to good outcomes.',
+      'I study how cooperation breaks \u2014 and how to design it back.'
+    ];
+
     if (prefersReducedMotion) {
-      // Just show all text
-      headline.querySelectorAll('.typing-text').forEach(function(el) {
-        el.textContent = el.dataset.text;
-      });
-      const caret = document.getElementById('typingCaret');
-      if (caret) caret.style.display = 'none';
+      textEl.textContent = ideas[0];
+      cursorEl.style.display = 'none';
       return;
     }
 
-    // Build per-char spans inside each typing-text element
-    const segments = [];
-    headline.querySelectorAll('.typing-text').forEach(function(el) {
-      const text = el.dataset.text;
-      el.textContent = '';
-      const chars = [];
-      for (let i = 0; i < text.length; i++) {
-        const span = document.createElement('span');
-        span.className = 'typing-char';
-        // Preserve spaces
-        span.textContent = text[i] === ' ' ? '\u00A0' : text[i];
-        el.appendChild(span);
-        chars.push(span);
-      }
-      segments.push(chars);
+    createTypewriter(textEl, cursorEl, {
+      texts: ideas,
+      typeSpeed: 42,
+      deleteSpeed: 22,
+      pauseAfter: 3200,
+      loop: true,
+      startDelay: 800
     });
+  })();
 
-    const allChars = segments.flat();
-    let i = 0;
-    const TYPE_SPEED = 35; // ms per char
-    const PAUSE_AT_PUNCT = 180; // extra pause on . , ;
+  // --- QUOTES: typewriter triggered when scrolled into view ---
+  (function() {
+    const quotes = document.querySelectorAll('.quote-typewriter');
+    if (!quotes.length) return;
 
-    function typeNext() {
-      if (i >= allChars.length) {
-        // Done — fade caret slowly after a beat
-        setTimeout(function() {
-          const caret = document.getElementById('typingCaret');
-          if (caret) {
-            caret.style.transition = 'opacity 1.2s ease';
-            caret.style.opacity = '0';
-          }
-        }, 600);
-        return;
-      }
-      allChars[i].classList.add('shown');
-      const ch = allChars[i].textContent;
-      i++;
-      const delay = (ch === '.' || ch === ',' || ch === ';') ? TYPE_SPEED + PAUSE_AT_PUNCT : TYPE_SPEED;
-      setTimeout(typeNext, delay);
+    if (prefersReducedMotion) {
+      quotes.forEach(function(q) {
+        const text = decodeHtml(q.dataset.text);
+        const textEl = q.querySelector('.text-type-text');
+        const cursorEl = q.querySelector('.text-type-cursor');
+        if (textEl) textEl.textContent = text;
+        if (cursorEl) cursorEl.style.display = 'none';
+      });
+      return;
     }
 
-    // Start typing after a brief pause to let other hero elements settle
-    setTimeout(typeNext, 700);
+    const obs = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (!entry.isIntersecting) return;
+        const q = entry.target;
+        const text = decodeHtml(q.dataset.text);
+        const textEl = q.querySelector('.text-type-text');
+        const cursorEl = q.querySelector('.text-type-cursor');
+        if (!textEl || !cursorEl) return;
+        createTypewriter(textEl, cursorEl, {
+          text: text,
+          typeSpeed: 35,
+          loop: false,
+          startDelay: 200,
+          onComplete: function() {
+            // Fade out cursor 1s after typing completes
+            setTimeout(function() {
+              cursorEl.style.transition = 'opacity 1.2s ease';
+              cursorEl.style.opacity = '0';
+            }, 1000);
+          }
+        });
+        obs.unobserve(q);
+      });
+    }, { threshold: 0.4, rootMargin: '0px 0px -10% 0px' });
+
+    quotes.forEach(function(q) { obs.observe(q); });
   })();
 
   // --- MAGNET EFFECT on links/buttons ---
