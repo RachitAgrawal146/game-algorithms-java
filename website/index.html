@@ -259,6 +259,73 @@ tailwind.config = {
     filter: blur(60px);
     animation: glowDrift 8s ease-in-out infinite alternate;
   }
+
+  /* ===== HERO TEXT-WRAP AROUND PORTRAIT ===== */
+  .hero-wrap {
+    position: relative;
+  }
+  .portrait-float {
+    float: right;
+    width: 280px;
+    margin: 0 0 1rem 2.5rem;
+    shape-outside: ellipse(45% 50% at 50% 45%);
+    shape-margin: 12px;
+  }
+  .portrait-float img {
+    width: 100%;
+    display: block;
+    object-fit: cover;
+    object-position: top;
+  }
+  .hero-headline {
+    font-size: clamp(2.4rem, 5.8vw, 4.2rem);
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+    color: #e8e6df;
+    font-weight: 300;
+    margin-bottom: 0;
+  }
+  .hero-headline-em {
+    color: #c9a96e;
+    font-style: italic;
+  }
+  .hero-clear { clear: both; }
+
+  /* Mobile: stack vertically, no float */
+  @media (max-width: 720px) {
+    .portrait-float {
+      float: none;
+      width: 200px;
+      margin: 0 auto 2rem;
+      shape-outside: none;
+    }
+    .hero-headline { text-align: center; font-size: clamp(2rem, 9vw, 3rem); }
+  }
+
+  /* ===== CURSOR-FOLLOWING GOLD GLOW ===== */
+  .cursor-glow {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 600px;
+    height: 600px;
+    pointer-events: none;
+    z-index: 1;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(201,169,110,0.10) 0%, rgba(201,169,110,0.04) 25%, transparent 60%);
+    border-radius: 50%;
+    filter: blur(40px);
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    will-change: transform;
+  }
+  .cursor-glow.cursor-glow-active { opacity: 1; }
+  @media (hover: none) {
+    .cursor-glow { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cursor-glow { display: none; }
+  }
   @keyframes glowDrift {
     0% { transform: translate(0, 0) scale(1); opacity: 0.6; }
     100% { transform: translate(40px, -30px) scale(1.15); opacity: 1; }
@@ -391,6 +458,7 @@ tailwind.config = {
 </head>
 <body>
 <div class="scroll-progress" id="scrollProgress"></div>
+<div class="cursor-glow" id="cursorGlow"></div>
 
 <!-- Navigation -->
 <nav class="nav-bar" id="navbar">
@@ -423,31 +491,32 @@ tailwind.config = {
   <section class="min-h-screen flex flex-col justify-center pt-24 pb-16 relative overflow-hidden">
     <div class="hero-glow"></div>
     <div class="reveal">
-      <div class="flex flex-col md:flex-row md:items-end md:gap-12 lg:gap-16">
 
-        <!-- Text content -->
-        <div class="flex-1 min-w-0">
-          <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-gold mb-8 hero-load">Ranchi &rarr; Sahyadri &rarr; The World</p>
+      <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-gold mb-8 hero-load">Ranchi &rarr; Sahyadri &rarr; The World</p>
 
-          <h1 class="font-display italic text-[clamp(2.8rem,8vw,5.5rem)] hero-load hero-load-delay leading-[1.05] tracking-tight text-text-primary mb-10" style="font-weight: 300;">
-            I grew up learning to sit with things I didn&rsquo;t understand yet. I still do.
-          </h1>
+      <!-- Hero text+image with text wrapping around portrait -->
+      <div class="hero-wrap">
 
-          <p class="text-lg text-text-muted leading-relaxed max-w-[600px] mb-10 hero-load hero-load-delay2" style="font-weight: 300;">
-            I build systems, perform on stage, and try to make the complex feel human. From Ranchi, shaped by silence, working on things that matter.
-          </p>
-
-          <div class="flex flex-wrap gap-3 hero-load hero-load-delay3">
-            <span class="tag">CS Researcher</span>
-            <span class="tag">Theatre Actor</span>
-            <span class="tag">Builder</span>
-            <span class="tag">Sahyadri School KFI</span>
-          </div>
+        <!-- Portrait floats right, headline wraps around it -->
+        <div class="portrait-float portrait-wrap hero-load hero-load-delay2" id="portraitWrap">
+          <img src="images/portrait.png" alt="Rachit Agrawal" loading="eager" />
         </div>
 
-        <!-- Portrait — no box, blends with background like a cutout -->
-        <div class="shrink-0 w-[220px] md:w-[260px] lg:w-[300px] mt-12 md:mt-0 portrait-wrap hero-load hero-load-delay2" id="portraitWrap">
-          <img src="images/portrait.png" alt="Rachit Agrawal" class="w-full object-cover object-top" loading="eager" style="display: block;" />
+        <h1 class="hero-headline font-display italic hero-load hero-load-delay">
+          I grew up learning to sit with things I didn&rsquo;t understand yet. <span class="hero-headline-em">I still do.</span>
+        </h1>
+
+        <div class="hero-clear"></div>
+
+        <p class="text-lg text-text-muted leading-relaxed max-w-[600px] mb-10 mt-8 hero-load hero-load-delay2" style="font-weight: 300;">
+          I build systems, perform on stage, and try to make the complex feel human. From Ranchi, shaped by silence, working on things that matter.
+        </p>
+
+        <div class="flex flex-wrap gap-3 hero-load hero-load-delay3">
+          <span class="tag">CS Researcher</span>
+          <span class="tag">Theatre Actor</span>
+          <span class="tag">Builder</span>
+          <span class="tag">Sahyadri School KFI</span>
         </div>
 
       </div>
@@ -1203,13 +1272,48 @@ tailwind.config = {
     }, { passive: true });
   }
 
-  // --- Portrait subtle parallax on mouse move ---
+  // --- Portrait subtle parallax + cursor-following gold glow ---
   const portraitWrap = document.getElementById('portraitWrap');
-  if (portraitWrap && !prefersReducedMotion) {
+  const cursorGlow = document.getElementById('cursorGlow');
+
+  if (!prefersReducedMotion) {
+    let glowX = window.innerWidth / 2;
+    let glowY = window.innerHeight / 2;
+    let targetX = glowX;
+    let targetY = glowY;
+    let glowActive = false;
+
     document.addEventListener('mousemove', function(e) {
-      const x = (e.clientX / window.innerWidth - 0.5) * 8;
-      const y = (e.clientY / window.innerHeight - 0.5) * 8;
-      portraitWrap.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+      // Portrait parallax
+      if (portraitWrap) {
+        const x = (e.clientX / window.innerWidth - 0.5) * 8;
+        const y = (e.clientY / window.innerHeight - 0.5) * 8;
+        portraitWrap.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+      }
+      // Glow target follows cursor
+      targetX = e.clientX;
+      targetY = e.clientY;
+      if (!glowActive && cursorGlow) {
+        cursorGlow.classList.add('cursor-glow-active');
+        glowActive = true;
+      }
+    });
+
+    // Glow position lerps toward target for smooth trailing
+    function animateGlow() {
+      glowX += (targetX - glowX) * 0.12;
+      glowY += (targetY - glowY) * 0.12;
+      if (cursorGlow) {
+        cursorGlow.style.transform = 'translate(' + (glowX - 300) + 'px, ' + (glowY - 300) + 'px)';
+      }
+      requestAnimationFrame(animateGlow);
+    }
+    if (cursorGlow) animateGlow();
+
+    // Hide on mouse leave window
+    document.addEventListener('mouseleave', function() {
+      if (cursorGlow) cursorGlow.classList.remove('cursor-glow-active');
+      glowActive = false;
     });
   }
 
