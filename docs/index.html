@@ -301,8 +301,8 @@ tailwind.config = {
   }
   .portrait-col {
     flex-shrink: 0;
-    width: clamp(280px, 30vw, 360px);
-    padding: 36px 30px;
+    width: clamp(360px, 40vw, 500px);
+    padding: 40px 36px;
     margin-left: auto;
     transition: transform 0.3s ease;
     will-change: transform;
@@ -369,8 +369,74 @@ tailwind.config = {
   /* Mobile: stack vertically */
   @media (max-width: 768px) {
     .hero-wrap { flex-direction: column; align-items: flex-start; gap: 2.5rem; }
-    .portrait-col { width: 280px; align-self: center; padding: 30px; margin-left: 0; }
+    .portrait-col { width: 320px; align-self: center; padding: 30px; margin-left: 0; }
     .hero-headline { text-align: left; }
+  }
+
+  /* ===== PHOTO PLACEHOLDERS (gold-framed, ready for upload) ===== */
+  .photo-slot {
+    position: relative;
+    width: 100%;
+    background: #141413;
+    border: 1px solid rgba(201, 169, 110, 0.25);
+    overflow: hidden;
+    transition: border-color 0.3s ease, transform 0.3s ease;
+  }
+  .photo-slot::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    box-shadow: inset 0 0 0 1px rgba(255, 220, 150, 0.06);
+    pointer-events: none;
+  }
+  .photo-slot:hover {
+    border-color: rgba(201, 169, 110, 0.5);
+    transform: translateY(-2px);
+  }
+  .photo-slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .photo-slot-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: #4a4844;
+  }
+  .photo-slot-placeholder span {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: #4a4844;
+    text-align: center;
+    padding: 0 1rem;
+  }
+  .photo-slot-placeholder svg {
+    width: 24px;
+    height: 24px;
+    opacity: 0.4;
+  }
+  /* Aspect ratios */
+  .photo-slot.ratio-16-9 { aspect-ratio: 16 / 9; }
+  .photo-slot.ratio-4-3  { aspect-ratio: 4 / 3; }
+  .photo-slot.ratio-3-4  { aspect-ratio: 3 / 4; }
+  .photo-slot.ratio-1-1  { aspect-ratio: 1 / 1; }
+
+  /* Photo grid */
+  .photo-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+  @media (max-width: 720px) {
+    .photo-grid-3 { grid-template-columns: 1fr; }
   }
 
   /* ===== SHINY TEXT (gradient sweep) ===== */
@@ -805,6 +871,18 @@ tailwind.config = {
           When I go back to Ranchi for holidays, I feel the noise of the outside world like a physical thing &mdash; people not present in their own lives, constantly rushing toward something without quite knowing what. Sahyadri made me allergic to shallowness. Not because I&rsquo;m better than the world outside. Because I&rsquo;ve tasted what slowness feels like.
         </p>
       </div>
+
+      <!-- Photo: Sahyadri / Astachal hill -->
+      <div class="mt-12">
+        <div class="photo-slot ratio-16-9">
+          <!-- Replace placeholder with: <img src="images/sahyadri.jpg" alt="Sahyadri / Astachal" /> -->
+          <div class="photo-slot-placeholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            <span>Sahyadri / Astachal</span>
+          </div>
+        </div>
+        <p class="font-mono text-[9px] uppercase tracking-[0.2em] text-text-dim mt-3">Sahyadri School (KFI), Pune</p>
+      </div>
     </div>
   </section>
 
@@ -1212,40 +1290,33 @@ tailwind.config = {
         <p class="text-text-muted text-sm mb-4" style="font-weight: 300;">
           A father watches his son turn into a tree. He grieves. The tree produces gold. The family gets rich. They expand their house. The building plans conflict with the tree. They cut it down. Only the granddaughter is human enough to realise what they&rsquo;ve done.
         </p>
-        <p class="text-text-muted text-sm italic mb-8" style="font-weight: 300;">
+        <p class="text-text-muted text-sm italic mb-6" style="font-weight: 300;">
           Half the audience was in tears. The question they went home with: does greed get in the way of human connection?
         </p>
-
-        <!-- Vriksha video embed -->
-        <div class="aspect-video w-full max-w-[560px] mb-10">
-          <iframe
-            src="https://www.youtube-nocookie.com/embed/GBrrRnUvKd4"
-            title="Vriksha — Full Performance"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen
-            loading="lazy"
-            class="w-full h-full border border-border"
-          ></iframe>
+        <div class="photo-slot ratio-16-9 mb-6 max-w-[560px]">
+          <!-- Replace with: <img src="images/vriksha.jpg" alt="Vriksha stage still" /> -->
+          <div class="photo-slot-placeholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            <span>Vriksha &mdash; Stage Still</span>
+          </div>
         </div>
+        <a href="https://youtu.be/GBrrRnUvKd4?si=LMiIi-zYoKtlLzdv" target="_blank" rel="noopener noreferrer" class="font-mono text-[10px] uppercase tracking-[0.2em] text-gold hover:text-text-primary transition-colors duration-300 link-anim">Watch the Full Performance &nearr;</a>
       </div>
 
       <!-- Twelve Angry Jurors expanded -->
       <div class="mt-12 pl-6 border-l border-gold/20">
         <p class="font-mono text-[9px] uppercase tracking-[0.2em] text-gold mb-4">Twelve Angry Jurors &mdash; Full Performance</p>
-        <p class="text-text-muted text-sm mb-8" style="font-weight: 300;">
+        <p class="text-text-muted text-sm mb-6" style="font-weight: 300;">
           A bilingual adaptation of Reginald Rose&rsquo;s courtroom drama. Twelve jurors deliberating a single boy&rsquo;s life &mdash; the only place in theatre where conviction and doubt are the entire stage. I played Juror #9: the old man who sees what nobody else is willing to see.
         </p>
-
-        <div class="aspect-video w-full max-w-[560px]">
-          <iframe
-            src="https://www.youtube-nocookie.com/embed/AY7zaDn7RCo"
-            title="Twelve Angry Jurors — Full Performance"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen
-            loading="lazy"
-            class="w-full h-full border border-border"
-          ></iframe>
+        <div class="photo-slot ratio-16-9 mb-6 max-w-[560px]">
+          <!-- Replace with: <img src="images/twelve-angry-jurors.jpg" alt="Twelve Angry Jurors stage still" /> -->
+          <div class="photo-slot-placeholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            <span>Twelve Angry Jurors &mdash; Stage Still</span>
+          </div>
         </div>
+        <a href="https://youtu.be/AY7zaDn7RCo" target="_blank" rel="noopener noreferrer" class="font-mono text-[10px] uppercase tracking-[0.2em] text-gold hover:text-text-primary transition-colors duration-300 link-anim">Watch the Full Performance &nearr;</a>
       </div>
     </div>
   </section>
@@ -1352,6 +1423,55 @@ tailwind.config = {
           </div>
         </div>
 
+      </div>
+
+      <!-- Trek photo grid -->
+      <div class="mt-16">
+        <p class="font-mono text-[9px] uppercase tracking-[0.2em] text-text-dim mb-4">Mountains</p>
+        <div class="photo-grid-3">
+          <div>
+            <div class="photo-slot ratio-4-3">
+              <!-- Replace with: <img src="images/bali-pass.jpg" alt="Bali Pass" /> -->
+              <div class="photo-slot-placeholder">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                <span>Bali Pass</span>
+              </div>
+            </div>
+            <p class="font-mono text-[9px] text-text-dim mt-2">16,000 ft</p>
+          </div>
+          <div>
+            <div class="photo-slot ratio-4-3">
+              <!-- Replace with: <img src="images/pandav-patthar.jpg" alt="Pandav Patthar" /> -->
+              <div class="photo-slot-placeholder">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                <span>Pandav Patthar</span>
+              </div>
+            </div>
+            <p class="font-mono text-[9px] text-text-dim mt-2">12,500 ft</p>
+          </div>
+          <div>
+            <div class="photo-slot ratio-4-3">
+              <!-- Replace with: <img src="images/inme-tons.jpg" alt="Inme Tons" /> -->
+              <div class="photo-slot-placeholder">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                <span>Inme Tons</span>
+              </div>
+            </div>
+            <p class="font-mono text-[9px] text-text-dim mt-2">Uttarakhand</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Community immersion photo -->
+      <div class="mt-12">
+        <p class="font-mono text-[9px] uppercase tracking-[0.2em] text-text-dim mb-4">Community</p>
+        <div class="photo-slot ratio-16-9 max-w-[640px]">
+          <!-- Replace with: <img src="images/anandvan.jpg" alt="Anandvan Ashram" /> -->
+          <div class="photo-slot-placeholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            <span>Anandvan Ashram &middot; Hemalkasa</span>
+          </div>
+        </div>
       </div>
     </div>
   </section>
