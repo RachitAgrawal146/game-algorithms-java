@@ -60,13 +60,13 @@
   // ----------------------------------------------------------------
 
   var NAV_LINKS = [
-    { label: 'Home', href: '/game-algorithms-java/' },
-    { label: 'Tic Tac Toe', href: '/game-algorithms-java/tictactoe/' },
-    { label: 'N-Queens', href: '/game-algorithms-java/nqueens/' },
-    { label: 'Connect 4', href: '/game-algorithms-java/connect4/' },
-    { label: 'Pathfinding', href: '/game-algorithms-java/pathfinding/' },
-    { label: 'Mastermind', href: '/game-algorithms-java/mastermind/' },
-    { label: 'Compare', href: '/game-algorithms-java/compare/' }
+    { label: 'Home', href: '/game-algorithms-java/algorithms/' },
+    { label: 'Tic Tac Toe', href: '/game-algorithms-java/algorithms/tictactoe/' },
+    { label: 'N-Queens', href: '/game-algorithms-java/algorithms/nqueens/' },
+    { label: 'Connect 4', href: '/game-algorithms-java/algorithms/connect4/' },
+    { label: 'Pathfinding', href: '/game-algorithms-java/algorithms/pathfinding/' },
+    { label: 'Mastermind', href: '/game-algorithms-java/algorithms/mastermind/' },
+    { label: 'Compare', href: '/game-algorithms-java/algorithms/compare/' }
   ];
 
   // Create <nav class="site-nav">
@@ -79,7 +79,7 @@
 
   // Logo / home link
   var logo = document.createElement('a');
-  logo.href = '/game-algorithms-java/';
+  logo.href = '/game-algorithms-java/algorithms/';
   logo.className = 'nav-logo';
 
   var logoIcon = document.createElement('span');

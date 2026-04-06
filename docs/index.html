@@ -3,769 +3,811 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Game Algorithms Engine</title>
-<meta name="description" content="Exploring decision-making algorithms in artificial intelligence through interactive game demos, empirical benchmarks, and comparative analysis." />
-<meta property="og:title" content="Game Algorithms Engine" />
-<meta property="og:description" content="Interactive research project exploring minimax, constraint satisfaction, pathfinding, and more through playable game demos." />
+<title>Rachit Agrawal</title>
+<meta name="description" content="I build systems, perform on stage, and try to make the complex feel human. CS researcher, theatre actor, builder." />
+<meta property="og:title" content="Rachit Agrawal" />
+<meta property="og:description" content="I build systems, perform on stage, and try to make the complex feel human. From Ranchi, shaped by silence, working on things that matter." />
 <meta property="og:type" content="website" />
 <meta name="twitter:card" content="summary" />
-<meta name="twitter:title" content="Game Algorithms Engine" />
-<meta name="twitter:description" content="Interactive research project exploring decision-making algorithms in AI." />
-
+<meta name="twitter:title" content="Rachit Agrawal" />
+<meta name="twitter:description" content="CS researcher, theatre actor, builder. Shaped by silence, working on things that matter." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="shared/styles.css" />
-
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        bg: "#0c0c0b",
+        surface: "#141413",
+        surface2: "#1c1c1a",
+        border: "rgba(255,255,255,0.07)",
+        "border-active": "rgba(255,255,255,0.12)",
+        "text-primary": "#e8e6df",
+        "text-muted": "#8a887f",
+        "text-dim": "#4a4844",
+        gold: "#c9a96e",
+        teal: "#7ab0a8",
+      },
+      fontFamily: {
+        display: ["Cormorant Garamond", "serif"],
+        mono: ["DM Mono", "monospace"],
+        body: ["Inter", "sans-serif"],
+      },
+      maxWidth: {
+        content: "760px",
+      },
+    },
+  },
+};
+</script>
 <style>
-/* ===== Page-specific styles ===== */
-
-/* Hero overrides */
-.hero {
-  padding: var(--space-24) var(--space-6) var(--space-12);
-  margin-top: 0;
-}
-
-.hero-eyebrow {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  font-weight: 400;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  color: var(--color-gold);
-  margin-bottom: var(--space-6);
-  display: block;
-}
-
-.hero h1 {
-  font-family: var(--font-heading);
-  font-size: clamp(2.6rem, 5.5vw, 4rem);
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  margin-bottom: var(--space-4);
-  line-height: 1.1;
-}
-
-.hero-subtitle {
-  font-family: var(--font-heading);
-  font-size: clamp(1.1rem, 2vw, 1.5rem);
-  font-weight: 400;
-  color: var(--color-text-muted);
-  margin-bottom: var(--space-6);
-}
-
-.hero-desc {
-  font-family: var(--font-body);
-  font-size: clamp(0.95rem, 1.5vw, 1.05rem);
-  color: var(--color-text-muted);
-  max-width: 640px;
-  margin: 0 auto var(--space-8);
-  line-height: 1.75;
-}
-
-.hero-buttons {
-  display: flex;
-  gap: var(--space-4);
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-bottom: var(--space-10);
-}
-
-.hero .stats-bar {
-  justify-content: center;
-  border-top: 1px solid var(--color-border);
-  padding-top: var(--space-8);
-  margin-top: var(--space-4);
-}
-
-/* Sections */
-.section {
-  padding: var(--space-20) 0;
-}
-
-.section + .section {
-  border-top: 1px solid var(--color-border);
-}
-
-/* Algorithm cards */
-.algo-card {
-  position: relative;
-  overflow: hidden;
-}
-
-.algo-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-}
-
-.algo-card--blue::before { background: var(--color-blue); }
-.algo-card--purple::before { background: var(--color-purple); }
-.algo-card--green::before { background: var(--color-green); }
-.algo-card--amber::before { background: var(--color-amber); }
-.algo-card--red::before { background: var(--color-red); }
-
-.algo-card .card-problem {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  color: var(--color-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin-bottom: var(--space-3);
-}
-
-.algo-card .card-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  margin-top: var(--space-4);
-  margin-bottom: var(--space-4);
-}
-
-.algo-card .card-link {
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  font-weight: 500;
-  color: var(--color-blue);
-  transition: color var(--duration-fast) var(--ease-out);
-}
-
-.algo-card .card-link:hover {
-  color: #60a5fa;
-}
-
-/* Findings section */
-.findings-wrapper {
-  background: var(--color-bg-card);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-10) var(--space-8);
-}
-
-.pull-quote {
-  font-family: var(--font-heading);
-  font-size: clamp(1.15rem, 2.2vw, 1.5rem);
-  font-style: italic;
-  font-weight: 500;
-  color: var(--color-text-heading);
-  line-height: 1.5;
-  text-align: center;
-  max-width: 720px;
-  margin: 0 auto var(--space-10);
-  position: relative;
-  padding: 0 var(--space-6);
-}
-
-.pull-quote::before {
-  content: '\201C';
-  position: absolute;
-  top: -0.35em;
-  left: -0.1em;
-  font-size: 3rem;
-  color: var(--color-gold);
-  opacity: 0.4;
-  font-style: normal;
-  line-height: 1;
-}
-
-.findings-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-6);
-}
-
-.finding-card {
-  padding: var(--space-6);
-  background: rgba(0, 0, 0, 0.25);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-}
-
-.finding-card h4 {
-  font-family: var(--font-heading);
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--color-text-heading);
-  margin-bottom: var(--space-3);
-}
-
-.finding-card p {
-  font-size: 0.88rem;
-  color: var(--color-text-muted);
-  line-height: 1.65;
-}
-
-/* Demo preview cards */
-.demos-scroll {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: var(--space-5);
-}
-
-.demo-card {
-  background: var(--color-bg-card);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--space-6);
-  display: flex;
-  flex-direction: column;
-  transition:
-    transform var(--duration-base) var(--ease-out),
-    border-color var(--duration-base) var(--ease-out),
-    box-shadow var(--duration-base) var(--ease-out);
-}
-
-.demo-card:hover {
-  transform: translateY(-3px);
-  border-color: var(--color-border-hover);
-  box-shadow: var(--shadow-lift);
-}
-
-.demo-ascii {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  line-height: 1.45;
-  color: var(--color-text-muted);
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: var(--radius-sm);
-  padding: var(--space-4);
-  margin-bottom: var(--space-4);
-  text-align: center;
-  white-space: pre;
-  min-height: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.demo-card h4 {
-  font-family: var(--font-heading);
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--color-text-heading);
-  margin-bottom: var(--space-2);
-}
-
-.demo-card .demo-desc {
-  font-size: 0.82rem;
-  color: var(--color-text-muted);
-  line-height: 1.55;
-  margin-bottom: auto;
-  padding-bottom: var(--space-4);
-}
-
-.demo-card .card-link {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--color-blue);
-  transition: color var(--duration-fast) var(--ease-out);
-  margin-top: auto;
-}
-
-.demo-card .card-link:hover {
-  color: #60a5fa;
-}
-
-/* Narrative section */
-.narrative {
-  max-width: 640px;
-  margin: 0 auto;
-}
-
-.narrative p {
-  font-size: 1.02rem;
-  color: var(--color-text-muted);
-  line-height: 1.8;
-  margin-bottom: var(--space-6);
-}
-
-.narrative p:last-child {
-  margin-bottom: 0;
-}
-
-/* Methodology */
-.method-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--space-6);
-  margin-bottom: var(--space-8);
-}
-
-.method-item {
-  padding: var(--space-5);
-  border-left: 2px solid var(--color-border);
-}
-
-.method-item h4 {
-  font-family: var(--font-heading);
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--color-text-heading);
-  margin-bottom: var(--space-2);
-}
-
-.method-item p {
-  font-size: 0.85rem;
-  color: var(--color-text-muted);
-  line-height: 1.55;
-}
-
-.source-link {
-  font-family: var(--font-mono);
-  font-size: 0.82rem;
-  color: var(--color-blue);
-  transition: color var(--duration-fast) var(--ease-out);
-}
-
-.source-link:hover {
-  color: #60a5fa;
-}
-
-/* Footer */
-.site-footer {
-  border-top: 1px solid var(--color-border);
-  padding: var(--space-10) 0;
-  text-align: center;
-}
-
-.site-footer p {
-  font-size: 0.82rem;
-  color: var(--color-text-muted);
-  line-height: 1.7;
-}
-
-.site-footer a {
-  color: var(--color-text-muted);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  transition: color var(--duration-fast) var(--ease-out);
-}
-
-.site-footer a:hover {
-  color: var(--color-text);
-}
-
-/* Scroll reveal */
-.reveal {
-  opacity: 0;
-  transform: translateY(28px);
-  transition:
-    opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Responsive: demo grid */
-@media (max-width: 1024px) {
-  .demos-scroll {
-    grid-template-columns: repeat(3, 1fr);
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background-color: #0c0c0b;
+    color: #e8e6df;
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
-  .findings-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  .method-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
 
-@media (max-width: 768px) {
-  .demos-scroll {
-    grid-template-columns: 1fr 1fr;
-    overflow-x: auto;
+  /* Noise texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 256px 256px;
   }
-  .findings-grid {
-    grid-template-columns: 1fr;
-  }
-  .findings-wrapper {
-    padding: var(--space-6) var(--space-5);
-  }
-  .method-grid {
-    grid-template-columns: 1fr;
-  }
-  .hero {
-    padding: var(--space-16) var(--space-4) var(--space-10);
-  }
-}
 
-@media (max-width: 480px) {
-  .demos-scroll {
-    grid-template-columns: 1fr;
+  /* Section label with extending line */
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: #c9a96e;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
   }
-}
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 0.5px;
+    background: rgba(255,255,255,0.07);
+  }
 
-/* Reduced motion */
-@media (prefers-reduced-motion: reduce) {
+  /* Section divider */
+  .section-divider {
+    border: none;
+    border-top: 0.5px solid rgba(255,255,255,0.07);
+  }
+
+  /* Scroll reveal */
   .reveal {
-    opacity: 1;
-    transform: none;
-    transition: none;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
   }
-}
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+    html { scroll-behavior: auto; }
+  }
+
+  /* Nav */
+  .nav-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(12, 12, 11, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 0.5px solid rgba(255,255,255,0.05);
+    transition: transform 0.4s ease;
+  }
+  .nav-bar.hidden { transform: translateY(-100%); }
+
+  /* Links */
+  a { color: inherit; text-decoration: none; }
+
+  /* Selection */
+  ::selection { background: rgba(201, 169, 110, 0.3); color: #e8e6df; }
+
+  /* Tag pill */
+  .tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    padding: 0.35rem 0.75rem;
+    border: 0.5px solid rgba(255,255,255,0.1);
+    color: #8a887f;
+    display: inline-block;
+  }
+
+  /* Project card */
+  .project-card {
+    padding: 2.5rem 0;
+    border-bottom: 0.5px solid rgba(255,255,255,0.07);
+    transition: background 0.4s ease;
+  }
+  .project-card:hover {
+    background: rgba(255,255,255,0.015);
+  }
+
+  /* Theatre table */
+  .theatre-table { width: 100%; border-collapse: collapse; }
+  .theatre-table th {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: #4a4844;
+    text-align: left;
+    padding: 0.75rem 0;
+    border-bottom: 0.5px solid rgba(255,255,255,0.07);
+  }
+  .theatre-table td {
+    padding: 1rem 0;
+    border-bottom: 0.5px solid rgba(255,255,255,0.04);
+    vertical-align: top;
+  }
+  .theatre-table tr:hover td { color: #c9a96e; }
+
+  /* Currently section */
+  .currently-box {
+    border: 0.5px dashed rgba(201, 169, 110, 0.3);
+    padding: 2.5rem;
+    position: relative;
+  }
+  .currently-box::before {
+    content: 'pinned';
+    position: absolute;
+    top: -8px;
+    left: 1.5rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: #c9a96e;
+    background: #0c0c0b;
+    padding: 0 0.5rem;
+  }
+
+  /* Writing piece */
+  .writing-piece {
+    padding: 1.5rem 0;
+    border-bottom: 0.5px solid rgba(255,255,255,0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 2rem;
+  }
+
+  /* Mobile nav */
+  .mobile-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(12, 12, 11, 0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 0.5px solid rgba(255,255,255,0.07);
+    padding: 0.75rem 0;
+    display: none;
+  }
+  @media (max-width: 768px) {
+    .mobile-nav { display: flex; justify-content: space-around; }
+    .desktop-nav { display: none; }
+    .nav-name { font-size: 1.125rem; }
+  }
+  .mobile-nav a {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #8a887f;
+    padding: 0.5rem;
+    transition: color 0.3s;
+  }
+  .mobile-nav a:hover, .mobile-nav a.active { color: #c9a96e; }
 </style>
 </head>
 <body>
 
-<!-- ============================================================
-     HERO
-     ============================================================ -->
-<section class="hero" id="top">
-  <div class="container">
-    <span class="hero-eyebrow reveal">Interactive Research Project</span>
-    <h1 class="reveal">Game Algorithms Engine</h1>
-    <p class="hero-subtitle reveal">Exploring Decision-Making in Artificial Intelligence</p>
-    <p class="hero-desc reveal">How do machines make decisions in adversarial environments? This project explores the algorithms behind game-playing AI&nbsp;&mdash; from minimax trees to constraint satisfaction&nbsp;&mdash; through interactive visualizations, empirical benchmarks, and comparative analysis.</p>
-
-    <div class="hero-buttons reveal">
-      <a href="#algorithms" class="btn btn-primary">Explore Algorithms &rarr;</a>
-      <a href="/game-algorithms-java/compare/" class="btn btn-ghost">View Research &nearr;</a>
-    </div>
-
-    <div class="stats-bar reveal">
-      <div class="stat-item">
-        <span class="stat-number">6</span>
-        <span class="stat-label">Algorithms</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-number">5</span>
-        <span class="stat-label">Interactive Demos</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-number">4</span>
-        <span class="stat-label">Problem Classes</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-number">2,300+</span>
-        <span class="stat-label">Lines of Code</span>
-      </div>
+<!-- Navigation -->
+<nav class="nav-bar" id="navbar">
+  <div class="max-w-content mx-auto px-6 py-5 flex justify-between items-center">
+    <a href="#" class="nav-name font-display italic text-xl text-text-primary tracking-tight">Rachit Agrawal</a>
+    <div class="desktop-nav flex items-center gap-10">
+      <a href="#research" class="font-mono text-[10px] uppercase tracking-[0.2em] text-text-muted hover:text-gold transition-colors duration-300">Research</a>
+      <a href="#projects" class="font-mono text-[10px] uppercase tracking-[0.2em] text-text-muted hover:text-gold transition-colors duration-300">Projects</a>
+      <a href="#theatre" class="font-mono text-[10px] uppercase tracking-[0.2em] text-text-muted hover:text-gold transition-colors duration-300">Theatre</a>
+      <a href="#writing" class="font-mono text-[10px] uppercase tracking-[0.2em] text-text-muted hover:text-gold transition-colors duration-300">Writing</a>
+      <a href="#contact" class="font-mono text-[10px] uppercase tracking-[0.2em] text-text-muted hover:text-gold transition-colors duration-300">Contact</a>
     </div>
   </div>
-</section>
+</nav>
 
-
-<!-- ============================================================
-     01 — ALGORITHMS
-     ============================================================ -->
-<section class="section" id="algorithms">
-  <div class="container">
-    <div class="section-label reveal">01 &mdash; Algorithms</div>
-
-    <div class="card-grid">
-
-      <!-- Minimax + Alpha-Beta -->
-      <div class="card algo-card algo-card--blue reveal">
-        <div class="card-problem">Tic Tac Toe &middot; Connect 4</div>
-        <h3>Minimax + Alpha-Beta Pruning</h3>
-        <p>Exhaustive game-tree search with intelligent branch elimination. Explores optimal play in two-player zero-sum games.</p>
-        <div class="card-tags">
-          <span class="tag">Adversarial</span>
-          <span class="tag">Tree Search</span>
-          <span class="tag">Pruning</span>
-        </div>
-        <a href="/game-algorithms-java/tictactoe/" class="card-link">Try Demo &rarr;</a>
-      </div>
-
-      <!-- Backtracking CSP -->
-      <div class="card algo-card algo-card--purple reveal">
-        <div class="card-problem">N-Queens</div>
-        <h3>Constraint Satisfaction (Backtracking)</h3>
-        <p>Systematic variable assignment with constraint checking. Guaranteed to find a solution through exhaustive search.</p>
-        <div class="card-tags">
-          <span class="tag">CSP</span>
-          <span class="tag">Backtracking</span>
-          <span class="tag">O(n!)</span>
-        </div>
-        <a href="/game-algorithms-java/nqueens/" class="card-link">Try Demo &rarr;</a>
-      </div>
-
-      <!-- Forward Checking -->
-      <div class="card algo-card algo-card--purple reveal">
-        <div class="card-problem">N-Queens</div>
-        <h3>Forward Checking</h3>
-        <p>Backtracking enhanced with domain propagation. Eliminates 58% more nodes but at 3&times; the overhead cost.</p>
-        <div class="card-tags">
-          <span class="tag">CSP</span>
-          <span class="tag">Propagation</span>
-          <span class="tag">Domain Reduction</span>
-        </div>
-        <a href="/game-algorithms-java/nqueens/" class="card-link">Try Demo &rarr;</a>
-      </div>
-
-      <!-- Minimum Conflicts -->
-      <div class="card algo-card algo-card--green reveal">
-        <div class="card-problem">N-Queens</div>
-        <h3>Minimum Conflicts (Local Search)</h3>
-        <p>Heuristic local search with random restarts. Achieves O(n) average-case on N-Queens&nbsp;&mdash; the fastest solver.</p>
-        <div class="card-tags">
-          <span class="tag">Local Search</span>
-          <span class="tag">Heuristic</span>
-          <span class="tag">Stochastic</span>
-        </div>
-        <a href="/game-algorithms-java/nqueens/" class="card-link">Try Demo &rarr;</a>
-      </div>
-
-      <!-- A* Pathfinding -->
-      <div class="card algo-card algo-card--amber reveal">
-        <div class="card-problem">Grid Navigation</div>
-        <h3>A* Pathfinding</h3>
-        <p>Optimal pathfinding using heuristic-guided search. Balances exploration and exploitation with admissible heuristics.</p>
-        <div class="card-tags">
-          <span class="tag">Graph Search</span>
-          <span class="tag">Heuristic</span>
-          <span class="tag">Optimal</span>
-        </div>
-        <a href="/game-algorithms-java/pathfinding/" class="card-link">Try Demo &rarr;</a>
-      </div>
-
-      <!-- Constraint Elimination -->
-      <div class="card algo-card algo-card--red reveal">
-        <div class="card-problem">Mastermind</div>
-        <h3>Constraint Elimination</h3>
-        <p>Information-theoretic approach: each guess eliminates ~82% of candidates. Solves any code in &le;6 guesses.</p>
-        <div class="card-tags">
-          <span class="tag">Information Theory</span>
-          <span class="tag">Filtering</span>
-        </div>
-        <a href="/game-algorithms-java/mastermind/" class="card-link">Try Demo &rarr;</a>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-
-<!-- ============================================================
-     02 — KEY FINDINGS
-     ============================================================ -->
-<section class="section" id="findings">
-  <div class="container">
-    <div class="section-label reveal">02 &mdash; Key Findings</div>
-
-    <div class="findings-wrapper reveal">
-      <p class="pull-quote">Algorithm efficiency depends on the pruning cost-to-benefit ratio, not just branch reduction.</p>
-
-      <div class="findings-grid">
-        <div class="finding-card">
-          <h4>Alpha-Beta Pruning</h4>
-          <p>Near-zero overhead &rarr; 94.2% node reduction at depth 10. The pruning cost is negligible relative to the exponential search savings.</p>
-        </div>
-        <div class="finding-card">
-          <h4>Forward Checking Paradox</h4>
-          <p>58% fewer nodes explored, but 3&times; slower than basic backtracking. Domain copying overhead exceeds the search savings.</p>
-        </div>
-        <div class="finding-card">
-          <h4>Constraint Elimination</h4>
-          <p>82% candidate elimination per guess. Expensive per-step computation is justified by the small, finite search space (360 codes).</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-<!-- ============================================================
-     03 — INTERACTIVE DEMOS
-     ============================================================ -->
-<section class="section" id="demos">
-  <div class="container">
-    <div class="section-label reveal">03 &mdash; Interactive Demos</div>
-
-    <div class="demos-scroll">
-
-      <!-- Tic Tac Toe -->
-      <a href="/game-algorithms-java/tictactoe/" class="demo-card reveal">
-        <div class="demo-ascii"> X | O | X
----+---+---
- O | X |
----+---+---
-   | O | X</div>
-        <h4>Tic Tac Toe</h4>
-        <p class="demo-desc">Watch the minimax tree expand in real-time as AI makes decisions</p>
-        <span class="card-link">Launch Demo &rarr;</span>
-      </a>
-
-      <!-- N-Queens -->
-      <a href="/game-algorithms-java/nqueens/" class="demo-card reveal">
-        <div class="demo-ascii">. Q . . .
-. . . Q .
-Q . . . .
-. . Q . .
-. . . . Q</div>
-        <h4>N-Queens</h4>
-        <p class="demo-desc">Step through backtracking, forward checking, and local search</p>
-        <span class="card-link">Launch Demo &rarr;</span>
-      </a>
-
-      <!-- Connect 4 -->
-      <a href="/game-algorithms-java/connect4/" class="demo-card reveal">
-        <div class="demo-ascii">. . . . . . .
-. . . . . . .
-. . . O . . .
-. . O X . . .
-. O X X . . .
-O X X O . O .</div>
-        <h4>Connect 4</h4>
-        <p class="demo-desc">Play against alpha-beta AI with live evaluation scoring</p>
-        <span class="card-link">Launch Demo &rarr;</span>
-      </a>
-
-      <!-- A* Pathfinding -->
-      <a href="/game-algorithms-java/pathfinding/" class="demo-card reveal">
-        <div class="demo-ascii">S . . # . . .
-. # . # . # .
-. # . . . # .
-. . # # . . .
-# . . . # . G
+<!-- Mobile bottom nav -->
+<div class="mobile-nav" id="mobilenav">
+  <a href="#research">Research</a>
+  <a href="#projects">Projects</a>
+  <a href="#theatre">Theatre</a>
+  <a href="#writing">Writing</a>
+  <a href="#contact">Contact</a>
 </div>
-        <h4>A* Pathfinding</h4>
-        <p class="demo-desc">Draw walls, generate mazes, and watch algorithms find the path</p>
-        <span class="card-link">Launch Demo &rarr;</span>
-      </a>
 
-      <!-- Mastermind -->
-      <a href="/game-algorithms-java/mastermind/" class="demo-card reveal">
-        <div class="demo-ascii">R G B Y  | ** .
-B Y R G  | *  ..
-G R Y B  | *** .
-R Y G B  | ****</div>
-        <h4>Mastermind</h4>
-        <p class="demo-desc">Break codes or watch the AI eliminate 82% of candidates per guess</p>
-        <span class="card-link">Launch Demo &rarr;</span>
-      </a>
+<main class="max-w-content mx-auto px-6">
 
-    </div>
-  </div>
-</section>
+  <!-- =============================== -->
+  <!-- HERO -->
+  <!-- =============================== -->
+  <section class="min-h-screen flex flex-col justify-center pt-24 pb-16">
+    <div class="reveal">
+      <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-gold mb-8">Ranchi &rarr; Sahyadri &rarr; The World</p>
 
+      <h1 class="font-display italic text-[clamp(2.8rem,8vw,5.5rem)] leading-[1.05] tracking-tight text-text-primary mb-10" style="font-weight: 300;">
+        I grew up learning to sit with things I didn&rsquo;t understand yet. I still do.
+      </h1>
 
-<!-- ============================================================
-     04 — THE QUESTION
-     ============================================================ -->
-<section class="section" id="question">
-  <div class="container">
-    <div class="section-label reveal">04 &mdash; The Question</div>
+      <p class="text-lg text-text-muted leading-relaxed max-w-[600px] mb-10" style="font-weight: 300;">
+        I build systems, perform on stage, and try to make the complex feel human. From Ranchi, shaped by silence, working on things that matter.
+      </p>
 
-    <div class="narrative reveal">
-      <p>Every game encodes a decision problem. Tic Tac Toe asks: can you see far enough ahead? N-Queens asks: can you eliminate contradictions early enough? Connect 4 asks: can you prune the irrelevant? Mastermind asks: can you extract maximum information from minimum data?</p>
-      <p>This project doesn't just implement algorithms&nbsp;&mdash; it asks when each approach breaks down, and why. The central finding: an algorithm's real-world efficiency depends not on theoretical complexity alone, but on the ratio between the cost of its optimization strategy and the savings that strategy produces.</p>
-      <p>Alpha-beta pruning costs almost nothing and saves exponentially. Forward checking costs a lot per step and saves only linearly. The math looks different. The truth is in the benchmarks.</p>
-    </div>
-  </div>
-</section>
-
-
-<!-- ============================================================
-     05 — METHODOLOGY
-     ============================================================ -->
-<section class="section" id="methodology">
-  <div class="container">
-    <div class="section-label reveal">05 &mdash; Methodology</div>
-
-    <div class="method-grid reveal">
-      <div class="method-item">
-        <h4>Java</h4>
-        <p>Algorithm implementations with empirical benchmarks</p>
+      <div class="flex flex-wrap gap-3 mb-12">
+        <span class="tag">CS Researcher</span>
+        <span class="tag">Theatre Actor</span>
+        <span class="tag">Builder</span>
+        <span class="tag">Sahyadri School KFI</span>
       </div>
-      <div class="method-item">
-        <h4>Vanilla JavaScript</h4>
-        <p>Interactive visualizations, no frameworks</p>
-      </div>
-      <div class="method-item">
-        <h4>HTML5 Canvas / DOM</h4>
-        <p>Real-time algorithm animation</p>
-      </div>
-      <div class="method-item">
-        <h4>Empirical Analysis</h4>
-        <p>Stochastic averaging, controlled experiments</p>
+
+      <!-- Portrait — RACHIT: replace src with your photo -->
+      <div class="w-full max-w-[280px]">
+        <div class="aspect-[3/4] bg-surface2 border border-border flex items-center justify-center overflow-hidden">
+          <!-- Replace this div with: <img src="your-photo.webp" alt="Rachit Agrawal" class="w-full h-full object-cover" /> -->
+          <span class="font-mono text-[9px] uppercase tracking-[0.2em] text-text-dim text-center px-4">Photo<br/>needed</span>
+        </div>
       </div>
     </div>
+  </section>
 
-    <a href="https://github.com/rachit-agrawal/game-algorithms-java" target="_blank" rel="noopener noreferrer" class="source-link reveal">View Source on GitHub &rarr;</a>
-  </div>
-</section>
+  <hr class="section-divider" />
 
+  <!-- =============================== -->
+  <!-- 01 — ORIGIN -->
+  <!-- =============================== -->
+  <section class="py-24 md:py-32" id="origin">
+    <div class="reveal">
+      <div class="section-label">01 &mdash; Origin</div>
 
-<!-- ============================================================
-     FOOTER
-     ============================================================ -->
-<footer class="site-footer">
-  <div class="container">
-    <p>Game Algorithms Engine &mdash; Built by Rachit Agrawal</p>
-    <p>Sahyadri School (KFI), Pune</p>
-    <p style="margin-top: var(--space-3);"><a href="https://github.com/rachit-agrawal/game-algorithms-java" target="_blank" rel="noopener noreferrer">GitHub</a></p>
-    <p style="margin-top: var(--space-3);">&copy; 2025</p>
+      <blockquote class="font-display italic text-[clamp(1.8rem,4vw,2.8rem)] leading-[1.2] text-text-primary mb-12" style="font-weight: 300;">
+        &ldquo;Most people learn in straight lines. I learned under trees.&rdquo;
+      </blockquote>
+
+      <div class="space-y-6 text-text-muted" style="font-weight: 300;">
+        <p>
+          I grew up in Ranchi, where the best school in the city had no interest in what its students actually thought. At nine years old, without fear, I left for Sahyadri School (KFI) in Pune &mdash; built on the philosophy of Jiddu Krishnamurti, where learning is not a narrow road and growth is not only academic.
+        </p>
+        <p>
+          Every day in the second term, the whole school assembles on a hill at sunset. We sit on rocks and stay completely quiet for twenty minutes. The objective isn&rsquo;t to think or reflect &mdash; just to observe. This is called <em class="text-gold not-italic">Astachal</em>. It is the most important thing I&rsquo;ve ever been taught, and it wasn&rsquo;t taught to me. It was just made possible.
+        </p>
+        <p>
+          When I go back to Ranchi for holidays, I feel the noise of the outside world like a physical thing &mdash; people not present in their own lives, constantly rushing toward something without quite knowing what. Sahyadri made me allergic to shallowness. Not because I&rsquo;m better than the world outside. Because I&rsquo;ve tasted what slowness feels like.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Credentials — understated, woven into narrative flow -->
+  <section class="py-24 md:py-32">
+    <div class="reveal">
+      <p class="text-text-muted" style="font-weight: 300;">
+        Currently in Grade 11 at Sahyadri, taking AP Calculus BC, AP Physics C: Mechanics, and AP Computer Science A. Scored 99% on the ICSE board in 2024, with centums in Physics and Biology. Selected for Ashoka University&rsquo;s Young Scholars Programme (2025) &mdash; a competitive residential programme in the Tech, Data &amp; Computer Science track.
+      </p>
+
+      <!-- Ashoka expanded -->
+      <div class="mt-8 pl-6 border-l border-teal/20">
+        <p class="font-mono text-[9px] uppercase tracking-[0.2em] text-teal mb-4">Ashoka Young Scholars &middot; April&ndash;May 2025</p>
+        <p class="text-text-muted text-sm" style="font-weight: 300;">
+          Ten days in Gurgaon. Hands-on projects in MakerSpace Labs &mdash; AI, automation, IoT, 3D modelling. Faculty seminars on AI &amp; society, digital privacy, data-driven decision-making. Met Prof. Sudheendra Hangal (Stanford CS), who recommended <em class="text-text-primary not-italic">Thinking Fast and Slow</em> and <em class="text-text-primary not-italic">How to Solve It</em> &mdash; two books that reframed how I think about problem-solving.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- =============================== -->
+  <!-- 02 — RESEARCH -->
+  <!-- =============================== -->
+  <section class="py-24 md:py-32" id="research">
+    <div class="reveal">
+      <div class="section-label">02 &mdash; Research</div>
+
+      <!-- Paper card -->
+      <div class="bg-surface p-8 md:p-10 border border-border mb-10">
+        <p class="font-mono text-[9px] uppercase tracking-[0.2em] text-gold mb-6">Published Research &middot; Polygence &middot; 2024&ndash;25</p>
+
+        <h2 class="font-display italic text-2xl md:text-3xl leading-snug text-text-primary mb-8" style="font-weight: 400;">
+          From Game-Theoretic Poker to the Collapse of Trust: Modelling Strategic Behaviour in Multi-Agent Systems
+        </h2>
+
+        <p class="text-text-muted mb-8" style="font-weight: 300;">
+          Trust is the most fragile infrastructure in any system. This research gives it mathematics. Using Kuhn Poker as a formal environment, I studied how trust emerges and collapses when eight different types of agents &mdash; from pure cooperators to chronic bluffers &mdash; interact across repeated games. The question underneath it: what does it actually take to build a reputation when you can&rsquo;t verify who you&rsquo;re playing against?
+        </p>
+
+        <span class="font-mono text-[10px] uppercase tracking-[0.2em] text-text-dim">Paper forthcoming</span>
+      </div>
+
+      <p class="text-text-muted text-sm" style="font-weight: 300;">
+        Research conducted through Polygence, mentored by domain experts. The ideas connect directly to live questions in AI safety and multi-agent systems &mdash; what happens when AI agents with different objectives interact repeatedly, and whether cooperation is ever stable.
+      </p>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- =============================== -->
+  <!-- 03 — PROJECTS -->
+  <!-- =============================== -->
+  <section class="py-24 md:py-32" id="projects">
+    <div class="reveal">
+      <div class="section-label">03 &mdash; Projects</div>
+
+      <!-- Lifeline -->
+      <div class="project-card">
+        <div class="flex flex-wrap gap-2 mb-4">
+          <span class="tag">Winner, Hilltop Entrepreneur</span>
+          <span class="tag">Flutter</span>
+          <span class="tag">Dart</span>
+          <span class="tag">2024</span>
+        </div>
+        <h3 class="font-display text-2xl text-text-primary mb-3" style="font-weight: 400;">Lifeline &mdash; Refugee Communication App</h3>
+        <p class="text-text-muted text-sm" style="font-weight: 300;">
+          An AI-equipped cross-platform application for people in conflict zones. Built around one question: what does a person actually need in the first hour after everything has been taken from them? Designed communication and resource-access tools for refugees in war-stricken zones. Won Sahyadri&rsquo;s school Shark Tank. Presented before the entire school assembly.
+        </p>
+      </div>
+
+      <!-- Game Algorithm Repo -->
+      <div class="project-card">
+        <div class="flex flex-wrap gap-2 mb-4">
+          <span class="tag">Python</span>
+          <span class="tag">Algorithms</span>
+          <span class="tag">AI</span>
+        </div>
+        <h3 class="font-display text-2xl text-text-primary mb-3" style="font-weight: 400;">Game Algorithm Repository</h3>
+        <p class="text-text-muted text-sm" style="font-weight: 300;">
+          Implementations of minimax with alpha-beta pruning (Connect 4), constraint satisfaction solvers (N-Queens, Mastermind), and adversarial search strategies &mdash; each with interactive HTML visualisers and empirical benchmarks. Games are the cleanest environment for studying how intelligence actually works. The most interesting finding: how dramatically pruning depth affects decision quality under time constraints.
+        </p>
+      </div>
+
+      <!-- Sage -->
+      <div class="project-card" style="border-bottom: none;">
+        <div class="flex flex-wrap gap-2 mb-4">
+          <span class="tag">Android</span>
+          <span class="tag">Accessibility</span>
+          <span class="tag">UX</span>
+          <span class="tag" style="border-color: rgba(201,169,110,0.3); color: #c9a96e;">Concept</span>
+        </div>
+        <h3 class="font-display text-2xl text-text-primary mb-3" style="font-weight: 400;">Sage &mdash; Senior Smartphone App</h3>
+        <p class="text-text-muted text-sm" style="font-weight: 300;">
+          Instead of teaching older users to navigate smartphones, Sage uses Android&rsquo;s Accessibility Service API to operate the phone on their behalf. The core insight: technology should adapt to people, not the other way around.
+        </p>
+      </div>
+
+      <!-- Sage is last project card -->
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- =============================== -->
+  <!-- 04 — THEATRE -->
+  <!-- =============================== -->
+  <section class="py-24 md:py-32" id="theatre">
+    <div class="reveal">
+      <div class="section-label">04 &mdash; Theatre</div>
+
+      <p class="text-text-primary text-lg mb-8" style="font-weight: 300;">
+        This is not a hobby. Each play was chosen because it had something to say. The stage as a social tool &mdash; for ideas that wouldn&rsquo;t otherwise reach the people who needed to hear them.
+      </p>
+
+      <div class="bg-surface p-8 md:p-10 border border-border mb-12">
+        <p class="font-mono text-[9px] uppercase tracking-[0.2em] text-text-dim mb-5">The Origin</p>
+        <p class="text-text-muted" style="font-weight: 300;">
+          In 9th grade, I was cast as an old man &mdash; partly because my Hindi was strong enough. In one rehearsal, something clicked. I realised the character was exactly like someone I&rsquo;d spent years watching closely: wise and childish at the same time. I started crying in the middle of a sad scene. My teacher, who was directing, started crying too. That was the day I became the old man of the school.
+        </p>
+      </div>
+
+      <!-- Productions table -->
+      <table class="theatre-table">
+        <thead>
+          <tr>
+            <th>Play</th>
+            <th>Role</th>
+            <th>Genre</th>
+            <th class="text-right">Watch</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="font-display text-lg text-text-primary" style="font-weight: 400;">Vriksha</td>
+            <td class="text-sm text-text-muted">Lead: Pandya Ji</td>
+            <td class="text-sm text-text-muted">Dramatic Hindi</td>
+            <td class="text-right">
+              <a href="https://youtu.be/GBrrRnUvKd4?si=LMiIi-zYoKtlLzdv" target="_blank" rel="noopener noreferrer" class="font-mono text-[10px] uppercase tracking-[0.15em] text-gold hover:text-text-primary transition-colors">YouTube &nearr;</a>
+            </td>
+          </tr>
+          <tr>
+            <td class="font-display text-lg text-text-primary" style="font-weight: 400;">Anyaay</td>
+            <td class="text-sm text-text-muted">Lead: The Farmer</td>
+            <td class="text-sm text-text-muted">Tragic Hindi</td>
+            <td class="text-right"><span class="text-text-dim text-sm">&mdash;</span></td>
+          </tr>
+          <tr>
+            <td class="font-display text-lg text-text-primary" style="font-weight: 400;">Rehearsal</td>
+            <td class="text-sm text-text-muted">Bhojpuri Farmer</td>
+            <td class="text-sm text-text-muted">Comedy Hindi</td>
+            <td class="text-right"><span class="text-text-dim text-sm">&mdash;</span></td>
+          </tr>
+          <tr>
+            <td class="font-display text-lg text-text-primary" style="font-weight: 400;">Twelve Angry Jurors</td>
+            <td class="text-sm text-text-muted">Juror #9</td>
+            <td class="text-sm text-text-muted">Bilingual Thriller</td>
+            <td class="text-right">
+              <a href="https://youtu.be/AY7zaDn7RCo" target="_blank" rel="noopener noreferrer" class="font-mono text-[10px] uppercase tracking-[0.15em] text-gold hover:text-text-primary transition-colors">YouTube &nearr;</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Vriksha expanded -->
+      <div class="mt-12 pl-6 border-l border-gold/20">
+        <p class="font-mono text-[9px] uppercase tracking-[0.2em] text-gold mb-4">Vriksha &mdash; The Full Story</p>
+        <p class="text-text-muted text-sm mb-4" style="font-weight: 300;">
+          A father watches his son turn into a tree. He grieves. The tree produces gold. The family gets rich. They expand their house. The building plans conflict with the tree. They cut it down. Only the granddaughter is human enough to realise what they&rsquo;ve done.
+        </p>
+        <p class="text-text-muted text-sm italic mb-8" style="font-weight: 300;">
+          Half the audience was in tears. The question they went home with: does greed get in the way of human connection?
+        </p>
+
+        <!-- Vriksha video embed -->
+        <div class="aspect-video w-full max-w-[560px]">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/GBrrRnUvKd4"
+            title="Vriksha — Full Performance"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+            loading="lazy"
+            class="w-full h-full border border-border"
+          ></iframe>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- =============================== -->
+  <!-- LEADERSHIP — woven between theatre and beyond -->
+  <!-- =============================== -->
+  <section class="py-24 md:py-32">
+    <div class="reveal">
+      <div class="section-label">04b &mdash; School Life</div>
+
+      <div class="space-y-6">
+        <div class="flex gap-4 items-baseline">
+          <span class="font-mono text-[9px] uppercase tracking-[0.2em] text-text-dim w-20 shrink-0">Editorial</span>
+          <p class="text-text-muted text-sm" style="font-weight: 300;">
+            Lead Editor of <em class="text-text-primary not-italic">Tiwai Tales</em> (school newsletter) and <em class="text-text-primary not-italic">Ninad &rsquo;26</em> (annual magazine). Oversaw content, coordinated student editorial teams, managed design and publication.
+          </p>
+        </div>
+        <div class="flex gap-4 items-baseline">
+          <span class="font-mono text-[9px] uppercase tracking-[0.2em] text-text-dim w-20 shrink-0">Stage</span>
+          <p class="text-text-muted text-sm" style="font-weight: 300;">
+            Emcee for Farewell &rsquo;24. Interviewed <em class="text-text-primary not-italic">Master Manjunath</em> &mdash; known for his role as Swami in <em>Malgudi Days</em> &mdash; on stage before the entire school. A conversation about craft, memory, and what it means to inhabit a character for decades.
+          </p>
+        </div>
+        <div class="flex gap-4 items-baseline">
+          <span class="font-mono text-[9px] uppercase tracking-[0.2em] text-text-dim w-20 shrink-0">Community</span>
+          <p class="text-text-muted text-sm" style="font-weight: 300;">
+            Anchor of the Almabase Committee &mdash; led the initiative to build a digital platform connecting Sahyadri alumni with current students.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- =============================== -->
+  <!-- 05 — BEYOND -->
+  <!-- =============================== -->
+  <section class="py-24 md:py-32" id="beyond">
+    <div class="reveal">
+      <div class="section-label">05 &mdash; Beyond the Screen</div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+
+        <!-- Treks -->
+        <div>
+          <p class="font-mono text-[10px] uppercase tracking-[0.2em] text-gold mb-6">Treks</p>
+          <div class="space-y-5">
+            <div>
+              <p class="text-text-primary text-sm" style="font-weight: 400;">Bali Pass, Uttarakhand</p>
+              <p class="font-mono text-[10px] text-text-dim">16,000 ft &middot; May 2024</p>
+            </div>
+            <div>
+              <p class="text-text-primary text-sm" style="font-weight: 400;">Pandav Patthar</p>
+              <p class="font-mono text-[10px] text-text-dim">12,500 ft &middot; May 2023</p>
+            </div>
+            <div>
+              <p class="text-text-primary text-sm" style="font-weight: 400;">Inme Tons, Uttarakhand</p>
+              <p class="font-mono text-[10px] text-text-dim">April 2023</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Community -->
+        <div>
+          <p class="font-mono text-[10px] uppercase tracking-[0.2em] text-gold mb-6">Community</p>
+          <div class="space-y-5">
+            <div>
+              <p class="text-text-primary text-sm" style="font-weight: 400;">Lok Biradari Prakalp, Hemalkasa</p>
+              <p class="text-text-dim text-xs">Volunteered at tribal school</p>
+            </div>
+            <div>
+              <p class="text-text-primary text-sm" style="font-weight: 400;">Anandvan Ashram</p>
+              <p class="text-text-dim text-xs">Taught visually impaired students</p>
+            </div>
+            <div>
+              <p class="text-text-primary text-sm" style="font-weight: 400;">UNESCO ESD Certification</p>
+            </div>
+            <div>
+              <p class="text-text-primary text-sm" style="font-weight: 400;">Hunnarshala Foundation, Bhuj</p>
+              <p class="text-text-dim text-xs">Sustainable earthen construction</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sports -->
+        <div>
+          <p class="font-mono text-[10px] uppercase tracking-[0.2em] text-gold mb-6">Sports</p>
+          <div class="space-y-5">
+            <div>
+              <p class="text-text-primary text-sm" style="font-weight: 400;">Handball Team Captain</p>
+            </div>
+            <div>
+              <p class="text-text-primary text-sm" style="font-weight: 400;">Basketball Camp Conductor</p>
+              <p class="text-text-dim text-xs">Mentored younger students</p>
+            </div>
+            <div>
+              <p class="text-text-primary text-sm" style="font-weight: 400;">Volleyball &amp; Athletics</p>
+              <p class="text-text-dim text-xs">School representation</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- =============================== -->
+  <!-- 06 — CURRENTLY -->
+  <!-- =============================== -->
+  <section class="py-24 md:py-32" id="currently">
+    <div class="reveal">
+      <div class="section-label">06 &mdash; Currently</div>
+
+      <div class="currently-box">
+        <p class="text-text-muted italic" style="font-weight: 300;">
+          <!-- WRITE THIS YOURSELF — what question are you currently turning over? -->
+          <span class="text-text-dim">[This space is waiting for Rachit. Write what question you&rsquo;re currently turning over &mdash; not polished, not academic, just honest thinking.]</span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- =============================== -->
+  <!-- 07 — WRITING -->
+  <!-- =============================== -->
+  <section class="py-24 md:py-32" id="writing">
+    <div class="reveal">
+      <div class="section-label">07 &mdash; Writing</div>
+
+      <div class="writing-piece">
+        <div>
+          <p class="text-text-primary mb-1" style="font-weight: 400;">I spent a year studying how trust breaks down. Here&rsquo;s what I found.</p>
+          <p class="text-text-dim text-xs">Plain-language version of the research paper</p>
+        </div>
+        <span class="font-mono text-[9px] uppercase tracking-[0.15em] text-text-dim whitespace-nowrap">Coming</span>
+      </div>
+
+      <div class="writing-piece">
+        <div>
+          <p class="text-text-primary mb-1" style="font-weight: 400;">A play I performed made half the audience cry. I&rsquo;m still thinking about why.</p>
+          <p class="text-text-dim text-xs">Vriksha, greed, and the question it leaves unanswered</p>
+        </div>
+        <span class="font-mono text-[9px] uppercase tracking-[0.15em] text-text-dim whitespace-nowrap">Coming</span>
+      </div>
+
+      <div class="writing-piece" style="border-bottom: none;">
+        <div>
+          <p class="text-text-primary mb-1" style="font-weight: 400;">What Sahyadri taught me that no school could.</p>
+          <p class="text-text-dim text-xs">Astachal, Krishnamurti, and attention as a practice</p>
+        </div>
+        <span class="font-mono text-[9px] uppercase tracking-[0.15em] text-text-dim whitespace-nowrap">Coming</span>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- =============================== -->
+  <!-- 08 — CONTACT -->
+  <!-- =============================== -->
+  <section class="py-24 md:py-32" id="contact">
+    <div class="reveal">
+      <div class="section-label">08 &mdash; Contact</div>
+
+      <h2 class="font-display italic text-[clamp(2.5rem,6vw,4rem)] leading-[1.1] text-text-primary mb-6" style="font-weight: 300;">
+        Let&rsquo;s talk.
+      </h2>
+
+      <p class="text-text-muted text-lg mb-12" style="font-weight: 300;">
+        I&rsquo;m always interested in research collaborations, interesting problems, and conversations that don&rsquo;t have easy answers.
+      </p>
+
+      <div class="space-y-4">
+        <a href="mailto:agrawalrachit146@gmail.com" class="flex items-center gap-3 text-gold hover:text-text-primary transition-colors duration-300 group">
+          <span class="font-mono text-[9px] uppercase tracking-[0.2em] text-text-dim w-12">Email</span>
+          <span class="text-sm" style="font-weight: 300;">agrawalrachit146@gmail.com</span>
+          <span class="text-xs opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
+        </a>
+        <a href="https://youtu.be/GBrrRnUvKd4?si=LMiIi-zYoKtlLzdv" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 text-text-muted hover:text-gold transition-colors duration-300 group">
+          <span class="font-mono text-[9px] uppercase tracking-[0.2em] text-text-dim w-12">Watch</span>
+          <span class="text-sm" style="font-weight: 300;">Vriksha &middot; Twelve Angry Jurors</span>
+          <span class="text-xs opacity-0 group-hover:opacity-100 transition-opacity">&nearr;</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Footer -->
+<footer class="border-t border-border mt-8">
+  <div class="max-w-content mx-auto px-6 py-12 flex flex-col md:flex-row justify-between items-center gap-4">
+    <p class="font-display italic text-sm text-text-primary">Rachit Agrawal</p>
+    <p class="font-mono text-[9px] uppercase tracking-[0.2em] text-text-dim">&copy; 2025 &middot; All rights reserved</p>
   </div>
 </footer>
 
+<!-- Spacer for mobile nav -->
+<div class="h-16 md:hidden"></div>
 
-<!-- ============================================================
-     SCRIPTS
-     ============================================================ -->
-<script src="shared/nav.js"></script>
+<!-- =============================== -->
+<!-- JAVASCRIPT -->
+<!-- =============================== -->
 <script>
-(function () {
+(function() {
   'use strict';
 
-  // ------------------------------------------------------------------
-  // 1. Scroll Reveal via IntersectionObserver
-  // ------------------------------------------------------------------
-  var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // --- Nav hide/show on scroll ---
+  const navbar = document.getElementById('navbar');
+  let lastScroll = 0;
+  let ticking = false;
 
-  if (!prefersReducedMotion && 'IntersectionObserver' in window) {
-    var revealElements = document.querySelectorAll('.reveal');
+  function updateNav() {
+    const currentScroll = window.scrollY;
+    if (currentScroll <= 80) {
+      navbar.classList.remove('hidden');
+    } else if (currentScroll > lastScroll && currentScroll > 200) {
+      navbar.classList.add('hidden');
+    } else if (currentScroll < lastScroll - 5) {
+      navbar.classList.remove('hidden');
+    }
+    lastScroll = currentScroll;
+    ticking = false;
+  }
 
-    var observer = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
+  window.addEventListener('scroll', function() {
+    if (!ticking) {
+      requestAnimationFrame(updateNav);
+      ticking = true;
+    }
+  }, { passive: true });
+
+  // --- Scroll reveal with IntersectionObserver ---
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (!prefersReducedMotion) {
+    const observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
         if (entry.isIntersecting) {
           entry.target.classList.add('visible');
           observer.unobserve(entry.target);
         }
       });
     }, {
-      threshold: 0.12,
-      rootMargin: '0px 0px -40px 0px'
+      threshold: 0.1,
+      rootMargin: '0px 0px -60px 0px'
     });
 
-    revealElements.forEach(function (el) {
+    document.querySelectorAll('.reveal').forEach(function(el) {
       observer.observe(el);
     });
   } else {
-    // If reduced motion or no IO support, show everything immediately
-    var all = document.querySelectorAll('.reveal');
-    for (var i = 0; i < all.length; i++) {
-      all[i].classList.add('visible');
-    }
+    document.querySelectorAll('.reveal').forEach(function(el) {
+      el.classList.add('visible');
+    });
   }
 
-  // ------------------------------------------------------------------
-  // 2. Smooth scroll for anchor links
-  // ------------------------------------------------------------------
-  if (!prefersReducedMotion) {
-    document.addEventListener('click', function (e) {
-      var link = e.target.closest('a[href^="#"]');
-      if (!link) return;
+  // --- Active nav link highlight ---
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.desktop-nav a, .mobile-nav a');
 
-      var targetId = link.getAttribute('href').slice(1);
-      var target = document.getElementById(targetId);
-      if (!target) return;
-
-      e.preventDefault();
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-      // Update URL without jumping
-      if (history.pushState) {
-        history.pushState(null, '', '#' + targetId);
+  function setActiveLink() {
+    let current = '';
+    sections.forEach(function(section) {
+      const rect = section.getBoundingClientRect();
+      if (rect.top <= 200) {
+        current = section.getAttribute('id');
+      }
+    });
+    navLinks.forEach(function(link) {
+      link.style.color = '';
+      if (link.getAttribute('href') === '#' + current) {
+        link.style.color = '#c9a96e';
       }
     });
   }
+
+  window.addEventListener('scroll', function() {
+    requestAnimationFrame(setActiveLink);
+  }, { passive: true });
+
+  // --- Smooth scroll for anchor links ---
+  document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
+    anchor.addEventListener('click', function(e) {
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
 })();
 </script>
+
 </body>
 </html>
