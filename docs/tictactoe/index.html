@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic Tac Toe — Minimax Decision Tree Visualization</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../shared/styles.css">
+  <style>
+    .page-layout {
+      display: flex; gap: var(--space-6); padding: var(--space-6);
+      max-width: 1600px; margin: 0 auto; min-height: calc(100vh - 200px);
+    }
+    .left-panel { flex: 0 0 420px; display: flex; flex-direction: column; gap: var(--space-6); }
+    .right-panel { flex: 1; min-width: 0; }
+
+    /* Page Header */
+    .page-header { text-align: center; padding: var(--space-12) var(--space-6) var(--space-6); }
+    .page-header .gold-label {
+      font-family: var(--font-mono); font-size: 0.72rem; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.14em; color: var(--color-gold); margin-bottom: var(--space-3);
+    }
+    .page-header h1 { font-family: var(--font-heading); font-size: clamp(2rem, 4vw, 3rem); letter-spacing: -0.03em; margin-bottom: var(--space-3); }
+    .page-header .subtitle { color: var(--color-text-muted); font-size: 0.95rem; max-width: 600px; margin: 0 auto; }
+
+    /* Game Board */
+    .board-wrapper { display: flex; justify-content: center; }
+    .game-board {
+      display: grid; grid-template-columns: repeat(3, 1fr); width: 300px; height: 300px;
+      background: var(--color-bg); border: 2px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden;
+    }
+    .game-cell {
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-heading); font-size: 2.4rem; font-weight: 700;
+      background: var(--color-bg-card); border: 1px solid var(--color-border);
+      cursor: pointer; transition: background var(--duration-fast) var(--ease-out); user-select: none;
+    }
+    .game-cell:hover:not(.taken) { background: var(--color-bg-card-hover); }
+    .game-cell.x-cell { color: var(--color-blue); }
+    .game-cell.o-cell { color: var(--color-red); }
+    .game-cell.win-cell { background: rgba(34, 197, 94, 0.15); }
+    .game-cell.taken { cursor: default; }
+
+    /* Game Status */
+    .game-status {
+      text-align: center; font-family: var(--font-heading); font-size: 1.1rem;
+      color: var(--color-text-heading); min-height: 1.5em; padding: var(--space-3) 0;
+    }
+
+    /* Controls */
+    .controls-section { background: var(--color-bg-card); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-5); }
+    .control-group { margin-bottom: var(--space-4); }
+    .control-group:last-child { margin-bottom: 0; }
+    .control-label {
+      font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--color-text-muted); margin-bottom: var(--space-2); display: block;
+    }
+    .radio-group { display: flex; gap: var(--space-3); }
+    .radio-group label {
+      display: flex; align-items: center; gap: var(--space-2);
+      font-size: 0.85rem; color: var(--color-text); cursor: pointer;
+    }
+    .radio-group input[type="radio"] { accent-color: var(--color-blue); }
+    .slider-row { display: flex; align-items: center; gap: var(--space-3); }
+    .slider-row input[type="range"] { flex: 1; accent-color: var(--color-blue); }
+    .slider-val { font-family: var(--font-mono); font-size: 0.85rem; color: var(--color-blue); min-width: 1.5em; text-align: center; }
+    .checkbox-label {
+      display: flex; align-items: center; gap: var(--space-2);
+      font-size: 0.85rem; color: var(--color-text); cursor: pointer;
+    }
+    .checkbox-label input { accent-color: var(--color-blue); }
+    .btn-new-game {
+      width: 100%; margin-top: var(--space-4); padding: var(--space-3) var(--space-6);
+      background: var(--color-blue); color: #fff; border: none; border-radius: var(--radius-sm);
+      font-family: var(--font-body); font-size: 0.875rem; font-weight: 600; cursor: pointer;
+      transition: background var(--duration-fast) var(--ease-out);
+    }
+    .btn-new-game:hover { background: #2563eb; }
+
+    /* Stats */
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3);
+      background: var(--color-bg-card); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-4);
+    }
+    .stat-box { text-align: center; }
+    .stat-box .stat-val { font-family: var(--font-mono); font-size: 1rem; font-weight: 700; color: var(--color-text-heading); }
+    .stat-box .stat-lbl { font-family: var(--font-mono); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-text-muted); margin-top: 2px; }
+
+    /* Tree Panel */
+    .tree-panel {
+      background: var(--color-bg-card); border: 1px solid var(--color-border); border-radius: var(--radius-md);
+      height: calc(100vh - 200px); overflow: auto; padding: var(--space-4); position: relative;
+    }
+    .tree-panel-title {
+      font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--color-gold); margin-bottom: var(--space-4);
+    }
+    .tree-placeholder {
+      display: flex; align-items: center; justify-content: center; height: 200px;
+      color: var(--color-text-muted); font-size: 0.9rem; font-style: italic;
+    }
+
+    /* Tree Nodes */
+    .tree-node { display: flex; flex-direction: column; align-items: center; }
+    .tree-children { display: flex; gap: 6px; margin-top: 4px; padding-top: 4px; position: relative; }
+    .tree-children::before {
+      content: ""; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: calc(100% - 45px); height: 1px; background: var(--color-border);
+    }
+    .tree-children > .tree-node::before {
+      content: ""; position: absolute; top: -4px; left: 50%; width: 1px; height: 4px;
+      background: var(--color-border);
+    }
+    .tree-children > .tree-node { position: relative; }
+    .connector-line { width: 1px; height: 6px; background: var(--color-border); }
+
+    .mini-board {
+      width: 45px; height: 45px; display: grid; grid-template-columns: repeat(3, 1fr);
+      border: 2px solid; border-radius: 3px; overflow: hidden; background: var(--color-bg);
+    }
+    .mini-board.max { border-color: var(--color-blue); }
+    .mini-board.min { border-color: var(--color-red); }
+    .mini-board.chosen { border-color: var(--color-green); background: rgba(34, 197, 94, 0.1); }
+    .mini-board.pruned { opacity: 0.25; }
+    .mini-cell {
+      display: flex; align-items: center; justify-content: center;
+      font-size: 7px; font-weight: 700; font-family: var(--font-mono);
+      border: 0.5px solid rgba(255,255,255,0.05);
+    }
+    .mini-cell.mx { color: var(--color-blue); }
+    .mini-cell.mo { color: var(--color-red); }
+    .node-score {
+      font-family: var(--font-mono); font-size: 9px; margin-top: 2px;
+      padding: 1px 4px; border-radius: 3px; background: rgba(255,255,255,0.05);
+    }
+    .node-score.positive { color: var(--color-green); }
+    .node-score.negative { color: var(--color-red); }
+    .node-score.zero { color: var(--color-text-muted); }
+
+    /* Educational Panel */
+    .edu-section { padding: 0 var(--space-6) var(--space-8); max-width: 1600px; margin: 0 auto; }
+    .edu-content p { margin-bottom: var(--space-4); }
+    .edu-content p:last-child { margin-bottom: 0; }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .page-layout { flex-direction: column; }
+      .left-panel { flex: none; }
+      .tree-panel { height: 500px; }
+    }
+    @media (max-width: 600px) {
+      .game-board { width: 260px; height: 260px; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .left-panel { flex: none; width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="gold-label">Adversarial Search</div>
+    <h1>Tic Tac Toe</h1>
+    <p class="subtitle">Minimax with alpha-beta pruning &mdash; watch the decision tree build in real-time</p>
+  </div>
+
+  <!-- Main Layout -->
+  <div class="page-layout">
+    <!-- Left Panel -->
+    <div class="left-panel">
+      <div class="game-status" id="status">Your turn (X)</div>
+      <div class="board-wrapper">
+        <div class="game-board" id="board"></div>
+      </div>
+
+      <div class="controls-section">
+        <div class="control-group">
+          <span class="control-label">Algorithm</span>
+          <div class="radio-group">
+            <label><input type="radio" name="algo" value="minimax"> Minimax</label>
+            <label><input type="radio" name="algo" value="alphabeta" checked> Alpha-Beta</label>
+          </div>
+        </div>
+        <div class="control-group">
+          <span class="control-label">Max Depth</span>
+          <div class="slider-row">
+            <input type="range" id="depthSlider" min="1" max="9" value="9">
+            <span class="slider-val" id="depthVal">9</span>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="checkbox-label"><input type="checkbox" id="aiFirst"> AI goes first (O)</label>
+        </div>
+        <button class="btn-new-game" id="newGameBtn">New Game</button>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-box"><div class="stat-val" id="statNodes">0</div><div class="stat-lbl">Nodes</div></div>
+        <div class="stat-box"><div class="stat-val" id="statPruned">0</div><div class="stat-lbl">Pruned</div></div>
+        <div class="stat-box"><div class="stat-val" id="statPct">0%</div><div class="stat-lbl">Pruning %</div></div>
+        <div class="stat-box"><div class="stat-val" id="statTime">0ms</div><div class="stat-lbl">Think Time</div></div>
+        <div class="stat-box"><div class="stat-val" id="statEval">-</div><div class="stat-lbl">Evaluation</div></div>
+        <div class="stat-box"><div class="stat-val" id="statBranch">-</div><div class="stat-lbl">Branching</div></div>
+      </div>
+    </div>
+
+    <!-- Right Panel: Tree -->
+    <div class="right-panel">
+      <div class="tree-panel" id="treePanel">
+        <div class="tree-panel-title">Decision Tree</div>
+        <div class="tree-placeholder" id="treePlaceholder">Make a move to see the AI decision tree</div>
+        <div id="treeContainer"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Educational Panel -->
+  <div class="edu-section">
+    <div class="educational-panel" id="eduPanel">
+      <div class="educational-panel__header" onclick="document.getElementById('eduPanel').classList.toggle('is-open')">
+        <span class="educational-panel__title">Learn About Minimax</span>
+        <span class="educational-panel__toggle">&#9660;</span>
+      </div>
+      <div class="educational-panel__body">
+        <div class="educational-panel__content edu-content">
+          <p><strong>Minimax</strong>: The AI assumes both players play optimally. The maximizer (AI/O) picks the move with the highest score, while the minimizer (Human/X) picks the lowest. Scores propagate from leaf nodes upward through the tree: <code>+1</code> for an AI win, <code>-1</code> for a human win, and <code>0</code> for a draw.</p>
+          <p><strong>Alpha-Beta Pruning</strong>: An optimization that maintains two bounds &mdash; &alpha; (best score the maximizer can guarantee) and &beta; (best score the minimizer can guarantee). When &alpha; &ge; &beta;, the remaining branches are pruned because they cannot influence the final decision. On tic-tac-toe, this reduces explored nodes from ~550,000 to ~18,000 (a 97% reduction).</p>
+          <p><strong>Why AI Never Loses</strong>: With full-depth minimax, tic-tac-toe is a solved game &mdash; optimal play from both sides always results in a draw. The decision tree mathematically proves that no sequence of moves can force a win against the AI. The best you can achieve is a tie.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../shared/nav.js"></script>
+  <script>
+  (function() {
+    'use strict';
+
+    // --- State ---
+    let board = Array(9).fill(null);
+    let gameOver = false;
+    let nodesExplored = 0;
+    let nodesPruned = 0;
+    let treeRoot = null;
+    const MAX_TREE_NODES = 200;
+    let treeNodeCount = 0;
+
+    // --- DOM refs ---
+    const boardEl = document.getElementById('board');
+    const statusEl = document.getElementById('status');
+    const treeContainer = document.getElementById('treeContainer');
+    const treePlaceholder = document.getElementById('treePlaceholder');
+    const depthSlider = document.getElementById('depthSlider');
+    const depthVal = document.getElementById('depthVal');
+
+    // --- Init board cells ---
+    for (let i = 0; i < 9; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'game-cell';
+      cell.dataset.idx = i;
+      cell.addEventListener('click', () => handleCellClick(i));
+      boardEl.appendChild(cell);
+    }
+
+    depthSlider.addEventListener('input', () => { depthVal.textContent = depthSlider.value; });
+    document.getElementById('newGameBtn').addEventListener('click', newGame);
+
+    function getAlgo() { return document.querySelector('input[name="algo"]:checked').value; }
+    function getDepth() { return parseInt(depthSlider.value); }
+
+    function newGame() {
+      board = Array(9).fill(null);
+      gameOver = false;
+      treeRoot = null;
+      treeContainer.innerHTML = '';
+      treePlaceholder.style.display = 'flex';
+      updateBoard();
+      clearStats();
+      if (document.getElementById('aiFirst').checked) {
+        statusEl.textContent = 'AI is thinking...';
+        setTimeout(() => aiMove(), 50);
+      } else {
+        statusEl.textContent = 'Your turn (X)';
+      }
+    }
+
+    function clearStats() {
+      document.getElementById('statNodes').textContent = '0';
+      document.getElementById('statPruned').textContent = '0';
+      document.getElementById('statPct').textContent = '0%';
+      document.getElementById('statTime').textContent = '0ms';
+      document.getElementById('statEval').textContent = '-';
+      document.getElementById('statBranch').textContent = '-';
+    }
+
+    function updateBoard() {
+      const cells = boardEl.children;
+      for (let i = 0; i < 9; i++) {
+        const c = cells[i];
+        c.textContent = board[i] || '';
+        c.className = 'game-cell';
+        if (board[i] === 'X') c.classList.add('x-cell', 'taken');
+        else if (board[i] === 'O') c.classList.add('o-cell', 'taken');
+      }
+    }
+
+    function highlightWin(line) {
+      const cells = boardEl.children;
+      line.forEach(i => cells[i].classList.add('win-cell'));
+    }
+
+    // --- Win check ---
+    const LINES = [
+      [0,1,2],[3,4,5],[6,7,8],
+      [0,3,6],[1,4,7],[2,5,8],
+      [0,4,8],[2,4,6]
+    ];
+
+    function checkWinner(b) {
+      for (const [a, c, d] of LINES) {
+        if (b[a] && b[a] === b[c] && b[a] === b[d]) return { winner: b[a], line: [a, c, d] };
+      }
+      return null;
+    }
+
+    function isFull(b) { return b.every(c => c !== null); }
+    function getEmpty(b) { return b.map((v, i) => v === null ? i : -1).filter(i => i >= 0); }
+
+    // --- Minimax ---
+    function minimax(b, depth, isMax, alpha, beta, useAB, treeNode, captureTree) {
+      nodesExplored++;
+      const res = checkWinner(b);
+      if (res) return { score: res.winner === 'O' ? 10 + depth : -(10 + depth) };
+      if (isFull(b) || depth === 0) return { score: 0 };
+
+      let best = isMax ? -Infinity : Infinity;
+      let bestMove = -1;
+      const moves = getEmpty(b);
+
+      for (let mi = 0; mi < moves.length; mi++) {
+        const move = moves[mi];
+        b[move] = isMax ? 'O' : 'X';
+
+        let child = null;
+        if (captureTree && treeNodeCount < MAX_TREE_NODES) {
+          child = { board: [...b], move, score: null, children: [], pruned: false, isMax: !isMax, chosen: false };
+          treeNode.children.push(child);
+          treeNodeCount++;
+        }
+
+        const result = minimax(b, depth - 1, !isMax, alpha, beta, useAB, child || { children: [] }, captureTree && treeNodeCount < MAX_TREE_NODES);
+        const sc = result.score;
+        if (child) child.score = sc;
+
+        b[move] = null;
+
+        if (isMax) {
+          if (sc > best) { best = sc; bestMove = move; }
+          if (useAB) {
+            alpha = Math.max(alpha, best);
+            if (alpha >= beta) {
+              // Mark remaining as pruned
+              if (captureTree && treeNode) {
+                for (let ri = mi + 1; ri < moves.length; ri++) {
+                  if (treeNodeCount < MAX_TREE_NODES) {
+                    const pb = [...b]; pb[moves[ri]] = 'X';
+                    treeNode.children.push({ board: pb, move: moves[ri], score: null, children: [], pruned: true, isMax: !isMax, chosen: false });
+                    treeNodeCount++;
+                  }
+                  nodesPruned++;
+                }
+              } else {
+                nodesPruned += (moves.length - mi - 1);
+              }
+              break;
+            }
+          }
+        } else {
+          if (sc < best) { best = sc; bestMove = move; }
+          if (useAB) {
+            beta = Math.min(beta, best);
+            if (alpha >= beta) {
+              if (captureTree && treeNode) {
+                for (let ri = mi + 1; ri < moves.length; ri++) {
+                  if (treeNodeCount < MAX_TREE_NODES) {
+                    const pb = [...b]; pb[moves[ri]] = 'O';
+                    treeNode.children.push({ board: pb, move: moves[ri], score: null, children: [], pruned: true, isMax: !isMax, chosen: false });
+                    treeNodeCount++;
+                  }
+                  nodesPruned++;
+                }
+              } else {
+                nodesPruned += (moves.length - mi - 1);
+              }
+              break;
+            }
+          }
+        }
+      }
+
+      return { score: best, move: bestMove };
+    }
+
+    // --- AI Move ---
+    function aiMove() {
+      if (gameOver) return;
+      nodesExplored = 0;
+      nodesPruned = 0;
+      treeNodeCount = 0;
+      const useAB = getAlgo() === 'alphabeta';
+      const depth = getDepth();
+
+      treeRoot = { board: [...board], move: -1, score: null, children: [], pruned: false, isMax: true, chosen: false };
+      treeNodeCount = 1;
+
+      const t0 = performance.now();
+      const result = minimax(board, depth, true, -Infinity, Infinity, useAB, treeRoot, true);
+      const elapsed = performance.now() - t0;
+      treeRoot.score = result.score;
+
+      // Mark chosen path
+      markChosen(treeRoot, result.move);
+
+      board[result.move] = 'O';
+      updateBoard();
+      updateStats(elapsed, result.score);
+      renderTree();
+
+      const wr = checkWinner(board);
+      if (wr) {
+        highlightWin(wr.line);
+        statusEl.textContent = 'AI wins!';
+        gameOver = true;
+      } else if (isFull(board)) {
+        statusEl.textContent = 'Draw!';
+        gameOver = true;
+      } else {
+        statusEl.textContent = 'Your turn (X)';
+      }
+    }
+
+    function markChosen(node, bestMove) {
+      for (const child of node.children) {
+        if (child.move === bestMove && !child.pruned) {
+          child.chosen = true;
+          // Recursively mark the best path in chosen child
+          if (child.children.length > 0) {
+            let bestChild = child.children[0];
+            for (const gc of child.children) {
+              if (!gc.pruned && gc.score !== null) {
+                if (!child.isMax && gc.score !== null && (bestChild.score === null || gc.score < bestChild.score)) bestChild = gc;
+                if (child.isMax && gc.score !== null && (bestChild.score === null || gc.score > bestChild.score)) bestChild = gc;
+              }
+            }
+            if (bestChild && !bestChild.pruned) markChosen(child, bestChild.move);
+          }
+          break;
+        }
+      }
+    }
+
+    function updateStats(elapsed, evalScore) {
+      document.getElementById('statNodes').textContent = nodesExplored.toLocaleString();
+      document.getElementById('statPruned').textContent = nodesPruned.toLocaleString();
+      const total = nodesExplored + nodesPruned;
+      const pct = total > 0 ? ((nodesPruned / total) * 100).toFixed(1) : 0;
+      document.getElementById('statPct').textContent = pct + '%';
+      document.getElementById('statTime').textContent = elapsed.toFixed(1) + 'ms';
+      const ev = evalScore > 0 ? '+' + evalScore : evalScore === 0 ? '0' : '' + evalScore;
+      document.getElementById('statEval').textContent = ev;
+      const empty = getEmpty(board).length + 1; // before the move
+      document.getElementById('statBranch').textContent = empty;
+    }
+
+    // --- Cell Click ---
+    function handleCellClick(i) {
+      if (gameOver || board[i] !== null) return;
+      board[i] = 'X';
+      updateBoard();
+
+      const wr = checkWinner(board);
+      if (wr) {
+        highlightWin(wr.line);
+        statusEl.textContent = 'You win!';
+        gameOver = true;
+        return;
+      }
+      if (isFull(board)) {
+        statusEl.textContent = 'Draw!';
+        gameOver = true;
+        return;
+      }
+
+      statusEl.textContent = 'AI is thinking...';
+      setTimeout(() => aiMove(), 30);
+    }
+
+    // --- Tree Rendering ---
+    function renderTree() {
+      treePlaceholder.style.display = 'none';
+      treeContainer.innerHTML = '';
+      if (!treeRoot) return;
+      const el = renderNode(treeRoot, 0);
+      treeContainer.appendChild(el);
+    }
+
+    function renderNode(node, depth) {
+      const wrap = document.createElement('div');
+      wrap.className = 'tree-node';
+
+      // Connector line from parent
+      if (depth > 0) {
+        const line = document.createElement('div');
+        line.className = 'connector-line';
+        wrap.appendChild(line);
+      }
+
+      // Mini board
+      const mb = document.createElement('div');
+      mb.className = 'mini-board';
+      if (node.pruned) mb.classList.add('pruned');
+      else if (node.chosen) mb.classList.add('chosen');
+      else mb.classList.add(node.isMax ? 'max' : 'min');
+
+      for (let i = 0; i < 9; i++) {
+        const mc = document.createElement('div');
+        mc.className = 'mini-cell';
+        if (node.board[i] === 'X') { mc.textContent = 'X'; mc.classList.add('mx'); }
+        else if (node.board[i] === 'O') { mc.textContent = 'O'; mc.classList.add('mo'); }
+        mb.appendChild(mc);
+      }
+      wrap.appendChild(mb);
+
+      // Score
+      if (node.score !== null) {
+        const sc = document.createElement('div');
+        sc.className = 'node-score';
+        const s = node.score;
+        sc.textContent = s > 0 ? '+' + s : s;
+        sc.classList.add(s > 0 ? 'positive' : s < 0 ? 'negative' : 'zero');
+        wrap.appendChild(sc);
+      }
+
+      // Children
+      if (node.children.length > 0) {
+        const ch = document.createElement('div');
+        ch.className = 'tree-children';
+        for (const child of node.children) {
+          ch.appendChild(renderNode(child, depth + 1));
+        }
+        wrap.appendChild(ch);
+      }
+
+      return wrap;
+    }
+
+    // --- Init ---
+    newGame();
+  })();
+  </script>
+</body>
+</html>

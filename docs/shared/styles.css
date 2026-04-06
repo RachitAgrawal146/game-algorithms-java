@@ -1,0 +1,739 @@
+/* ==========================================================================
+   Game Algorithms Showcase — Shared Design System
+   A dark-themed CSS design system for documenting game algorithms.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Custom Properties
+   -------------------------------------------------------------------------- */
+:root {
+  /* Colors — Background */
+  --color-bg:             #0a0a0f;
+  --color-bg-card:        #1a1a25;
+  --color-bg-card-hover:  #1f1f2e;
+  --color-border:         rgba(255, 255, 255, 0.08);
+  --color-border-hover:   rgba(255, 255, 255, 0.14);
+
+  /* Colors — Text */
+  --color-text:           #e4e4e7;
+  --color-text-muted:     #71717a;
+  --color-text-heading:   #ffffff;
+
+  /* Colors — Accents */
+  --color-blue:           #3b82f6;
+  --color-green:          #22c55e;
+  --color-amber:          #f59e0b;
+  --color-red:            #ef4444;
+  --color-purple:         #a855f7;
+  --color-gold:           #c9a96e;
+
+  /* Typography */
+  --font-heading:         'Space Grotesk', system-ui, sans-serif;
+  --font-body:            'Inter', system-ui, sans-serif;
+  --font-mono:            'JetBrains Mono', ui-monospace, 'Cascadia Code', monospace;
+
+  /* Spacing scale (4px base) */
+  --space-1:  0.25rem;   /*  4px */
+  --space-2:  0.5rem;    /*  8px */
+  --space-3:  0.75rem;   /* 12px */
+  --space-4:  1rem;      /* 16px */
+  --space-5:  1.25rem;   /* 20px */
+  --space-6:  1.5rem;    /* 24px */
+  --space-8:  2rem;      /* 32px */
+  --space-10: 2.5rem;    /* 40px */
+  --space-12: 3rem;      /* 48px */
+  --space-16: 4rem;      /* 64px */
+  --space-20: 5rem;      /* 80px */
+  --space-24: 6rem;      /* 96px */
+
+  /* Radii */
+  --radius-sm:  6px;
+  --radius-md:  10px;
+  --radius-lg:  16px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-card:  0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-lift:  0 8px 24px rgba(0, 0, 0, 0.4);
+
+  /* Transitions */
+  --ease-out:     cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 400ms;
+
+  /* Layout */
+  --nav-height: 60px;
+  --container-max: 1200px;
+}
+
+
+/* --------------------------------------------------------------------------
+   2. Reset & Base Styles
+   -------------------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Noise texture overlay */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}
+
+img, svg, video {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  color: var(--color-text-heading);
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+
+/* --------------------------------------------------------------------------
+   3. Selection & Scrollbar
+   -------------------------------------------------------------------------- */
+::selection {
+  background-color: rgba(59, 130, 246, 0.35);
+  color: #fff;
+}
+
+/* Thin dark scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) var(--color-bg);
+}
+
+
+/* --------------------------------------------------------------------------
+   4. Navigation — .site-nav
+   -------------------------------------------------------------------------- */
+.site-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: var(--nav-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-8);
+  background: rgba(10, 10, 15, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.nav-logo {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--color-text-heading);
+  letter-spacing: -0.02em;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.nav-logo:hover {
+  color: var(--color-gold);
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.nav-links a {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+  color: var(--color-gold);
+}
+
+
+/* --------------------------------------------------------------------------
+   5. Layout — .container
+   -------------------------------------------------------------------------- */
+.container {
+  max-width: var(--container-max);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--space-6);
+  padding-right: var(--space-6);
+}
+
+
+/* --------------------------------------------------------------------------
+   6. Hero Section — .hero
+   -------------------------------------------------------------------------- */
+.hero {
+  text-align: center;
+  padding: var(--space-24) var(--space-6) var(--space-16);
+  margin-top: var(--nav-height);
+}
+
+.hero h1 {
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  letter-spacing: -0.03em;
+  margin-bottom: var(--space-6);
+}
+
+.hero p {
+  font-size: clamp(1rem, 1.8vw, 1.25rem);
+  color: var(--color-text-muted);
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.7;
+}
+
+
+/* --------------------------------------------------------------------------
+   7. Section Label — .section-label
+   -------------------------------------------------------------------------- */
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-gold);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+}
+
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, var(--color-gold), transparent);
+  opacity: 0.3;
+}
+
+
+/* --------------------------------------------------------------------------
+   8. Cards — .card, .card-grid
+   -------------------------------------------------------------------------- */
+.card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  transition:
+    transform var(--duration-base) var(--ease-out),
+    border-color var(--duration-base) var(--ease-out),
+    box-shadow var(--duration-base) var(--ease-out);
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  border-color: var(--color-border-hover);
+  box-shadow: var(--shadow-lift);
+}
+
+.card h3 {
+  font-size: 1.15rem;
+  margin-bottom: var(--space-3);
+}
+
+.card p {
+  color: var(--color-text-muted);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-6);
+}
+
+
+/* --------------------------------------------------------------------------
+   9. Buttons — .btn
+   -------------------------------------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition:
+    background var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+  user-select: none;
+  white-space: nowrap;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn-primary {
+  background: var(--color-blue);
+  color: #fff;
+  border-color: var(--color-blue);
+}
+
+.btn-primary:hover {
+  background: #2563eb;
+  border-color: #2563eb;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+.btn-ghost:hover {
+  border-color: var(--color-text-muted);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+
+/* --------------------------------------------------------------------------
+   10. Stats Bar — .stats-bar
+   -------------------------------------------------------------------------- */
+.stats-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+  padding: var(--space-6) 0;
+}
+
+.stats-bar .stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.stats-bar .stat-number {
+  font-family: var(--font-heading);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-text-heading);
+}
+
+.stats-bar .stat-label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+}
+
+
+/* --------------------------------------------------------------------------
+   11. Tags — .tag
+   -------------------------------------------------------------------------- */
+.tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  color: var(--color-text-muted);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+
+/* --------------------------------------------------------------------------
+   12. Algorithm Badge — .algo-badge
+   -------------------------------------------------------------------------- */
+.algo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
+  letter-spacing: 0.02em;
+}
+
+.algo-badge--pathfinding {
+  background: rgba(59, 130, 246, 0.12);
+  color: var(--color-blue);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.algo-badge--search {
+  background: rgba(168, 85, 247, 0.12);
+  color: var(--color-purple);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+}
+
+.algo-badge--sorting {
+  background: rgba(34, 197, 94, 0.12);
+  color: var(--color-green);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.algo-badge--optimization {
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--color-amber);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.algo-badge--ai {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--color-red);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+
+/* --------------------------------------------------------------------------
+   13. Code Block — .code-block
+   -------------------------------------------------------------------------- */
+.code-block {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  line-height: 1.7;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  overflow-x: auto;
+  tab-size: 4;
+  color: var(--color-text);
+}
+
+.code-block code {
+  font-family: inherit;
+  background: none;
+  padding: 0;
+}
+
+
+/* --------------------------------------------------------------------------
+   14. Complexity Table — .complexity-table
+   -------------------------------------------------------------------------- */
+.complexity-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.complexity-table thead th {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+}
+
+.complexity-table tbody td {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+}
+
+.complexity-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.complexity-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.complexity-table .complexity-good {
+  color: var(--color-green);
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+.complexity-table .complexity-avg {
+  color: var(--color-amber);
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+.complexity-table .complexity-bad {
+  color: var(--color-red);
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+
+/* --------------------------------------------------------------------------
+   15. Educational Panel — .educational-panel
+   -------------------------------------------------------------------------- */
+.educational-panel {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: border-color var(--duration-base) var(--ease-out);
+}
+
+.educational-panel:hover {
+  border-color: var(--color-border-hover);
+}
+
+.educational-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--duration-fast) var(--ease-out);
+}
+
+.educational-panel__header:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.educational-panel__title {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text-heading);
+}
+
+.educational-panel__toggle {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.educational-panel.is-open .educational-panel__toggle {
+  transform: rotate(180deg);
+}
+
+.educational-panel.is-open .educational-panel__header {
+  border-bottom-color: var(--color-border);
+}
+
+.educational-panel__body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height var(--duration-slow) var(--ease-out);
+}
+
+.educational-panel.is-open .educational-panel__body {
+  max-height: 800px;
+}
+
+.educational-panel__content {
+  padding: var(--space-5);
+  font-size: 0.9rem;
+  line-height: 1.75;
+  color: var(--color-text-muted);
+}
+
+.educational-panel__content strong {
+  color: var(--color-text);
+}
+
+.educational-panel__content code {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  color: var(--color-blue);
+}
+
+
+/* --------------------------------------------------------------------------
+   16. Animation Utilities
+   -------------------------------------------------------------------------- */
+.fade-in {
+  opacity: 0;
+  transition: opacity var(--duration-slow) var(--ease-out);
+}
+
+.fade-in.is-visible {
+  opacity: 1;
+}
+
+.slide-up {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity var(--duration-slow) var(--ease-out),
+    transform var(--duration-slow) var(--ease-out);
+}
+
+.slide-up.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+/* --------------------------------------------------------------------------
+   17. Responsive Breakpoints
+   -------------------------------------------------------------------------- */
+
+/* Tablet — 1024px */
+@media (max-width: 1024px) {
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .hero h1 {
+    font-size: clamp(2rem, 4.5vw, 3rem);
+  }
+
+  .hero {
+    padding: var(--space-20) var(--space-6) var(--space-12);
+  }
+}
+
+/* Mobile — 768px */
+@media (max-width: 768px) {
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .site-nav {
+    padding: 0 var(--space-4);
+  }
+
+  .nav-links {
+    gap: var(--space-4);
+  }
+
+  .nav-links a {
+    font-size: 0.62rem;
+  }
+
+  .hero {
+    padding: var(--space-16) var(--space-4) var(--space-10);
+  }
+
+  .stats-bar {
+    gap: var(--space-6);
+    justify-content: center;
+  }
+
+  .container {
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
+  }
+
+  .complexity-table {
+    font-size: 0.8rem;
+  }
+
+  .complexity-table thead th,
+  .complexity-table tbody td {
+    padding: var(--space-2) var(--space-3);
+  }
+}
+
+
+/* --------------------------------------------------------------------------
+   18. Reduced Motion
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .fade-in,
+  .slide-up {
+    opacity: 1;
+    transform: none;
+  }
+}

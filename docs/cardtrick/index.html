@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>21-Card Trick — Algorithm Visualizer</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Shared Design System -->
+  <link rel="stylesheet" href="../shared/styles.css" />
+
+  <style>
+    /* ── Page-specific overrides ──────────────────────────────────── */
+
+    /* Use shared design system variables with local fallbacks */
+    :root {
+      --bg:        var(--color-bg, #0a0a0f);
+      --surface:   var(--color-bg-card, #1a1a25);
+      --card-bg:   var(--color-bg-card, #1a1a25);
+      --border:    var(--color-border, rgba(255,255,255,0.08));
+      --text:      var(--color-text, #e4e4e7);
+      --muted:     var(--color-text-muted, #71717a);
+      --hint:      #555a72;
+      --blue:      var(--color-blue, #3b82f6);
+      --blue-bg:   rgba(59,130,246,0.12);
+      --amber:     var(--color-amber, #f59e0b);
+      --amber-bg:  rgba(245,158,11,0.12);
+      --green:     var(--color-green, #22c55e);
+      --green-bg:  rgba(34,197,94,0.10);
+      --red:       var(--color-red, #ef4444);
+      --red-bg:    rgba(239,68,68,0.12);
+      --gold:      var(--color-gold, #c9a96e);
+      --radius:    var(--radius-sm, 6px);
+      --radius-lg: var(--radius-md, 10px);
+      --mono:      var(--font-mono, 'JetBrains Mono', ui-monospace, monospace);
+    }
+
+    .page-wrapper {
+      max-width: 740px;
+      margin: 0 auto;
+      padding: 24px 20px 48px;
+    }
+
+    /* ── Page title ──────────────────────────────────────────────── */
+    .page-title {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .page-title .gold-label {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gold);
+      margin-bottom: 8px;
+    }
+    .page-title h1 {
+      font-family: var(--font-heading, 'Space Grotesk', system-ui, sans-serif);
+      font-size: clamp(1.8rem, 4vw, 2.4rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--color-text-heading, #fff);
+      margin-bottom: 8px;
+    }
+    .page-title .subtitle {
+      font-family: var(--font-body, 'Inter', system-ui, sans-serif);
+      font-size: 1rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ── Tags ────────────────────────────────────────────────────── */
+    .tag {
+      display: inline-block;
+      border-radius: 4px; padding: 2px 8px; font-size: 11px; margin: 0 2px;
+      font-family: var(--mono);
+    }
+    .tag-green  { background: var(--green-bg);  color: var(--green);  border: 0.5px solid var(--green); }
+    .tag-amber  { background: var(--amber-bg);  color: var(--amber);  border: 0.5px solid var(--amber); }
+
+    /* ── Trick panels & controls ─────────────────────────────────── */
+    .panel {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px 18px;
+    }
+    .panel + .panel { margin-top: 12px; }
+    .panel-label {
+      font-size: 10px; color: var(--hint);
+      text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px;
+      font-family: var(--mono);
+    }
+
+    .trick-container button {
+      font-family: var(--mono); font-size: 11px; padding: 5px 11px;
+      background: var(--card-bg); border: 0.5px solid var(--border);
+      border-radius: var(--radius); color: var(--muted);
+      cursor: pointer; transition: all 0.12s;
+      user-select: none;
+    }
+    .trick-container button:hover  { background: #2a2e42; color: var(--text); border-color: rgba(255,255,255,0.15); }
+    .trick-container button:active { transform: scale(0.97); }
+    .trick-container button:disabled { opacity: 0.3; cursor: default; }
+
+    .status-bar {
+      text-align: center; padding: 10px; border-radius: var(--radius);
+      font-size: 13px; font-weight: 600; margin-bottom: 14px;
+      font-family: var(--mono);
+    }
+    .status-bar.info    { background: var(--blue-bg);   border: 0.5px solid var(--blue);  color: var(--blue); }
+    .status-bar.success { background: var(--green-bg);  border: 0.5px solid var(--green); color: var(--green); }
+    .status-bar.pick    { background: var(--amber-bg);  border: 0.5px solid var(--amber); color: var(--amber); }
+
+    /* Card columns layout */
+    .columns-wrap {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .col-header {
+      text-align: center; font-size: 12px; font-weight: 600;
+      padding: 6px; border-radius: var(--radius) var(--radius) 0 0;
+      background: var(--card-bg); cursor: pointer; transition: all 0.15s;
+      border: 1px solid transparent;
+      font-family: var(--mono);
+    }
+    .col-header:hover {
+      background: var(--blue-bg); border-color: var(--blue); color: var(--blue);
+    }
+    .col-header.selected {
+      background: var(--amber-bg); border-color: var(--amber); color: var(--amber);
+    }
+    .col-header.disabled { cursor: default; opacity: 0.4; }
+    .col-header.disabled:hover { background: var(--card-bg); border-color: transparent; color: var(--text); }
+
+    .col-cards {
+      display: flex; flex-direction: column; gap: 4px;
+      padding: 8px;
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: 0 0 var(--radius) var(--radius);
+      min-height: 300px;
+    }
+
+    .card-item {
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+      transition: all 0.3s;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      font-family: var(--mono);
+    }
+    .card-item.hearts, .card-item.diamonds { color: var(--red); }
+    .card-item.spades, .card-item.clubs    { color: var(--text); }
+    .card-item.highlight {
+      background: var(--green-bg);
+      border-color: var(--green);
+      color: var(--green);
+      transform: scale(1.05);
+      box-shadow: 0 0 15px rgba(34,197,94,0.3);
+    }
+    .card-item.chosen {
+      background: var(--amber-bg);
+      border-color: var(--amber);
+    }
+
+    /* Phase display */
+    .phase-dots {
+      display: flex; gap: 8px; justify-content: center; margin-bottom: 14px;
+    }
+    .phase-dot {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--card-bg); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; transition: all 0.3s;
+      font-family: var(--mono);
+    }
+    .phase-dot.active {
+      background: var(--blue-bg); border-color: var(--blue); color: var(--blue);
+    }
+    .phase-dot.done {
+      background: var(--green-bg); border-color: var(--green); color: var(--green);
+    }
+
+    .action-row { display: flex; gap: 8px; justify-content: center; margin-bottom: 14px; }
+    .action-row button { padding: 8px 20px; font-size: 12px; }
+    .btn-pick {
+      background: var(--amber-bg) !important; border-color: var(--amber) !important;
+      color: var(--amber) !important;
+    }
+    .btn-start {
+      background: var(--green-bg) !important; border-color: var(--green) !important;
+      color: var(--green) !important; padding: 8px 24px !important; font-size: 13px !important;
+    }
+
+    .reveal-card {
+      display: none; text-align: center; padding: 20px;
+      animation: revealPop 0.5s ease;
+    }
+    .reveal-card.show { display: block; }
+    @keyframes revealPop {
+      from { opacity: 0; transform: scale(0.8); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    .big-card {
+      display: inline-block;
+      padding: 20px 32px;
+      font-size: 36px; font-weight: 700;
+      border-radius: 12px;
+      background: var(--card-bg);
+      border: 2px solid var(--green);
+      box-shadow: 0 0 30px rgba(34,197,94,0.3);
+      font-family: var(--mono);
+    }
+
+    .algo-desc { font-size: 11px; color: var(--muted); line-height: 1.75; margin-top: 4px; font-family: var(--mono); }
+
+    #btn-reset {
+      width: 100%; padding: 8px;
+      background: var(--card-bg); font-size: 12px; margin-top: 12px;
+    }
+
+    /* ── Educational panel (page-specific supplement to shared styles) ── */
+    .educational-panel {
+      margin-top: 20px;
+    }
+    .edu-section { margin-bottom: 20px; }
+    .edu-section:last-child { margin-bottom: 0; }
+    .edu-section h4 {
+      font-family: var(--font-heading, 'Space Grotesk', system-ui, sans-serif);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--color-text-heading, #fff);
+      margin-bottom: 8px;
+    }
+    .edu-section p {
+      margin-bottom: 8px;
+    }
+    .edu-section p:last-child {
+      margin-bottom: 0;
+    }
+    .edu-section code {
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--blue);
+    }
+  </style>
+</head>
+<body>
+
+<div class="page-wrapper">
+  <div class="page-title">
+    <div class="gold-label">Mathematical Algorithm</div>
+    <h1>21-Card Trick</h1>
+    <p class="subtitle">Deterministic convergence through ternary subdivision</p>
+  </div>
+
+  <div class="trick-container">
+    <div class="phase-dots" id="phase-dots">
+      <div class="phase-dot active">1</div>
+      <div class="phase-dot">2</div>
+      <div class="phase-dot">3</div>
+    </div>
+
+    <div class="status-bar info" id="status">Remember any card, then click the column it's in</div>
+
+    <div id="game-area">
+      <div class="columns-wrap" id="columns-wrap"></div>
+    </div>
+
+    <div class="reveal-card" id="reveal">
+      <p style="color:var(--green);margin-bottom:12px;font-size:14px">Your card is:</p>
+      <div class="big-card" id="big-card"></div>
+    </div>
+
+    <button id="btn-reset" onclick="resetGame()">&#x21BA; Play Again</button>
+
+    <div class="panel" style="margin-top:14px">
+      <div class="panel-label">How It Works</div>
+      <div class="algo-desc">
+        21 cards are dealt into 3 columns of 7. Each round, you tell the
+        algorithm which column contains your card. The chosen column is
+        placed in the <b>middle</b> of the three stacks when gathering them
+        back together. After 3 rounds, your card is guaranteed to be at
+        position 11 (the centre) &mdash; a consequence of the mathematical
+        structure of the rearrangement, not luck.
+      </div>
+    </div>
+  </div>
+
+  <!-- Educational Panel -->
+  <div class="educational-panel" id="edu-panel">
+    <div class="educational-panel__header" onclick="document.getElementById('edu-panel').classList.toggle('is-open')">
+      <span class="educational-panel__title">Learn How This Works &#x25BC;</span>
+      <span class="educational-panel__toggle">&#x25B2;</span>
+    </div>
+    <div class="educational-panel__body">
+      <div class="educational-panel__content">
+        <div class="edu-section">
+          <h4>The Trick</h4>
+          <p>21 cards are dealt into 3 columns of 7. The magician asks which column contains your card. The cards are gathered &mdash; with the chosen column placed in the middle. After 3 rounds, the card is always at position 11 (the exact centre of 21 cards).</p>
+        </div>
+
+        <div class="edu-section">
+          <h4>Why It Works (The Mathematics)</h4>
+          <p>After round 1: Your card is somewhere in positions 8&ndash;14 (the middle 7).</p>
+          <p>After round 2: Your card is in positions 10&ndash;12 (the middle 3).</p>
+          <p>After round 3: Your card is at position 11 (the exact middle).</p>
+          <p>Each round places the chosen group of 7 in the middle of the deck. Within that group, the card's position is also narrowed to the middle third. The three rounds of ternary subdivision converge deterministically to the centre.</p>
+        </div>
+
+        <div class="edu-section">
+          <h4>Formally</h4>
+          <p>The algorithm performs a base-3 digit extraction. Each round identifies one ternary digit of the card's position within the chosen column. Three rounds = three digits = uniquely identifies 1 of 3<sup>3</sup> = 27 positions. Since 21 &lt; 27, three rounds always suffice.</p>
+        </div>
+
+        <div class="edu-section">
+          <h4>Complexity</h4>
+          <p><strong>Time:</strong> <code>O(1)</code> &mdash; exactly 3 rounds, regardless of which card is chosen</p>
+          <p><strong>Space:</strong> <code>O(n)</code> where n = 21 (the card array)</p>
+          <p>This is a deterministic, non-adaptive algorithm &mdash; the same 3 steps work for any card.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const SUITS = ['\u2660','\u2666','\u2663','\u2665'];
+  const SUIT_NAMES = ['spades','diamonds','clubs','hearts'];
+  const RANKS = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+
+  let cards21, columns, round, selectedCol;
+
+  function makeDeck () {
+    const deck = [];
+    for (let s = 0; s < 4; s++)
+      for (let r = 0; r < 13; r++)
+        deck.push({ rank: RANKS[r], suit: SUITS[s], suitName: SUIT_NAMES[s] });
+    return deck;
+  }
+
+  function shuffle (arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function dealColumns () {
+    columns = [[], [], []];
+    for (let i = 0; i < 21; i++) {
+      columns[i % 3].push(cards21[i]);
+    }
+  }
+
+  function gatherColumns (chosenCol) {
+    // Place chosen column in the middle
+    const other = [0, 1, 2].filter(c => c !== chosenCol);
+    const gathered = [];
+    // First non-chosen column
+    for (const card of columns[other[0]]) gathered.push(card);
+    // Chosen column in the middle
+    for (const card of columns[chosenCol]) gathered.push(card);
+    // Second non-chosen column
+    for (const card of columns[other[1]]) gathered.push(card);
+    cards21 = gathered;
+  }
+
+  function cardText (c) { return c.rank + c.suit; }
+
+  // ── Rendering ────────────────────────────────────────────────
+
+  function renderColumns () {
+    const wrap = document.getElementById('columns-wrap');
+    wrap.innerHTML = '';
+
+    for (let c = 0; c < 3; c++) {
+      const colDiv = document.createElement('div');
+
+      const header = document.createElement('div');
+      header.className = 'col-header';
+      header.textContent = 'Column ' + (c + 1);
+      header.onclick = () => pickColumn(c);
+      colDiv.appendChild(header);
+
+      const cardsDiv = document.createElement('div');
+      cardsDiv.className = 'col-cards';
+      columns[c].forEach(card => {
+        const item = document.createElement('div');
+        item.className = 'card-item ' + card.suitName;
+        item.textContent = cardText(card);
+        cardsDiv.appendChild(item);
+      });
+      colDiv.appendChild(cardsDiv);
+
+      wrap.appendChild(colDiv);
+    }
+  }
+
+  function updatePhases () {
+    const dots = document.querySelectorAll('.phase-dot');
+    dots.forEach((d, i) => {
+      d.className = 'phase-dot';
+      if (i < round) d.classList.add('done');
+      else if (i === round) d.classList.add('active');
+    });
+  }
+
+  function setStatus (msg, cls) {
+    const s = document.getElementById('status');
+    s.textContent = msg;
+    s.className = 'status-bar ' + cls;
+  }
+
+  // ── Game logic ───────────────────────────────────────────────
+
+  function pickColumn (col) {
+    if (round >= 3) return;
+
+    // Highlight chosen column header
+    const headers = document.querySelectorAll('.col-header');
+    headers.forEach((h, i) => {
+      h.classList.toggle('selected', i === col);
+    });
+
+    gatherColumns(col);
+    round++;
+    updatePhases();
+
+    if (round >= 3) {
+      // Reveal the card
+      setTimeout(() => {
+        document.getElementById('game-area').style.display = 'none';
+        const reveal = document.getElementById('reveal');
+        const bigCard = document.getElementById('big-card');
+        const foundCard = cards21[10];
+        bigCard.textContent = cardText(foundCard);
+        bigCard.className = 'big-card ' + foundCard.suitName;
+        reveal.classList.add('show');
+        setStatus('Your card is ' + cardText(foundCard) + '!', 'success');
+      }, 500);
+    } else {
+      setStatus('Round ' + (round + 1) + ' of 3 \u2014 which column is your card in now?', 'pick');
+      dealColumns();
+      setTimeout(renderColumns, 400);
+    }
+  }
+
+  // ── Reset ────────────────────────────────────────────────────
+
+  window.resetGame = function () {
+    const deck = shuffle(makeDeck());
+    cards21 = deck.slice(0, 21);
+    round = 0;
+    selectedCol = -1;
+
+    document.getElementById('game-area').style.display = '';
+    document.getElementById('reveal').classList.remove('show');
+
+    updatePhases();
+    dealColumns();
+    renderColumns();
+    setStatus('Remember any card, then click the column it\'s in (Round 1 of 3)', 'info');
+  };
+
+  // ── Init ─────────────────────────────────────────────────────
+
+  resetGame();
+
+})();
+</script>
+
+<script src="../shared/nav.js"></script>
+
+</body>
+</html>

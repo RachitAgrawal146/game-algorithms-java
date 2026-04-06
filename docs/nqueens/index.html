@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>N-Queens Algorithm Visualizer</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0f1117;
+      --surface:   #1a1d27;
+      --card:      #22263a;
+      --border:    rgba(255,255,255,0.08);
+      --text:      #e8eaf0;
+      --muted:     #8b90a8;
+      --hint:      #555a72;
+      --blue:      #4f8ef7;
+      --blue-bg:   rgba(79,142,247,0.12);
+      --amber:     #f5a623;
+      --amber-bg:  rgba(245,166,35,0.12);
+      --green:     #3ecf8e;
+      --green-bg:  rgba(62,207,142,0.10);
+      --red:       #f25f5c;
+      --red-bg:    rgba(242,95,92,0.12);
+      --radius:    8px;
+      --radius-lg: 12px;
+      --mono:      'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 13px;
+      min-height: 100vh;
+      padding: 24px 20px 48px;
+    }
+
+    .header { text-align: center; margin-bottom: 28px; }
+    .header h1 { font-size: 22px; font-weight: 600; letter-spacing: 0.5px; }
+    .header p  { margin-top: 6px; color: var(--muted); font-size: 12px; }
+    .tag {
+      display: inline-block;
+      background: var(--blue-bg); color: var(--blue);
+      border: 0.5px solid var(--blue);
+      border-radius: 4px; padding: 2px 8px; font-size: 11px; margin: 0 2px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 20px;
+      max-width: 900px;
+      margin: 0 auto;
+      align-items: start;
+    }
+    @media (max-width: 680px) { .layout { grid-template-columns: 1fr; } }
+
+    .panel {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 12px 14px;
+    }
+    .panel + .panel { margin-top: 10px; }
+    .panel-label {
+      font-size: 10px; color: var(--hint);
+      text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px;
+    }
+
+    .ctrl-row {
+      display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end;
+      max-width: 900px; margin: 0 auto 16px;
+    }
+    .ctrl-group { display: flex; flex-direction: column; gap: 5px; }
+    .ctrl-label { font-size: 10px; color: var(--hint); letter-spacing: 0.6px; text-transform: uppercase; }
+    .btn-group  { display: flex; gap: 4px; flex-wrap: wrap; }
+
+    button {
+      font-family: var(--mono); font-size: 11px; padding: 5px 11px;
+      background: var(--card); border: 0.5px solid var(--border);
+      border-radius: var(--radius); color: var(--muted);
+      cursor: pointer; transition: all 0.12s;
+      user-select: none;
+    }
+    button:hover  { background: #2a2e42; color: var(--text); border-color: rgba(255,255,255,0.15); }
+    button:active { transform: scale(0.97); }
+
+    .act-algo { background: var(--blue-bg)  !important; border-color: var(--blue)  !important; color: var(--blue)  !important; }
+    .act-n    { background: var(--amber-bg) !important; border-color: var(--amber) !important; color: var(--amber) !important; }
+    .act-sp   { background: var(--green-bg) !important; border-color: var(--green) !important; color: var(--green) !important; }
+
+    #btn-play { padding: 6px 18px; font-size: 12px; min-width: 90px; }
+    #btn-play.playing { background: var(--red-bg)   !important; border-color: var(--red)   !important; color: var(--red)   !important; }
+    #btn-play.stopped { background: var(--green-bg) !important; border-color: var(--green) !important; color: var(--green) !important; }
+
+    #board-wrap { display: inline-flex; flex-direction: column; gap: 2px; }
+    .board-row  { display: flex; gap: 2px; }
+    .cell {
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 4px; transition: background 0.08s;
+      line-height: 1; user-select: none;
+    }
+
+    .transport { display: flex; gap: 4px; align-items: center; margin-top: 10px; }
+
+    .progress-wrap { margin-top: 8px; }
+    .progress-track { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+    .progress-fill  { height: 100%; background: var(--muted); border-radius: 2px; transition: width 0.05s; }
+    .progress-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--hint); margin-top: 3px; }
+
+    .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .metric { background: var(--card); border-radius: var(--radius); padding: 8px 10px; }
+    .metric-lbl { font-size: 9px; color: var(--hint); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 3px; }
+    .metric-val { font-size: 20px; font-weight: 600; }
+
+    .action-badge { font-size: 12px; min-height: 18px; padding: 4px 0 2px; }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+    .chip { font-size: 10px; padding: 2px 7px; border-radius: var(--radius); border: 0.5px solid var(--border); color: var(--hint); background: transparent; }
+    .chip.placed { background: var(--blue-bg);  border-color: var(--blue);  color: var(--blue); }
+    .chip.active { background: var(--amber-bg); border-color: var(--amber); color: var(--amber); }
+
+    .domain-cols { display: flex; gap: 4px; margin-top: 4px; }
+    .domain-col { flex: 1; text-align: center; border-radius: var(--radius); padding: 4px 2px; min-width: 0; border: 0.5px solid var(--border); }
+    .dc-lbl { font-size: 9px; }
+    .dc-val { font-size: 14px; font-weight: 600; }
+
+    .algo-desc { font-size: 11px; color: var(--muted); line-height: 1.75; margin-top: 4px; }
+
+    .solved-banner {
+      display: none; text-align: center; padding: 8px; border-radius: var(--radius);
+      background: var(--green-bg); border: 0.5px solid var(--green); color: var(--green);
+      font-size: 13px; font-weight: 600; margin-top: 10px;
+    }
+    .solved-banner.show { display: block; }
+  </style>
+</head>
+<body>
+<div style="padding: 90px 20px 0; max-width: 900px; margin: 0 auto; text-align: center;">
+  <p style="font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 0.25em; color: #c9a96e; margin-bottom: 8px;">CONSTRAINT SATISFACTION</p>
+  <h1 style="font-family: 'Space Grotesk', sans-serif; font-size: 2.5rem; font-weight: 700; color: #fff; margin: 0 0 8px;">N-Queens Solver</h1>
+  <p style="font-family: 'Inter', sans-serif; font-size: 1rem; color: #71717a; margin-bottom: 24px;">Comparing backtracking, forward checking, and local search</p>
+</div>
+
+
+<div class="header">
+  <h1>N-Queens Algorithm Visualizer</h1>
+  <p>
+    <span class="tag">Backtracking</span>
+    <span class="tag">Forward Checking</span>
+    <span class="tag">Min-Conflicts</span>
+    &nbsp;— step through each algorithm and watch it work
+  </p>
+</div>
+
+<div class="ctrl-row" id="ctrl-row"></div>
+
+<div class="layout">
+  <div>
+    <div id="board-wrap"></div>
+
+    <!-- Transport buttons — created once, never destroyed -->
+    <div class="transport">
+      <button id="btn-start">&#x23EE;</button>
+      <button id="btn-prev">&#x25C0;</button>
+      <button id="btn-play" class="stopped">&#9654;&nbsp;play</button>
+      <button id="btn-next">&#x25B6;</button>
+      <button id="btn-end">&#x23ED;</button>
+      <button id="btn-regen" style="display:none;margin-left:4px">&#x21BA; restart</button>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+      <div class="progress-labels">
+        <span id="prog-step">step 1</span>
+        <span id="prog-total">— total steps</span>
+      </div>
+    </div>
+
+    <div class="solved-banner" id="solved-banner">&#10003; solution found</div>
+  </div>
+
+  <div id="sidebar"></div>
+</div>
+
+<script>
+(function ()
+{
+  // ── Algorithm step recorders ────────────────────────────────────
+
+  function safe (q, row, col)
+  {
+    for (let c = 0; c < col; c++)
+      if (q[c] === row || Math.abs(q[c] - row) === Math.abs(c - col))
+        return false;
+    return true;
+  }
+
+  function recordBT (n)
+  {
+    const steps = [], q = new Array(n).fill(-1);
+    let nodes = 0, bt = 0;
+    function solve (col)
+    {
+      if (col === n) { steps.push({ type:'solved', q:[...q], nodes, bt }); return true; }
+      for (let row = 0; row < n; row++)
+      {
+        nodes++;
+        steps.push({ type:'try', col, row, q:[...q], nodes, bt });
+        if (safe(q, row, col))
+        {
+          q[col] = row;
+          steps.push({ type:'place', col, row, q:[...q], nodes, bt });
+          if (solve(col + 1)) return true;
+          bt++; q[col] = -1;
+          steps.push({ type:'back', col, row, q:[...q], nodes, bt });
+        }
+      }
+      return false;
+    }
+    solve(0);
+    return steps;
+  }
+
+  function recordFC (n)
+  {
+    const steps = [], q = new Array(n).fill(-1);
+    let nodes = 0, bt = 0;
+    const mkD = () => Array.from({ length: n }, () => new Array(n).fill(true));
+    const cpD = d => d.map(r => [...r]);
+    const emD = d => !d.some(Boolean);
+
+    function prop (col, row, d)
+    {
+      const nd = cpD(d);
+      for (let fc = col + 1; fc < n; fc++)
+      {
+        const dist = fc - col;
+        nd[fc][row] = false;
+        if (row - dist >= 0) nd[fc][row - dist] = false;
+        if (row + dist < n)  nd[fc][row + dist] = false;
+        if (emD(nd[fc])) return null;
+      }
+      return nd;
+    }
+
+    function solve (col, d)
+    {
+      if (col === n) { steps.push({ type:'solved', q:[...q], d:cpD(d), nodes, bt }); return true; }
+      for (let row = 0; row < n; row++)
+      {
+        if (!d[col][row]) continue;
+        nodes++;
+        steps.push({ type:'try', col, row, q:[...q], d:cpD(d), nodes, bt });
+        q[col] = row;
+        const nd = prop(col, row, d);
+        if (nd)
+        {
+          steps.push({ type:'place', col, row, q:[...q], d:cpD(nd), nodes, bt });
+          if (solve(col + 1, nd)) return true;
+          bt++; q[col] = -1;
+          steps.push({ type:'back', col, row, q:[...q], d:cpD(d), nodes, bt });
+        }
+        else
+        {
+          steps.push({ type:'prune', col, row, q:[...q], d:cpD(d), nodes, bt });
+          bt++; q[col] = -1;
+        }
+      }
+      return false;
+    }
+    solve(0, mkD());
+    return steps;
+  }
+
+  function recordMC (n)
+  {
+    const steps = [], q = new Array(n).fill(0);
+    let nodes = 0;
+    function conf (col, row, qq)
+    {
+      let c = 0;
+      for (let i = 0; i < n; i++)
+      {
+        if (i === col) continue;
+        if (qq[i] === row) c++;
+        if (Math.abs(qq[i] - row) === Math.abs(i - col)) c++;
+      }
+      return c;
+    }
+    function totalConf (qq) { let t = 0; for (let c = 0; c < n; c++) t += conf(c, qq[c], qq); return Math.floor(t / 2); }
+    function mostConf (qq)
+    {
+      let max = 0, worst = [];
+      for (let c = 0; c < n; c++)
+      {
+        const v = conf(c, qq[c], qq);
+        if (v > max) { max = v; worst = [c]; }
+        else if (v === max && max > 0) worst.push(c);
+      }
+      return worst.length ? worst[Math.floor(Math.random() * worst.length)] : -1;
+    }
+    function minRow (col, qq)
+    {
+      let min = Infinity, best = [];
+      for (let row = 0; row < n; row++)
+      {
+        const old = qq[col]; qq[col] = row;
+        const v = conf(col, row, qq);
+        qq[col] = old;
+        if (v < min) { min = v; best = [row]; }
+        else if (v === min) best.push(row);
+      }
+      return best[Math.floor(Math.random() * best.length)];
+    }
+    for (let c = 0; c < n; c++) q[c] = Math.floor(Math.random() * n);
+    steps.push({ type:'mc_init', q:[...q], tc:totalConf(q), nodes:0, bt:0 });
+    for (let i = 0; i < n * 500; i++)
+    {
+      const col = mostConf(q); if (col === -1) break;
+      const row = minRow(col, q); nodes++; q[col] = row;
+      const tc = totalConf(q);
+      steps.push({ type:'mc_move', col, row, q:[...q], tc, nodes, bt:0 });
+      if (tc === 0) break;
+    }
+    if (totalConf(q) === 0) steps.push({ type:'solved', q:[...q], tc:0, nodes, bt:0 });
+    return steps;
+  }
+
+  // ── State ───────────────────────────────────────────────────────
+
+  const SPEEDS = { slow: 500, medium: 80, fast: 10 };
+  const TYPE_META =
+  {
+    try:     { lbl: 'Trying position',          col: '#4f8ef7' },
+    place:   { lbl: 'Queen placed',             col: '#f5a623' },
+    back:    { lbl: 'Backtracking',             col: '#f25f5c' },
+    prune:   { lbl: 'Domain empty — pruning',   col: '#f25f5c' },
+    solved:  { lbl: 'Solution found',           col: '#3ecf8e' },
+    mc_init: { lbl: 'Random initial placement', col: '#8b90a8' },
+    mc_move: { lbl: 'Moving queen',             col: '#f5a623' },
+  };
+
+  let ST = { algo:'BT', n:6, speed:'medium', steps:[], idx:0, playing:false, timer:null };
+
+  // ── Board cell pool — elements reused, never recreated ──────────
+
+  let cellEls = [], lastN = 0;
+
+  function initBoard (n)
+  {
+    const wrap = document.getElementById('board-wrap');
+    if (n === lastN) return;
+    wrap.innerHTML = '';
+    cellEls = [];
+    const sz = Math.max(36, Math.min(58, Math.floor(330 / n)));
+    for (let row = 0; row < n; row++)
+    {
+      const rowDiv = document.createElement('div');
+      rowDiv.className = 'board-row';
+      for (let col = 0; col < n; col++)
+      {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.style.cssText = `width:${sz}px;height:${sz}px;font-size:${Math.floor(sz*0.55)}px`;
+        rowDiv.appendChild(cell);
+        cellEls.push(cell);
+      }
+      wrap.appendChild(rowDiv);
+    }
+    lastN = n;
+  }
+
+  function updateBoard ()
+  {
+    const { algo, n, steps, idx } = ST;
+    const step    = steps[idx] || {};
+    const queens  = step.q || new Array(n).fill(-1);
+    const domains = step.d;
+    const solved  = step.type === 'solved';
+
+    for (let row = 0; row < n; row++)
+    {
+      for (let col = 0; col < n; col++)
+      {
+        const cell   = cellEls[row * n + col];
+        const hasQ   = queens[col] === row;
+        const isBack = (step.type === 'back' || step.type === 'prune') && step.col === col;
+        const isTry  = step.type === 'try' && step.col === col && step.row === row;
+        const pruned = algo === 'FC' && domains && queens[col] === -1 && !domains[col][row];
+
+        let bg;
+        if (hasQ)       bg = solved ? 'rgba(62,207,142,0.15)' : isBack ? 'rgba(242,95,92,0.15)' : 'rgba(79,142,247,0.15)';
+        else if (isTry) bg = 'rgba(79,142,247,0.07)';
+        else if (pruned)bg = 'rgba(242,95,92,0.06)';
+        else            bg = (row + col) % 2 === 0 ? 'var(--surface)' : 'var(--card)';
+
+        cell.style.background   = bg;
+        cell.style.outline      = isTry ? '2px solid rgba(79,142,247,0.5)' : 'none';
+        cell.style.outlineOffset = '-2px';
+
+        if (hasQ)
+        {
+          const qc = solved ? 'var(--green)' : isBack ? 'var(--red)' : 'var(--amber)';
+          cell.innerHTML = `<span style="color:${qc}">&#x265B;</span>`;
+        }
+        else cell.innerHTML = '';
+      }
+    }
+  }
+
+  // ── Controls rebuild — only on algo/N/speed change ──────────────
+
+  function renderControls ()
+  {
+    const { algo, n, speed } = ST;
+    document.getElementById('ctrl-row').innerHTML = `
+      <div class="ctrl-group">
+        <span class="ctrl-label">Algorithm</span>
+        <div class="btn-group">
+          <button class="${algo==='BT'?'act-algo':''}" onclick="APP.setAlgo('BT')">Backtracking</button>
+          <button class="${algo==='FC'?'act-algo':''}" onclick="APP.setAlgo('FC')">Forward check</button>
+          <button class="${algo==='MC'?'act-algo':''}" onclick="APP.setAlgo('MC')">Min-conflicts</button>
+        </div>
+      </div>
+      <div class="ctrl-group">
+        <span class="ctrl-label">Board size &nbsp;N = ${n}</span>
+        <div class="btn-group">
+          ${[4,5,6,7,8,9,10].map(v =>
+            `<button class="${n===v?'act-n':''}" onclick="APP.setN(${v})">${v}</button>`
+          ).join('')}
+        </div>
+      </div>
+      <div class="ctrl-group">
+        <span class="ctrl-label">Speed</span>
+        <div class="btn-group">
+          <button class="${speed==='slow'  ?'act-sp':''}" onclick="APP.setSpeed('slow')">slow</button>
+          <button class="${speed==='medium'?'act-sp':''}" onclick="APP.setSpeed('medium')">medium</button>
+          <button class="${speed==='fast'  ?'act-sp':''}" onclick="APP.setSpeed('fast')">fast</button>
+        </div>
+      </div>`;
+  }
+
+  // ── Transport: update state only, never rebuild ─────────────────
+
+  function updateTransport ()
+  {
+    const { steps, idx, playing, algo } = ST;
+    const btnPlay = document.getElementById('btn-play');
+    btnPlay.className = playing ? 'playing' : 'stopped';
+    btnPlay.innerHTML = playing ? '&#9646;&#9646;&nbsp;pause' : '&#9654;&nbsp;play';
+    document.getElementById('btn-start').disabled = idx === 0;
+    document.getElementById('btn-prev' ).disabled = idx === 0;
+    document.getElementById('btn-next' ).disabled = idx >= steps.length - 1;
+    document.getElementById('btn-end'  ).disabled = idx >= steps.length - 1;
+    document.getElementById('btn-regen').style.display = algo === 'MC' ? 'inline-block' : 'none';
+  }
+
+  function updateProgress ()
+  {
+    const { steps, idx } = ST;
+    const pct = steps.length > 1 ? ((idx / (steps.length - 1)) * 100).toFixed(1) : 0;
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('prog-step').textContent    = 'step ' + (idx + 1);
+    document.getElementById('prog-total').textContent   = steps.length + ' total steps';
+  }
+
+  // ── Sidebar — no interactive elements inside, safe to innerHTML ─
+
+  function updateSidebar ()
+  {
+    const { algo, n, steps, idx } = ST;
+    const step   = steps[idx] || {};
+    const queens = step.q || new Array(n).fill(-1);
+    const solved = step.type === 'solved';
+    const meta   = TYPE_META[step.type] || {};
+    const placed = queens.filter(q => q !== -1).length;
+
+    document.getElementById('solved-banner').className = 'solved-banner' + (solved ? ' show' : '');
+
+    const detail = (() =>
+    {
+      if (step.type === 'try')     return ` — col ${step.col}, row ${step.row}`;
+      if (step.type === 'place')   return ` — col ${step.col}, row ${step.row}`;
+      if (step.type === 'back')    return ` — undoing col ${step.col}`;
+      if (step.type === 'prune')   return ` — col ${step.col} row ${step.row}`;
+      if (step.type === 'mc_move') return ` — col ${step.col} → row ${step.row}`;
+      if (step.type === 'mc_init') return ` — ${step.tc} conflicts`;
+      return '';
+    })();
+
+    let pathHTML = '';
+    if (algo !== 'MC')
+    {
+      const chips = Array.from({ length: n }, (_, col) =>
+      {
+        const row = queens[col];
+        const cls = row === -1 ? 'chip' : col === step.col ? 'chip active' : 'chip placed';
+        return `<span class="${cls}">c${col}${row !== -1 ? ' r' + row : ''}</span>`;
+      }).join('');
+      pathHTML = `<div class="panel"><div class="panel-label">Search path</div><div class="chips">${chips}</div></div>`;
+    }
+
+    let domainHTML = '';
+    if (algo === 'FC' && step.d)
+    {
+      const cols = Array.from({ length: n }, (_, col) =>
+      {
+        const done  = queens[col] !== -1;
+        const avail = done ? -1 : step.d[col].filter(Boolean).length;
+        const bg  = done ? 'transparent' : avail===0 ? 'var(--red-bg)'   : avail===1 ? 'var(--amber-bg)' : 'var(--green-bg)';
+        const tc  = done ? 'var(--hint)'  : avail===0 ? 'var(--red)'     : avail===1 ? 'var(--amber)'   : 'var(--green)';
+        const bc  = done ? 'var(--border)': avail===0 ? 'var(--red)'     : avail===1 ? 'var(--amber)'   : 'var(--green)';
+        return `<div class="domain-col" style="background:${bg};border-color:${bc}">
+          <div class="dc-lbl" style="color:${tc}">c${col}</div>
+          <div class="dc-val" style="color:${tc}">${done ? '&#x2713;' : avail}</div>
+        </div>`;
+      }).join('');
+      domainHTML = `<div class="panel"><div class="panel-label">Domain sizes — available rows per column</div><div class="domain-cols">${cols}</div></div>`;
+    }
+
+    let mcHTML = '';
+    if (algo === 'MC' && step.q)
+    {
+      const tc = step.tc ?? 0;
+      mcHTML = `<div class="panel"><div class="panel-label">Total conflicts remaining</div>
+        <div style="font-size:32px;font-weight:600;color:${tc===0?'var(--green)':'var(--red)'}">${tc}</div></div>`;
+    }
+
+    const sl = algo==='MC' ? 'Conflicts left' : 'Backtracks';
+    const sv = algo==='MC' ? (step.tc ?? 0)   : (step.bt || 0);
+    const descs = {
+      BT: 'Places queens column by column. If a conflict arises, undoes the last placement and tries the next row. Exhaustive — guaranteed to find a solution for all N.',
+      FC: 'After each placement, immediately eliminates impossible rows from all future columns. If any column runs out of options, backtracks without going deeper — far fewer nodes explored.',
+      MC: 'Places queens randomly, then repeatedly moves the most-conflicted queen to the row with fewest conflicts. Blazing fast on average, but probabilistic — may need a random restart.',
+    };
+
+    document.getElementById('sidebar').innerHTML = `
+      <div class="panel">
+        <div class="panel-label">Current action</div>
+        <div class="action-badge" style="color:${meta.col||'var(--text)'}">${meta.lbl||'—'}${detail}</div>
+      </div>
+      <div class="panel">
+        <div class="panel-label">Live metrics</div>
+        <div class="metrics-grid" style="margin-top:4px">
+          <div class="metric"><div class="metric-lbl">Nodes explored</div><div class="metric-val" style="color:var(--blue)">${(step.nodes||0).toLocaleString()}</div></div>
+          <div class="metric"><div class="metric-lbl">${sl}</div><div class="metric-val" style="color:var(--red)">${sv}</div></div>
+          <div class="metric"><div class="metric-lbl">Queens placed</div><div class="metric-val" style="color:var(--amber)">${placed}</div></div>
+          <div class="metric"><div class="metric-lbl">Progress</div><div class="metric-val" style="color:var(--green)">${Math.round((placed/n)*100)}%</div></div>
+        </div>
+      </div>
+      ${pathHTML}${domainHTML}${mcHTML}
+      <div class="panel">
+        <div class="panel-label">${algo==='BT'?'Backtracking':algo==='FC'?'Forward checking':'Min-conflicts'}</div>
+        <div class="algo-desc">${descs[algo]}</div>
+      </div>`;
+  }
+
+  // ── Master update ───────────────────────────────────────────────
+
+  function update ()
+  {
+    updateBoard();
+    updateTransport();
+    updateProgress();
+    updateSidebar();
+  }
+
+  // ── Recompute (algo or N changed) ───────────────────────────────
+
+  function recompute ()
+  {
+    if (ST.timer) clearInterval(ST.timer);
+    ST.playing = false;
+    ST.idx     = 0;
+    ST.steps   = { BT:recordBT, FC:recordFC, MC:recordMC }[ST.algo](ST.n);
+    initBoard(ST.n);
+    renderControls();
+    update();
+  }
+
+  // ── Playback ────────────────────────────────────────────────────
+
+  function startTimer ()
+  {
+    if (ST.timer) clearInterval(ST.timer);
+    ST.timer = setInterval(() =>
+    {
+      if (ST.idx >= ST.steps.length - 1)
+      {
+        ST.playing = false;
+        clearInterval(ST.timer);
+        update();
+        return;
+      }
+      ST.idx++;
+      update();
+    }, SPEEDS[ST.speed]);
+  }
+
+  function go (delta)
+  {
+    if (ST.playing) { ST.playing = false; clearInterval(ST.timer); }
+    if      (delta === 'start') ST.idx = 0;
+    else if (delta === 'end')   ST.idx = ST.steps.length - 1;
+    else    ST.idx = Math.max(0, Math.min(ST.steps.length - 1, ST.idx + delta));
+    update();
+  }
+
+  function togglePlay ()
+  {
+    ST.playing = !ST.playing;
+    if (ST.playing)
+    {
+      if (ST.idx >= ST.steps.length - 1) ST.idx = 0;
+      startTimer();
+    }
+    else
+    {
+      clearInterval(ST.timer);
+    }
+    update();
+  }
+
+  // ── Wire transport buttons ONCE ─────────────────────────────────
+  // addEventListener keeps the listener alive through any DOM changes elsewhere.
+  // This is why we never rebuild these buttons — to keep these listeners intact.
+
+  document.getElementById('btn-start').addEventListener('click', () => go('start'));
+  document.getElementById('btn-prev' ).addEventListener('click', () => go(-1));
+  document.getElementById('btn-play' ).addEventListener('click', togglePlay);
+  document.getElementById('btn-next' ).addEventListener('click', () => go(+1));
+  document.getElementById('btn-end'  ).addEventListener('click', () => go('end'));
+  document.getElementById('btn-regen').addEventListener('click', recompute);
+
+  // ── Public API (algo/N/speed buttons use onclick, which is fine ─
+  // because those buttons ARE rebuilt on setting change — their
+  // onclick targets window.APP which always points to the same object)
+
+  window.APP =
+  {
+    setAlgo: v => { ST.algo = v; recompute(); },
+    setN:    v => { ST.n    = v; recompute(); },
+    setSpeed: v =>
+    {
+      ST.speed = v;
+      if (ST.playing) { clearInterval(ST.timer); startTimer(); }
+      renderControls();
+    },
+  };
+
+  recompute();
+
+})();
+</script>
+
+<div style="max-width: 900px; margin: 40px auto; padding: 0 20px;">
+  <div class="educational-panel" style="border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; overflow: hidden;">
+    <button onclick="this.parentElement.classList.toggle('is-open'); this.querySelector('span').textContent = this.parentElement.classList.contains('is-open') ? '▲' : '▼'" style="width: 100%; padding: 16px 20px; background: #1a1a25; border: none; color: #e4e4e7; font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; justify-content: space-between; align-items: center; text-align: left;">
+      Learn About These Algorithms <span style="font-size: 12px;">▼</span>
+    </button>
+    <div class="educational-panel-body" style="display: none; padding: 24px; background: #12121a; font-family: 'Inter', sans-serif; color: #a1a1aa; font-size: 14px; line-height: 1.7;">
+      <h3 style="font-family: 'Space Grotesk', sans-serif; color: #fff; font-size: 16px; margin: 0 0 8px;">Problem Definition</h3>
+      <p style="margin: 0 0 20px;">Place N queens on an N&times;N chessboard such that no two queens threaten each other. No two queens can share the same row, column, or diagonal.</p>
+
+      <h3 style="font-family: 'Space Grotesk', sans-serif; color: #3b82f6; font-size: 16px; margin: 0 0 8px;">Algorithm 1: Backtracking</h3>
+      <p style="margin: 0 0 6px;">Assigns one queen per column, left to right. For each column, tries every row. If no safe row exists, backtracks to the previous column and tries the next row.</p>
+      <p style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #71717a; margin: 0 0 20px;">Time: O(n!) &middot; Space: O(n) &middot; Trade-off: Simple but explores many dead-end branches</p>
+
+      <h3 style="font-family: 'Space Grotesk', sans-serif; color: #a855f7; font-size: 16px; margin: 0 0 8px;">Algorithm 2: Forward Checking</h3>
+      <p style="margin: 0 0 6px;">Backtracking enhanced with constraint propagation. After placing each queen, immediately eliminates conflicting rows from all future columns&rsquo; domains. If any column&rsquo;s domain becomes empty, backtracks immediately.</p>
+      <p style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #71717a; margin: 0 0 20px;">Time: O(n!) &middot; Space: O(n&sup2;) &middot; Trade-off: 58% fewer nodes but 3&times; overhead from domain copying</p>
+
+      <h3 style="font-family: 'Space Grotesk', sans-serif; color: #22c55e; font-size: 16px; margin: 0 0 8px;">Algorithm 3: Minimum Conflicts (Local Search)</h3>
+      <p style="margin: 0 0 6px;">Starts with a random placement, then iteratively moves the most-conflicted queen to the row with fewest conflicts. Uses random restarts to escape local minima.</p>
+      <p style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #71717a; margin: 0 0 20px;">Time: O(n) avg &middot; Space: O(n) &middot; Trade-off: Probabilistic but remarkably fast in practice</p>
+
+      <div style="padding: 16px; background: rgba(201,169,110,0.08); border-left: 3px solid #c9a96e; margin-top: 8px;">
+        <h3 style="font-family: 'Space Grotesk', sans-serif; color: #c9a96e; font-size: 14px; margin: 0 0 8px;">Key Insight</h3>
+        <p style="margin: 0;">Forward Checking explores 58% fewer nodes than Backtracking but runs 3&times; slower. The overhead of copying domain arrays at each step exceeds the search savings. This demonstrates that node count alone doesn&rsquo;t predict real-world performance &mdash; the cost per node matters.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+.educational-panel.is-open .educational-panel-body { display: block !important; }
+</style>
+<script src="../shared/nav.js"></script>
+
+</body>
+</html>

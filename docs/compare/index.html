@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Algorithm Comparison | Game Algorithms</title>
+<meta name="description" content="Side-by-side performance analysis of game algorithms across problem domains." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../shared/styles.css" />
+<style>
+/* ---- Page-specific styles ---- */
+
+.section { padding: var(--space-16) 0; }
+.section + .section { border-top: 1px solid var(--color-border); }
+
+.section-title {
+  font-family: var(--font-heading);
+  font-size: clamp(1.4rem, 3vw, 1.8rem);
+  margin-bottom: var(--space-8);
+  color: var(--color-text-heading);
+}
+
+/* ---------- Chart Container ---------- */
+.chart-area {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  margin-bottom: var(--space-8);
+  overflow-x: auto;
+}
+
+.chart-area h4 {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-4);
+}
+
+/* ---------- Bar Chart (CSS-only) ---------- */
+.bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 300px;
+  padding-bottom: var(--space-8);
+  position: relative;
+}
+
+.bar-group {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  flex: 1;
+  min-width: 40px;
+  position: relative;
+}
+
+.bar {
+  flex: 1;
+  min-width: 8px;
+  max-width: 28px;
+  border-radius: 3px 3px 0 0;
+  position: relative;
+  cursor: pointer;
+  transition: filter var(--duration-fast) var(--ease-out);
+  transform-origin: bottom;
+  transform: scaleY(0);
+}
+
+.bar.animated { transform: scaleY(1); transition: transform 0.6s var(--ease-out); }
+.bar:hover { filter: brightness(1.3); }
+
+.bar--blue   { background: var(--color-blue); }
+.bar--purple { background: var(--color-purple); }
+.bar--green  { background: var(--color-green); }
+.bar--amber  { background: var(--color-amber); }
+.bar--red    { background: var(--color-red); }
+
+.bar-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #222;
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  padding: 3px 7px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration-fast);
+  z-index: 10;
+}
+
+.bar:hover .bar-tooltip { opacity: 1; }
+
+.bar-label {
+  position: absolute;
+  bottom: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+/* Y-axis labels */
+.y-axis {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 300px;
+  padding-bottom: var(--space-8);
+  margin-right: var(--space-3);
+  min-width: 50px;
+  text-align: right;
+}
+
+.y-axis span {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: var(--color-text-muted);
+  line-height: 1;
+}
+
+.chart-wrapper {
+  display: flex;
+  align-items: stretch;
+}
+
+.chart-wrapper .bar-chart { flex: 1; }
+
+/* ---------- Legend ---------- */
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+}
+
+.legend-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+/* ---------- Data Table ---------- */
+.data-table-wrap {
+  overflow-x: auto;
+  margin-bottom: var(--space-6);
+}
+
+/* ---------- Insight Box ---------- */
+.insight-box {
+  background: rgba(201, 169, 110, 0.06);
+  border: 1px solid rgba(201, 169, 110, 0.18);
+  border-radius: var(--radius-md);
+  padding: var(--space-5) var(--space-6);
+  margin-bottom: var(--space-8);
+}
+
+.insight-box p {
+  font-size: 0.92rem;
+  line-height: 1.7;
+  color: var(--color-text);
+}
+
+.insight-box strong {
+  color: var(--color-gold);
+  font-weight: 600;
+}
+
+.insight-label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-gold);
+  margin-bottom: var(--space-2);
+  display: block;
+}
+
+/* ---------- Pruning percentage overlay ---------- */
+.pruning-line {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: var(--space-8);
+  pointer-events: none;
+}
+
+.pruning-line svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- Cross-Problem Cards ---------- */
+.thesis-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+.thesis-card h4 {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  color: var(--color-text-heading);
+  margin-bottom: var(--space-3);
+}
+
+.thesis-card .verdict {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+.verdict--good { color: var(--color-green); }
+.verdict--bad  { color: var(--color-red); }
+
+.thesis-card .detail-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.88rem;
+  padding: var(--space-1) 0;
+  color: var(--color-text-muted);
+}
+
+.thesis-card .detail-row span:last-child { color: var(--color-text); }
+
+.thesis-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-6);
+}
+
+@media (max-width: 900px) {
+  .thesis-grid { grid-template-columns: 1fr; }
+}
+
+/* ---------- Central quote ---------- */
+.central-quote {
+  font-family: var(--font-heading);
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  line-height: 1.7;
+  color: var(--color-text);
+  border-left: 3px solid var(--color-gold);
+  padding-left: var(--space-6);
+  margin-bottom: var(--space-10);
+  max-width: 800px;
+}
+
+/* ---------- Footer links ---------- */
+.footer-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-4);
+  padding: var(--space-10) 0 var(--space-16);
+}
+
+.footer-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  transition: border-color var(--duration-fast), color var(--duration-fast);
+}
+
+.footer-link:hover {
+  border-color: var(--color-gold);
+  color: var(--color-gold);
+}
+
+/* Histogram specific */
+.histogram-wrap { position: relative; }
+
+/* Cumulative line */
+.cumulative-line {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: var(--space-8);
+  pointer-events: none;
+}
+
+.cumulative-line svg { width: 100%; height: 100%; }
+</style>
+</head>
+<body>
+
+<!-- ================================================================
+     HERO
+     ================================================================ -->
+<section class="hero">
+  <span class="section-label" style="justify-content:center; margin-bottom: var(--space-4);">
+    Empirical Analysis
+  </span>
+  <h1>Algorithm Comparison</h1>
+  <p>Side-by-side performance analysis across problem domains</p>
+</section>
+
+<main class="container">
+
+<!-- ================================================================
+     SECTION 1: N-Queens
+     ================================================================ -->
+<section class="section slide-up" id="nqueens">
+  <span class="section-label">N-Queens</span>
+  <h2 class="section-title">Algorithm Comparison</h2>
+
+  <div class="chart-area">
+    <h4>Nodes / Steps Explored (Log Scale)</h4>
+    <div class="chart-wrapper">
+      <div class="y-axis" id="nq-yaxis"></div>
+      <div class="bar-chart" id="nq-chart"></div>
+    </div>
+    <div class="chart-legend">
+      <div class="legend-item"><span class="legend-swatch" style="background:var(--color-blue)"></span> Backtracking</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:var(--color-purple)"></span> Forward Checking</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:var(--color-green)"></span> Min-Conflicts</div>
+    </div>
+  </div>
+
+  <div class="data-table-wrap">
+    <table class="complexity-table">
+      <thead>
+        <tr>
+          <th>N</th><th>Backtracking (nodes)</th><th>Forward Checking (nodes)</th><th>Min-Conflicts (avg steps)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>4</td><td>8</td><td>5</td><td>3</td></tr>
+        <tr><td>6</td><td>152</td><td>38</td><td>8</td></tr>
+        <tr><td>8</td><td>876</td><td>210</td><td>12</td></tr>
+        <tr><td>10</td><td>975</td><td>390</td><td>7</td></tr>
+        <tr><td>12</td><td>3,066</td><td>1,100</td><td>14</td></tr>
+        <tr><td>14</td><td>17,756</td><td>5,200</td><td>10</td></tr>
+        <tr><td>16</td><td>542</td><td>189</td><td>9</td></tr>
+        <tr><td>18</td><td>10,094</td><td>3,800</td><td>11</td></tr>
+        <tr><td>20</td><td>55,590</td><td>19,800</td><td>15</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="insight-box">
+    <span class="insight-label">Key Insight</span>
+    <p><strong>Forward Checking explores ~58% fewer nodes than Backtracking</strong> but runs ~3x slower due to domain copying overhead. <strong>Min-Conflicts achieves O(n) average-case</strong> &mdash; orders of magnitude faster.</p>
+  </div>
+</section>
+
+<!-- ================================================================
+     SECTION 2: Connect 4 — Pruning Efficiency
+     ================================================================ -->
+<section class="section slide-up" id="connect4">
+  <span class="section-label">Connect 4</span>
+  <h2 class="section-title">Pruning Efficiency by Depth</h2>
+
+  <div class="chart-area">
+    <h4>Nodes Explored (Log Scale) &mdash; With &amp; Without Pruning</h4>
+    <div class="chart-wrapper">
+      <div class="y-axis" id="c4-yaxis"></div>
+      <div class="bar-chart" id="c4-chart" style="position:relative;">
+        <!-- pruning % line drawn by JS -->
+      </div>
+    </div>
+    <div class="chart-legend">
+      <div class="legend-item"><span class="legend-swatch" style="background:var(--color-blue)"></span> No Pruning</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:var(--color-green)"></span> Alpha-Beta</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:var(--color-amber); border-radius:50%"></span> Pruning %</div>
+    </div>
+  </div>
+
+  <div class="data-table-wrap">
+    <table class="complexity-table">
+      <thead>
+        <tr><th>Depth</th><th>Nodes (no pruning)</th><th>Nodes (with &alpha;-&beta;)</th><th>Pruning %</th><th>Time (ms)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>2</td><td>49</td><td>27</td><td>44.9%</td><td>&lt;1</td></tr>
+        <tr><td>4</td><td>2,401</td><td>440</td><td>81.7%</td><td>2</td></tr>
+        <tr><td>6</td><td>117,649</td><td>5,217</td><td>95.6%</td><td>45</td></tr>
+        <tr><td>8</td><td>5,764,801</td><td>45,810</td><td>99.2%</td><td>380</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="insight-box">
+    <span class="insight-label">Key Insight</span>
+    <p><strong>Pruning effectiveness increases with depth:</strong> from 44.9% at depth 2 to 99.2% at depth 8. The deeper you search, the more you save.</p>
+  </div>
+</section>
+
+<!-- ================================================================
+     SECTION 3: Mastermind — Guess Distribution
+     ================================================================ -->
+<section class="section slide-up" id="mastermind">
+  <span class="section-label">Mastermind</span>
+  <h2 class="section-title">Guess Distribution</h2>
+
+  <div class="chart-area">
+    <h4>Codes Solved per Guess Count (of 360 total)</h4>
+    <div class="chart-wrapper histogram-wrap">
+      <div class="y-axis" id="mm-yaxis"></div>
+      <div class="bar-chart" id="mm-chart" style="position:relative;"></div>
+    </div>
+    <div class="chart-legend">
+      <div class="legend-item"><span class="legend-swatch" style="background:var(--color-red)"></span> Codes Solved</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:var(--color-amber); border-radius:50%"></span> Cumulative %</div>
+    </div>
+  </div>
+
+  <div class="data-table-wrap">
+    <table class="complexity-table">
+      <thead>
+        <tr><th>Guesses</th><th>Codes Solved</th><th>Cumulative %</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>1</td><td>0.3%</td></tr>
+        <tr><td>2</td><td>8</td><td>2.5%</td></tr>
+        <tr><td>3</td><td>62</td><td>19.7%</td></tr>
+        <tr><td>4</td><td>168</td><td>66.4%</td></tr>
+        <tr><td>5</td><td>108</td><td>96.4%</td></tr>
+        <tr><td>6</td><td>13</td><td>100%</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="insight-box">
+    <span class="insight-label">Key Insight</span>
+    <p><strong>Average: 4.15 guesses.</strong> The first guess eliminates ~82% of candidates. By guess 3, 19.7% of codes are already cracked.</p>
+  </div>
+</section>
+
+<!-- ================================================================
+     SECTION 4: Cross-Problem Analysis
+     ================================================================ -->
+<section class="section slide-up" id="thesis">
+  <span class="section-label">Cross-Problem Analysis</span>
+  <h2 class="section-title">The Pruning Cost-to-Benefit Ratio</h2>
+
+  <p class="central-quote">The central finding across all four problems: an algorithm's real-world efficiency depends not on theoretical complexity alone, but on the ratio between the cost of its optimization strategy and the savings that strategy produces.</p>
+
+  <div class="thesis-grid">
+    <!-- Alpha-Beta -->
+    <div class="thesis-card">
+      <h4>Alpha-Beta Pruning</h4>
+      <span class="tag" style="margin-bottom:var(--space-3);">Connect 4</span>
+      <div class="detail-row"><span>Optimization cost</span><span>Near zero</span></div>
+      <div class="detail-row"><span>Savings</span><span>Exponential (94-99%)</span></div>
+      <div class="detail-row"><span>Mechanism</span><span>Two integer comparisons/node</span></div>
+      <p class="verdict verdict--good">Verdict: Always worth it &mdash; the optimization is essentially free</p>
+    </div>
+
+    <!-- Forward Checking -->
+    <div class="thesis-card">
+      <h4>Forward Checking</h4>
+      <span class="tag" style="margin-bottom:var(--space-3);">N-Queens</span>
+      <div class="detail-row"><span>Optimization cost</span><span>High</span></div>
+      <div class="detail-row"><span>Savings</span><span>Linear (58% nodes)</span></div>
+      <div class="detail-row"><span>Mechanism</span><span>O(n&sup2;) domain copying/step</span></div>
+      <p class="verdict verdict--bad">Verdict: Not always worth it &mdash; overhead exceeds savings at small N</p>
+    </div>
+
+    <!-- Constraint Elimination -->
+    <div class="thesis-card">
+      <h4>Constraint Elimination</h4>
+      <span class="tag" style="margin-bottom:var(--space-3);">Mastermind</span>
+      <div class="detail-row"><span>Optimization cost</span><span>Moderate</span></div>
+      <div class="detail-row"><span>Savings</span><span>High (82% / round)</span></div>
+      <div class="detail-row"><span>Mechanism</span><span>Candidate filtering each guess</span></div>
+      <p class="verdict verdict--good">Verdict: Worth it &mdash; finite search space makes per-step cost acceptable</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     SECTION 5: Complexity Summary
+     ================================================================ -->
+<section class="section slide-up" id="complexity">
+  <span class="section-label">Reference</span>
+  <h2 class="section-title">Complexity Summary</h2>
+
+  <div class="data-table-wrap">
+    <table class="complexity-table">
+      <thead>
+        <tr>
+          <th>Algorithm</th><th>Problem</th><th>Time</th><th>Space</th><th>Optimal?</th><th>Key Strength</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Backtracking</td><td>N-Queens</td>
+          <td class="complexity-bad">O(n!)</td><td class="complexity-good">O(n)</td>
+          <td>Yes (finds all)</td><td>Simplicity</td>
+        </tr>
+        <tr>
+          <td>Forward Checking</td><td>N-Queens</td>
+          <td class="complexity-bad">O(n!)</td><td class="complexity-avg">O(n&sup2;)</td>
+          <td>Yes</td><td>Early pruning</td>
+        </tr>
+        <tr>
+          <td>Min-Conflicts</td><td>N-Queens</td>
+          <td class="complexity-good">O(n) avg</td><td class="complexity-good">O(n)</td>
+          <td>Probabilistic</td><td>Speed</td>
+        </tr>
+        <tr>
+          <td>Minimax</td><td>Connect 4</td>
+          <td class="complexity-bad">O(b<sup>d</sup>)</td><td class="complexity-avg">O(bd)</td>
+          <td>Yes</td><td>Optimal play</td>
+        </tr>
+        <tr>
+          <td>Alpha-Beta</td><td>Connect 4</td>
+          <td class="complexity-avg">O(b<sup>d/2</sup>)</td><td class="complexity-avg">O(bd)</td>
+          <td>Yes</td><td>Pruned optimal</td>
+        </tr>
+        <tr>
+          <td>A*</td><td>Pathfinding</td>
+          <td class="complexity-bad">O(b<sup>d</sup>)</td><td class="complexity-bad">O(b<sup>d</sup>)</td>
+          <td>Yes (if h admissible)</td><td>Heuristic guidance</td>
+        </tr>
+        <tr>
+          <td>Constraint Elim</td><td>Mastermind</td>
+          <td class="complexity-avg">O(k&middot;n)</td><td class="complexity-good">O(n)</td>
+          <td>Near-optimal</td><td>Information gain</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ================================================================
+     FOOTER
+     ================================================================ -->
+<section class="section" id="explore">
+  <span class="section-label">Explore</span>
+  <h2 class="section-title">Explore the algorithms interactively</h2>
+  <div class="footer-links">
+    <a class="footer-link" href="../nqueens/">N-Queens Visualizer &rarr;</a>
+    <a class="footer-link" href="../connect4/">Connect 4 AI &rarr;</a>
+    <a class="footer-link" href="../pathfinding/">Pathfinding Demo &rarr;</a>
+    <a class="footer-link" href="../mastermind/">Mastermind Solver &rarr;</a>
+    <a class="footer-link" href="../tictactoe/">Tic Tac Toe &rarr;</a>
+  </div>
+</section>
+
+</main>
+
+<!-- ================================================================
+     CHART RENDERING (pure JS, no libraries)
+     ================================================================ -->
+<script>
+(function () {
+  'use strict';
+
+  /* ---------- Utility: log-scale height ---------- */
+  function logHeight(value, maxLog, chartHeight) {
+    if (value <= 0) return 0;
+    return (Math.log10(value) / maxLog) * chartHeight;
+  }
+
+  function formatNum(n) {
+    return n.toLocaleString();
+  }
+
+  /* ---------- Build Y-axis labels (log scale) ---------- */
+  function buildYAxis(containerId, maxExp) {
+    var el = document.getElementById(containerId);
+    if (!el) return;
+    for (var e = maxExp; e >= 0; e--) {
+      var s = document.createElement('span');
+      var v = Math.pow(10, e);
+      s.textContent = v >= 1000000 ? (v / 1000000) + 'M' : v >= 1000 ? (v / 1000) + 'K' : v;
+      el.appendChild(s);
+    }
+  }
+
+  /* ---------- Create a single bar ---------- */
+  function makeBar(value, heightPx, colorClass, label) {
+    var bar = document.createElement('div');
+    bar.className = 'bar ' + colorClass;
+    bar.style.height = Math.max(heightPx, 2) + 'px';
+
+    var tip = document.createElement('span');
+    tip.className = 'bar-tooltip';
+    tip.textContent = label || formatNum(value);
+    bar.appendChild(tip);
+    return bar;
+  }
+
+  /* ---------- Intersection Observer for animation ---------- */
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        // Animate bars within this chart
+        var bars = entry.target.querySelectorAll('.bar');
+        bars.forEach(function (b, i) {
+          setTimeout(function () { b.classList.add('animated'); }, i * 40);
+        });
+        // Also trigger slide-up
+        entry.target.classList.add('is-visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+
+  /* ================================================================
+     N-Queens Chart
+     ================================================================ */
+  var nqData = [
+    { n: 4,  bt: 8,     fc: 5,     mc: 3 },
+    { n: 6,  bt: 152,   fc: 38,    mc: 8 },
+    { n: 8,  bt: 876,   fc: 210,   mc: 12 },
+    { n: 10, bt: 975,   fc: 390,   mc: 7 },
+    { n: 12, bt: 3066,  fc: 1100,  mc: 14 },
+    { n: 14, bt: 17756, fc: 5200,  mc: 10 },
+    { n: 16, bt: 542,   fc: 189,   mc: 9 },
+    { n: 18, bt: 10094, fc: 3800,  mc: 11 },
+    { n: 20, bt: 55590, fc: 19800, mc: 15 }
+  ];
+
+  var nqMaxLog = 5; // 10^5 = 100K
+  var nqChartH = 300;
+
+  buildYAxis('nq-yaxis', nqMaxLog);
+
+  var nqChart = document.getElementById('nq-chart');
+  nqData.forEach(function (d) {
+    var group = document.createElement('div');
+    group.className = 'bar-group';
+
+    group.appendChild(makeBar(d.bt, logHeight(d.bt, nqMaxLog, nqChartH), 'bar--blue'));
+    group.appendChild(makeBar(d.fc, logHeight(d.fc, nqMaxLog, nqChartH), 'bar--purple'));
+    group.appendChild(makeBar(d.mc, logHeight(d.mc, nqMaxLog, nqChartH), 'bar--green'));
+
+    var lbl = document.createElement('span');
+    lbl.className = 'bar-label';
+    lbl.textContent = 'N=' + d.n;
+    group.appendChild(lbl);
+
+    nqChart.appendChild(group);
+  });
+
+  observer.observe(nqChart);
+
+  /* ================================================================
+     Connect 4 Chart
+     ================================================================ */
+  var c4Data = [
+    { depth: 2, noPrune: 49,      ab: 27,    pct: 44.9  },
+    { depth: 4, noPrune: 2401,    ab: 440,   pct: 81.7  },
+    { depth: 6, noPrune: 117649,  ab: 5217,  pct: 95.6  },
+    { depth: 8, noPrune: 5764801, ab: 45810, pct: 99.2  }
+  ];
+
+  var c4MaxLog = 7; // 10^7
+  var c4ChartH = 300;
+
+  buildYAxis('c4-yaxis', c4MaxLog);
+
+  var c4Chart = document.getElementById('c4-chart');
+  c4Data.forEach(function (d) {
+    var group = document.createElement('div');
+    group.className = 'bar-group';
+
+    group.appendChild(makeBar(d.noPrune, logHeight(d.noPrune, c4MaxLog, c4ChartH), 'bar--blue'));
+    group.appendChild(makeBar(d.ab, logHeight(d.ab, c4MaxLog, c4ChartH), 'bar--green'));
+
+    var lbl = document.createElement('span');
+    lbl.className = 'bar-label';
+    lbl.textContent = 'D=' + d.depth;
+    group.appendChild(lbl);
+
+    c4Chart.appendChild(group);
+  });
+
+  // Pruning % line overlay (SVG)
+  requestAnimationFrame(function () {
+    var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('viewBox', '0 0 100 100');
+    svg.setAttribute('preserveAspectRatio', 'none');
+    svg.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:calc(100% - 2rem);pointer-events:none;';
+
+    var polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+    var points = c4Data.map(function (d, i) {
+      var x = ((i + 0.5) / c4Data.length) * 100;
+      var y = 100 - d.pct;
+      return x + ',' + y;
+    }).join(' ');
+
+    polyline.setAttribute('points', points);
+    polyline.setAttribute('fill', 'none');
+    polyline.setAttribute('stroke', '#f59e0b');
+    polyline.setAttribute('stroke-width', '2');
+    polyline.setAttribute('vector-effect', 'non-scaling-stroke');
+    svg.appendChild(polyline);
+
+    // Dots with labels
+    c4Data.forEach(function (d, i) {
+      var cx = ((i + 0.5) / c4Data.length) * 100;
+      var cy = 100 - d.pct;
+
+      var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      circle.setAttribute('cx', cx);
+      circle.setAttribute('cy', cy);
+      circle.setAttribute('r', '1.5');
+      circle.setAttribute('fill', '#f59e0b');
+      svg.appendChild(circle);
+
+      var text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      text.setAttribute('x', cx);
+      text.setAttribute('y', cy - 3);
+      text.setAttribute('text-anchor', 'middle');
+      text.setAttribute('fill', '#f59e0b');
+      text.setAttribute('font-size', '6');
+      text.setAttribute('font-family', 'JetBrains Mono, monospace');
+      text.textContent = d.pct + '%';
+      svg.appendChild(text);
+    });
+
+    c4Chart.appendChild(svg);
+  });
+
+  observer.observe(c4Chart);
+
+  /* ================================================================
+     Mastermind Histogram
+     ================================================================ */
+  var mmData = [
+    { guesses: 1, codes: 1,   cum: 0.3  },
+    { guesses: 2, codes: 8,   cum: 2.5  },
+    { guesses: 3, codes: 62,  cum: 19.7 },
+    { guesses: 4, codes: 168, cum: 66.4 },
+    { guesses: 5, codes: 108, cum: 96.4 },
+    { guesses: 6, codes: 13,  cum: 100  }
+  ];
+
+  var mmMax = 180; // linear scale
+  var mmChartH = 300;
+
+  // Y-axis: linear for histogram
+  (function () {
+    var el = document.getElementById('mm-yaxis');
+    [180, 135, 90, 45, 0].forEach(function (v) {
+      var s = document.createElement('span');
+      s.textContent = v;
+      el.appendChild(s);
+    });
+  })();
+
+  var mmChart = document.getElementById('mm-chart');
+  mmData.forEach(function (d) {
+    var group = document.createElement('div');
+    group.className = 'bar-group';
+
+    var hPx = (d.codes / mmMax) * mmChartH;
+    group.appendChild(makeBar(d.codes, hPx, 'bar--red', d.codes + ' codes'));
+
+    var lbl = document.createElement('span');
+    lbl.className = 'bar-label';
+    lbl.textContent = d.guesses + (d.guesses === 1 ? ' guess' : ' guesses');
+    group.appendChild(lbl);
+
+    mmChart.appendChild(group);
+  });
+
+  // Cumulative % line
+  requestAnimationFrame(function () {
+    var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('viewBox', '0 0 100 100');
+    svg.setAttribute('preserveAspectRatio', 'none');
+    svg.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:calc(100% - 2rem);pointer-events:none;';
+
+    var polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+    var points = mmData.map(function (d, i) {
+      var x = ((i + 0.5) / mmData.length) * 100;
+      var y = 100 - d.cum;
+      return x + ',' + y;
+    }).join(' ');
+
+    polyline.setAttribute('points', points);
+    polyline.setAttribute('fill', 'none');
+    polyline.setAttribute('stroke', '#f59e0b');
+    polyline.setAttribute('stroke-width', '2');
+    polyline.setAttribute('vector-effect', 'non-scaling-stroke');
+    svg.appendChild(polyline);
+
+    mmData.forEach(function (d, i) {
+      var cx = ((i + 0.5) / mmData.length) * 100;
+      var cy = 100 - d.cum;
+
+      var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      circle.setAttribute('cx', cx);
+      circle.setAttribute('cy', cy);
+      circle.setAttribute('r', '1.5');
+      circle.setAttribute('fill', '#f59e0b');
+      svg.appendChild(circle);
+
+      var text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      text.setAttribute('x', cx);
+      text.setAttribute('y', cy - 3);
+      text.setAttribute('text-anchor', 'middle');
+      text.setAttribute('fill', '#f59e0b');
+      text.setAttribute('font-size', '6');
+      text.setAttribute('font-family', 'JetBrains Mono, monospace');
+      text.textContent = d.cum + '%';
+      svg.appendChild(text);
+    });
+
+    mmChart.appendChild(svg);
+  });
+
+  observer.observe(mmChart);
+
+  /* ================================================================
+     Slide-up observer for all sections
+     ================================================================ */
+  document.querySelectorAll('.slide-up').forEach(function (el) {
+    observer.observe(el);
+  });
+
+})();
+</script>
+
+<script src="../shared/nav.js"></script>
+</body>
+</html>
