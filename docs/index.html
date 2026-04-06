@@ -174,24 +174,39 @@ tailwind.config = {
   }
   .theatre-table tr:hover td { color: #c9a96e; }
 
-  /* Currently section */
+  /* Currently section — highlighted, brighter */
   .currently-box {
-    border: 0.5px dashed rgba(201, 169, 110, 0.3);
-    padding: 2.5rem;
+    border: 1px solid rgba(201, 169, 110, 0.45);
+    padding: 3rem 3.25rem;
     position: relative;
+    background: linear-gradient(135deg, rgba(201, 169, 110, 0.045) 0%, rgba(201, 169, 110, 0.015) 100%);
+    box-shadow:
+      0 0 0 1px rgba(201, 169, 110, 0.05),
+      0 8px 30px rgba(201, 169, 110, 0.06),
+      inset 0 0 60px rgba(201, 169, 110, 0.025);
   }
   .currently-box::before {
     content: 'pinned';
     position: absolute;
     top: -8px;
-    left: 1.5rem;
+    left: 1.75rem;
     font-family: 'DM Mono', monospace;
-    font-size: 9px;
+    font-size: 10px;
     text-transform: uppercase;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.25em;
     color: #c9a96e;
     background: #0c0c0b;
-    padding: 0 0.5rem;
+    padding: 0 0.6rem;
+  }
+  /* Subtle gold corner accents */
+  .currently-box::after {
+    content: '';
+    position: absolute;
+    top: -1px; right: -1px;
+    width: 24px; height: 24px;
+    border-top: 1px solid #c9a96e;
+    border-right: 1px solid #c9a96e;
+    pointer-events: none;
   }
 
   /* Writing piece */
@@ -726,13 +741,29 @@ tailwind.config = {
     position: relative;
     min-height: 3rem;
   }
+  .thought-rotate { min-height: 4.5rem; }
   .thought-item {
     position: absolute;
     inset: 0;
     opacity: 0;
     transition: opacity 0.8s ease;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(1.15rem, 1.6vw, 1.4rem);
+    line-height: 1.55;
+    color: #f0ede4;
+    letter-spacing: -0.005em;
   }
   .thought-item.thought-active { opacity: 1; position: relative; }
+  .thought-mark {
+    color: #c9a96e;
+    font-size: 1.3em;
+    line-height: 0;
+    position: relative;
+    top: 0.18em;
+    margin: 0 0.05em;
+  }
 
   /* ===== HERO LOAD ANIMATION ===== */
   .hero-load { opacity: 0; transform: translateY(20px); animation: heroIn 1s ease 0.2s forwards; }
@@ -1295,11 +1326,7 @@ tailwind.config = {
           Half the audience was in tears. The question they went home with: does greed get in the way of human connection?
         </p>
         <div class="photo-slot ratio-16-9 mb-6 max-w-[560px]">
-          <!-- Replace with: <img src="images/vriksha.jpg" alt="Vriksha stage still" /> -->
-          <div class="photo-slot-placeholder">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-            <span>Vriksha &mdash; Stage Still</span>
-          </div>
+          <img src="images/vriksha.png" alt="Vriksha — stage performance" loading="lazy" />
         </div>
         <a href="https://youtu.be/GBrrRnUvKd4?si=LMiIi-zYoKtlLzdv" target="_blank" rel="noopener noreferrer" class="font-mono text-[10px] uppercase tracking-[0.2em] text-gold hover:text-text-primary transition-colors duration-300 link-anim">Watch the Full Performance &nearr;</a>
       </div>
@@ -1311,11 +1338,7 @@ tailwind.config = {
           A bilingual adaptation of Reginald Rose&rsquo;s courtroom drama. Twelve jurors deliberating a single boy&rsquo;s life &mdash; the only place in theatre where conviction and doubt are the entire stage. I played Juror #9: the old man who sees what nobody else is willing to see.
         </p>
         <div class="photo-slot ratio-16-9 mb-6 max-w-[560px]">
-          <!-- Replace with: <img src="images/twelve-angry-jurors.jpg" alt="Twelve Angry Jurors stage still" /> -->
-          <div class="photo-slot-placeholder">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-            <span>Twelve Angry Jurors &mdash; Stage Still</span>
-          </div>
+          <img src="images/twelve-angry-jurors.png" alt="Twelve Angry Jurors — stage performance" loading="lazy" />
         </div>
         <a href="https://youtu.be/AY7zaDn7RCo" target="_blank" rel="noopener noreferrer" class="font-mono text-[10px] uppercase tracking-[0.2em] text-gold hover:text-text-primary transition-colors duration-300 link-anim">Watch the Full Performance &nearr;</a>
       </div>
@@ -1442,11 +1465,7 @@ tailwind.config = {
           </div>
           <div>
             <div class="photo-slot ratio-4-3">
-              <!-- Replace with: <img src="images/pandav-patthar.jpg" alt="Pandav Patthar" /> -->
-              <div class="photo-slot-placeholder">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-                <span>Pandav Patthar</span>
-              </div>
+              <img src="images/pandav-patthar.jpg" alt="Pandav Patthar — 12,500 ft" loading="lazy" />
             </div>
             <p class="font-mono text-[9px] text-text-dim mt-2">12,500 ft</p>
           </div>
@@ -1488,14 +1507,14 @@ tailwind.config = {
 
       <div class="currently-box">
         <div class="thought-rotate" id="thoughtRotate">
-          <p class="thought-item thought-active text-text-muted italic" style="font-weight: 300;">
-            What happens when you design AI systems to cooperate &mdash; but cooperation itself becomes the exploit?
+          <p class="thought-item thought-active">
+            <span class="thought-mark">&ldquo;</span>What happens when you design AI systems to cooperate &mdash; but cooperation itself becomes the exploit?<span class="thought-mark">&rdquo;</span>
           </p>
-          <p class="thought-item text-text-muted italic" style="font-weight: 300;">
-            I keep thinking about how Vriksha&rsquo;s audience saw greed on stage and recognised it in themselves. Theatre as a mirror, not a lesson.
+          <p class="thought-item">
+            <span class="thought-mark">&ldquo;</span>I keep thinking about how Vriksha&rsquo;s audience saw greed on stage and recognised it in themselves. Theatre as a mirror, not a lesson.<span class="thought-mark">&rdquo;</span>
           </p>
-          <p class="thought-item text-text-muted italic" style="font-weight: 300;">
-            Sahyadri taught me that slowness is not the opposite of ambition. It might be the precondition for it.
+          <p class="thought-item">
+            <span class="thought-mark">&ldquo;</span>Sahyadri taught me that slowness is not the opposite of ambition. It might be the precondition for it.<span class="thought-mark">&rdquo;</span>
           </p>
         </div>
       </div>
