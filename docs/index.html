@@ -267,28 +267,33 @@ tailwind.config = {
   <!-- =============================== -->
   <section class="min-h-screen flex flex-col justify-center pt-24 pb-16">
     <div class="reveal">
-      <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-gold mb-8">Ranchi &rarr; Sahyadri &rarr; The World</p>
+      <div class="flex flex-col md:flex-row md:items-end md:gap-12 lg:gap-16">
 
-      <h1 class="font-display italic text-[clamp(2.8rem,8vw,5.5rem)] leading-[1.05] tracking-tight text-text-primary mb-10" style="font-weight: 300;">
-        I grew up learning to sit with things I didn&rsquo;t understand yet. I still do.
-      </h1>
+        <!-- Text content -->
+        <div class="flex-1 min-w-0">
+          <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-gold mb-8">Ranchi &rarr; Sahyadri &rarr; The World</p>
 
-      <p class="text-lg text-text-muted leading-relaxed max-w-[600px] mb-10" style="font-weight: 300;">
-        I build systems, perform on stage, and try to make the complex feel human. From Ranchi, shaped by silence, working on things that matter.
-      </p>
+          <h1 class="font-display italic text-[clamp(2.8rem,8vw,5.5rem)] leading-[1.05] tracking-tight text-text-primary mb-10" style="font-weight: 300;">
+            I grew up learning to sit with things I didn&rsquo;t understand yet. I still do.
+          </h1>
 
-      <div class="flex flex-wrap gap-3 mb-12">
-        <span class="tag">CS Researcher</span>
-        <span class="tag">Theatre Actor</span>
-        <span class="tag">Builder</span>
-        <span class="tag">Sahyadri School KFI</span>
-      </div>
+          <p class="text-lg text-text-muted leading-relaxed max-w-[600px] mb-10" style="font-weight: 300;">
+            I build systems, perform on stage, and try to make the complex feel human. From Ranchi, shaped by silence, working on things that matter.
+          </p>
 
-      <!-- Portrait -->
-      <div class="w-full max-w-[280px]">
-        <div class="aspect-[3/4] bg-surface2 border border-border overflow-hidden">
-          <img src="images/portrait.png" alt="Rachit Agrawal" class="w-full h-full object-cover object-top" loading="eager" />
+          <div class="flex flex-wrap gap-3">
+            <span class="tag">CS Researcher</span>
+            <span class="tag">Theatre Actor</span>
+            <span class="tag">Builder</span>
+            <span class="tag">Sahyadri School KFI</span>
+          </div>
         </div>
+
+        <!-- Portrait — no box, blends with background like a cutout -->
+        <div class="shrink-0 w-[220px] md:w-[260px] lg:w-[300px] mt-12 md:mt-0">
+          <img src="images/portrait.png" alt="Rachit Agrawal" class="w-full object-cover object-top" loading="eager" style="display: block;" />
+        </div>
+
       </div>
     </div>
   </section>
