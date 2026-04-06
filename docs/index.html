@@ -294,7 +294,75 @@ tailwind.config = {
     object-fit: cover;
     object-position: top;
     position: relative;
-    z-index: 1;
+    z-index: 2;
+  }
+
+  /* Circular gold halo extending beyond the photo frame */
+  .portrait-halo {
+    position: absolute;
+    width: 380px;
+    height: 380px;
+    border-radius: 50%;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: radial-gradient(circle at center,
+      rgba(255, 230, 170, 0.32) 0%,
+      rgba(201, 169, 110, 0.20) 22%,
+      rgba(201, 169, 110, 0.10) 40%,
+      rgba(201, 169, 110, 0.04) 60%,
+      transparent 78%);
+    filter: blur(28px);
+    pointer-events: none;
+    z-index: 0;
+    animation: haloBreath 6s ease-in-out infinite alternate;
+  }
+  @keyframes haloBreath {
+    0%   { opacity: 0.85; transform: translateX(-50%) scale(1); }
+    100% { opacity: 1;    transform: translateX(-50%) scale(1.08); }
+  }
+  @media (max-width: 720px) {
+    .portrait-halo { width: 280px; height: 280px; top: 10px; }
+  }
+
+  /* ===== TYPING ANIMATION ===== */
+  .typing-caret {
+    display: inline-block;
+    width: 0.06em;
+    background: #c9a96e;
+    margin-left: 0.04em;
+    animation: caretBlink 0.9s steps(2) infinite;
+    vertical-align: baseline;
+    position: relative;
+    top: 0.05em;
+    border-radius: 1px;
+    align-self: stretch;
+  }
+  .typing-caret-inline {
+    display: inline-block;
+    width: 0.06em;
+    height: 0.85em;
+    background: #c9a96e;
+    margin-left: 0.04em;
+    animation: caretBlink 0.9s steps(2) infinite;
+    vertical-align: text-bottom;
+    border-radius: 1px;
+  }
+  @keyframes caretBlink {
+    0%, 50%   { opacity: 1; }
+    50.01%, 100% { opacity: 0; }
+  }
+  .typing-char {
+    opacity: 0;
+    transition: opacity 0.05s linear;
+  }
+  .typing-char.shown { opacity: 1; }
+
+  /* ===== MAGNET HOVER ===== */
+  .magnet {
+    display: inline-block;
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    will-change: transform;
   }
   .hero-headline {
     font-size: clamp(2.4rem, 5.8vw, 4.2rem);
@@ -321,21 +389,25 @@ tailwind.config = {
     .hero-headline { text-align: center; font-size: clamp(2rem, 9vw, 3rem); }
   }
 
-  /* ===== FLUID GOLDEN SPLASH CURSOR ===== */
-  .splash-canvas {
+  /* ===== GOLD BLOB CURSOR (gooey SVG) ===== */
+  .blob-cursor {
     position: fixed;
-    inset: 0;
+    top: 0;
+    left: 0;
     width: 100vw;
     height: 100vh;
     pointer-events: none;
     z-index: 9998;
     mix-blend-mode: screen;
+    opacity: 0;
+    transition: opacity 0.5s ease;
   }
+  .blob-cursor.active { opacity: 1; }
   @media (hover: none) {
-    .splash-canvas { display: none; }
+    .blob-cursor { display: none; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .splash-canvas { display: none; }
+    .blob-cursor { display: none; }
   }
   @keyframes glowDrift {
     0% { transform: translate(0, 0) scale(1); opacity: 0.6; }
@@ -469,7 +541,26 @@ tailwind.config = {
 </head>
 <body>
 <div class="scroll-progress" id="scrollProgress"></div>
-<canvas class="splash-canvas" id="splashCanvas"></canvas>
+<svg class="blob-cursor" id="blobCursor" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet">
+  <defs>
+    <filter id="goo-gold" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur"/>
+      <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -10" result="goo"/>
+      <feBlend in="SourceGraphic" in2="goo"/>
+    </filter>
+    <radialGradient id="blobGrad">
+      <stop offset="0%"  stop-color="#fff0c8"/>
+      <stop offset="40%" stop-color="#e8c478"/>
+      <stop offset="100%" stop-color="#c9a96e"/>
+    </radialGradient>
+  </defs>
+  <g filter="url(#goo-gold)">
+    <circle id="blob1" cx="0" cy="0" r="14" fill="url(#blobGrad)"/>
+    <circle id="blob2" cx="0" cy="0" r="11" fill="#d4b074"/>
+    <circle id="blob3" cx="0" cy="0" r="8"  fill="#e5c486"/>
+    <circle id="blob4" cx="0" cy="0" r="5"  fill="#fff0c8"/>
+  </g>
+</svg>
 
 <!-- Navigation -->
 <nav class="nav-bar" id="navbar">
@@ -510,11 +601,12 @@ tailwind.config = {
 
         <!-- Portrait floats right, headline wraps around it -->
         <div class="portrait-float portrait-wrap hero-load hero-load-delay2" id="portraitWrap">
+          <div class="portrait-halo"></div>
           <img src="images/portrait.png" alt="Rachit Agrawal" loading="eager" />
         </div>
 
-        <h1 class="hero-headline font-display italic hero-load hero-load-delay">
-          I grew up learning to sit with things I didn&rsquo;t understand yet. <span class="hero-headline-em">I still do.</span>
+        <h1 class="hero-headline font-display italic hero-load hero-load-delay" id="typingHeadline">
+          <span class="typing-text" data-text="I grew up learning to sit with things I didn&rsquo;t understand yet. "></span><span class="typing-text typing-em hero-headline-em" data-text="I still do."></span><span class="typing-caret-inline" id="typingCaret"></span>
         </h1>
 
         <div class="hero-clear"></div>
@@ -874,8 +966,8 @@ tailwind.config = {
           The most interesting finding: an algorithm&rsquo;s real-world efficiency depends not on theoretical complexity alone, but on the ratio between the cost of its optimisation strategy and the savings that strategy produces.
         </p>
         <div class="flex flex-wrap gap-4">
-          <a href="https://github.com/RachitAgrawal146/game-algorithms-java" target="_blank" rel="noopener noreferrer" class="font-mono text-[10px] uppercase tracking-[0.2em] text-gold hover:text-text-primary transition-colors duration-300 link-anim">Source Code &nearr;</a>
-          <a href="/game-algorithms-java/algorithms/" target="_blank" rel="noopener noreferrer" class="font-mono text-[10px] uppercase tracking-[0.2em] text-gold hover:text-text-primary transition-colors duration-300 link-anim">Interactive Demos &rarr;</a>
+          <a href="https://github.com/RachitAgrawal146/game-algorithms-java" target="_blank" rel="noopener noreferrer" class="font-mono text-[10px] uppercase tracking-[0.2em] text-gold hover:text-text-primary transition-colors duration-300 link-anim magnet">Source Code &nearr;</a>
+          <a href="/game-algorithms-java/algorithms/" target="_blank" rel="noopener noreferrer" class="font-mono text-[10px] uppercase tracking-[0.2em] text-gold hover:text-text-primary transition-colors duration-300 link-anim magnet">Interactive Demos &rarr;</a>
         </div>
       </div>
 
@@ -1302,51 +1394,29 @@ tailwind.config = {
     }, { passive: true });
   }
 
-  // --- Portrait parallax + lighter golden splash cursor ---
+  // --- Portrait parallax + GOLD BLOB CURSOR (gooey SVG) ---
   const portraitWrap = document.getElementById('portraitWrap');
-  const splashCanvas = document.getElementById('splashCanvas');
+  const blobCursor = document.getElementById('blobCursor');
 
-  if (!prefersReducedMotion && splashCanvas) {
-    const ctx = splashCanvas.getContext('2d');
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-
-    function resizeCanvas() {
-      splashCanvas.width = window.innerWidth * dpr;
-      splashCanvas.height = window.innerHeight * dpr;
-      splashCanvas.style.width = window.innerWidth + 'px';
-      splashCanvas.style.height = window.innerHeight + 'px';
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.scale(dpr, dpr);
+  if (!prefersReducedMotion && blobCursor) {
+    // Set viewBox to match window
+    function sizeBlob() {
+      blobCursor.setAttribute('viewBox', '0 0 ' + window.innerWidth + ' ' + window.innerHeight);
+      blobCursor.setAttribute('width',  window.innerWidth);
+      blobCursor.setAttribute('height', window.innerHeight);
     }
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
+    sizeBlob();
+    window.addEventListener('resize', sizeBlob);
 
-    // Particle pool — gentle gold motes
-    const particles = [];
-    const MAX_PARTICLES = 90;
+    const blobs = [
+      { el: document.getElementById('blob1'), lerp: 0.28, x: 0, y: 0 },
+      { el: document.getElementById('blob2'), lerp: 0.18, x: 0, y: 0 },
+      { el: document.getElementById('blob3'), lerp: 0.12, x: 0, y: 0 },
+      { el: document.getElementById('blob4'), lerp: 0.08, x: 0, y: 0 }
+    ];
     let mouseX = window.innerWidth / 2;
     let mouseY = window.innerHeight / 2;
-    let prevX = mouseX;
-    let prevY = mouseY;
-    let lastSpawn = 0;
-
-    function spawnParticles(x, y, vx, vy, count) {
-      for (let i = 0; i < count; i++) {
-        if (particles.length >= MAX_PARTICLES) particles.shift();
-        const angle = Math.random() * Math.PI * 2;
-        const speed = Math.random() * 0.4 + 0.15;
-        particles.push({
-          x: x + (Math.random() - 0.5) * 4,
-          y: y + (Math.random() - 0.5) * 4,
-          vx: vx * 0.10 + Math.cos(angle) * speed,
-          vy: vy * 0.10 + Math.sin(angle) * speed,
-          radius: Math.random() * 8 + 6,
-          maxRadius: Math.random() * 14 + 12,
-          born: performance.now(),
-          maxLife: Math.random() * 500 + 450
-        });
-      }
-    }
+    let active = false;
 
     document.addEventListener('mousemove', function(e) {
       mouseX = e.clientX;
@@ -1359,64 +1429,113 @@ tailwind.config = {
         portraitWrap.style.transform = 'translate(' + px + 'px, ' + py + 'px)';
       }
 
-      const vx = mouseX - prevX;
-      const vy = mouseY - prevY;
-      const speed = Math.sqrt(vx * vx + vy * vy);
-
-      const now = performance.now();
-      if (now - lastSpawn > 18) {
-        const count = Math.min(2, Math.max(1, Math.floor(speed / 14)));
-        spawnParticles(mouseX, mouseY, vx, vy, count);
-        lastSpawn = now;
+      if (!active) {
+        blobCursor.classList.add('active');
+        active = true;
+        blobs.forEach(function(b) { b.x = mouseX; b.y = mouseY; });
       }
-
-      prevX = mouseX;
-      prevY = mouseY;
     });
 
-    function renderSplash() {
-      const now = performance.now();
-      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    document.addEventListener('mouseleave', function() {
+      blobCursor.classList.remove('active');
+      active = false;
+    });
 
-      for (let i = particles.length - 1; i >= 0; i--) {
-        const p = particles[i];
-        const age = (now - p.born) / p.maxLife;
-        if (age >= 1) { particles.splice(i, 1); continue; }
-
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vx *= 0.93;
-        p.vy *= 0.93;
-        const r = p.radius + (p.maxRadius - p.radius) * Math.min(1, age * 2);
-
-        // Lighter alpha curve
-        const alpha = Math.sin((1 - age) * Math.PI * 0.6) * 0.22;
-
-        const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
-        grad.addColorStop(0,    'rgba(255, 235, 180, ' + alpha + ')');
-        grad.addColorStop(0.4,  'rgba(201, 169, 110, ' + (alpha * 0.5) + ')');
-        grad.addColorStop(1,    'rgba(201, 169, 110, 0)');
-
-        ctx.fillStyle = grad;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      // Small soft core at cursor (much lighter)
-      const coreGrad = ctx.createRadialGradient(mouseX, mouseY, 0, mouseX, mouseY, 9);
-      coreGrad.addColorStop(0,   'rgba(255, 240, 200, 0.45)');
-      coreGrad.addColorStop(0.5, 'rgba(255, 210, 130, 0.18)');
-      coreGrad.addColorStop(1,   'rgba(255, 210, 130, 0)');
-      ctx.fillStyle = coreGrad;
-      ctx.beginPath();
-      ctx.arc(mouseX, mouseY, 9, 0, Math.PI * 2);
-      ctx.fill();
-
-      requestAnimationFrame(renderSplash);
+    function renderBlob() {
+      blobs.forEach(function(b) {
+        b.x += (mouseX - b.x) * b.lerp;
+        b.y += (mouseY - b.y) * b.lerp;
+        b.el.setAttribute('cx', b.x);
+        b.el.setAttribute('cy', b.y);
+      });
+      requestAnimationFrame(renderBlob);
     }
-    renderSplash();
+    renderBlob();
   }
+
+  // --- TYPING ANIMATION on headline ---
+  (function() {
+    const headline = document.getElementById('typingHeadline');
+    if (!headline) return;
+    if (prefersReducedMotion) {
+      // Just show all text
+      headline.querySelectorAll('.typing-text').forEach(function(el) {
+        el.textContent = el.dataset.text;
+      });
+      const caret = document.getElementById('typingCaret');
+      if (caret) caret.style.display = 'none';
+      return;
+    }
+
+    // Build per-char spans inside each typing-text element
+    const segments = [];
+    headline.querySelectorAll('.typing-text').forEach(function(el) {
+      const text = el.dataset.text;
+      el.textContent = '';
+      const chars = [];
+      for (let i = 0; i < text.length; i++) {
+        const span = document.createElement('span');
+        span.className = 'typing-char';
+        // Preserve spaces
+        span.textContent = text[i] === ' ' ? '\u00A0' : text[i];
+        el.appendChild(span);
+        chars.push(span);
+      }
+      segments.push(chars);
+    });
+
+    const allChars = segments.flat();
+    let i = 0;
+    const TYPE_SPEED = 35; // ms per char
+    const PAUSE_AT_PUNCT = 180; // extra pause on . , ;
+
+    function typeNext() {
+      if (i >= allChars.length) {
+        // Done — fade caret slowly after a beat
+        setTimeout(function() {
+          const caret = document.getElementById('typingCaret');
+          if (caret) {
+            caret.style.transition = 'opacity 1.2s ease';
+            caret.style.opacity = '0';
+          }
+        }, 600);
+        return;
+      }
+      allChars[i].classList.add('shown');
+      const ch = allChars[i].textContent;
+      i++;
+      const delay = (ch === '.' || ch === ',' || ch === ';') ? TYPE_SPEED + PAUSE_AT_PUNCT : TYPE_SPEED;
+      setTimeout(typeNext, delay);
+    }
+
+    // Start typing after a brief pause to let other hero elements settle
+    setTimeout(typeNext, 700);
+  })();
+
+  // --- MAGNET EFFECT on links/buttons ---
+  (function() {
+    if (prefersReducedMotion) return;
+    const magnets = document.querySelectorAll('.magnet');
+    const STRENGTH = 0.35;
+    const RADIUS = 80;
+
+    magnets.forEach(function(el) {
+      el.addEventListener('mousemove', function(e) {
+        const rect = el.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const dx = e.clientX - cx;
+        const dy = e.clientY - cy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < RADIUS * 2) {
+          el.style.transform = 'translate(' + (dx * STRENGTH) + 'px, ' + (dy * STRENGTH) + 'px)';
+        }
+      });
+      el.addEventListener('mouseleave', function() {
+        el.style.transform = '';
+      });
+    });
+  })();
 
   // --- Hero ambient gold particles (slow-drifting motes) ---
   const heroCanvas = document.getElementById('heroParticleCanvas');
