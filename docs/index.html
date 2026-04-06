@@ -276,53 +276,118 @@ tailwind.config = {
   }
   .hero-wrap, .hero-wrap > * { position: relative; z-index: 1; }
 
-  /* ===== HERO TEXT-WRAP AROUND PORTRAIT ===== */
+  /* ===== HERO SIDE-BY-SIDE LAYOUT ===== */
   .hero-wrap {
+    display: flex;
+    align-items: center;
+    gap: clamp(2rem, 5vw, 4rem);
     position: relative;
   }
-  .portrait-float {
-    float: right;
-    width: 280px;
-    margin: 0 0 1rem 2.5rem;
-    shape-outside: ellipse(45% 50% at 50% 45%);
-    shape-margin: 12px;
-    position: relative;
+  .hero-text-col {
+    flex: 1 1 0;
+    min-width: 0;
   }
-  .portrait-float img {
+  .portrait-col {
+    flex-shrink: 0;
+    width: clamp(220px, 28vw, 320px);
+    transition: transform 0.3s ease;
+    will-change: transform;
+  }
+
+  /* Circular gold-framed portrait */
+  .portrait-frame {
+    position: relative;
     width: 100%;
-    display: block;
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .portrait-frame img {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
-    object-position: top;
+    object-position: 50% 18%;
+    display: block;
     position: relative;
     z-index: 2;
   }
-
-  /* Circular gold halo extending beyond the photo frame */
-  .portrait-halo {
+  /* Thin gold ring border */
+  .portrait-frame-ring {
     position: absolute;
-    width: 380px;
-    height: 380px;
+    inset: 0;
     border-radius: 50%;
-    top: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: radial-gradient(circle at center,
-      rgba(255, 230, 170, 0.32) 0%,
-      rgba(201, 169, 110, 0.20) 22%,
-      rgba(201, 169, 110, 0.10) 40%,
-      rgba(201, 169, 110, 0.04) 60%,
-      transparent 78%);
-    filter: blur(28px);
+    border: 1.5px solid rgba(201, 169, 110, 0.55);
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 220, 150, 0.15),
+      0 0 30px rgba(201, 169, 110, 0.18),
+      0 0 60px rgba(201, 169, 110, 0.10);
+    z-index: 3;
     pointer-events: none;
-    z-index: 0;
+  }
+  /* Soft outer halo glow that extends beyond the ring */
+  .portrait-frame-glow {
+    position: absolute;
+    inset: -22%;
+    border-radius: 50%;
+    background: radial-gradient(circle at center,
+      rgba(255, 230, 170, 0.28) 0%,
+      rgba(201, 169, 110, 0.16) 28%,
+      rgba(201, 169, 110, 0.06) 50%,
+      transparent 72%);
+    filter: blur(20px);
+    z-index: 1;
+    pointer-events: none;
     animation: haloBreath 6s ease-in-out infinite alternate;
   }
   @keyframes haloBreath {
-    0%   { opacity: 0.85; transform: translateX(-50%) scale(1); }
-    100% { opacity: 1;    transform: translateX(-50%) scale(1.08); }
+    0%   { opacity: 0.85; transform: scale(1); }
+    100% { opacity: 1;    transform: scale(1.06); }
   }
-  @media (max-width: 720px) {
-    .portrait-halo { width: 280px; height: 280px; top: 10px; }
+
+  /* Mobile: stack vertically */
+  @media (max-width: 768px) {
+    .hero-wrap { flex-direction: column; align-items: flex-start; gap: 2.5rem; }
+    .portrait-col { width: 220px; align-self: center; }
+    .hero-headline { text-align: left; }
+  }
+
+  /* ===== SHINY TEXT (gradient sweep) ===== */
+  .shiny-text {
+    background: linear-gradient(
+      110deg,
+      rgba(201, 169, 110, 0.5) 0%,
+      rgba(201, 169, 110, 0.5) 35%,
+      rgba(255, 240, 200, 1) 50%,
+      rgba(201, 169, 110, 0.5) 65%,
+      rgba(201, 169, 110, 0.5) 100%
+    );
+    background-size: 200% auto;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: shinySweep 4s linear infinite;
+  }
+  @keyframes shinySweep {
+    0%   { background-position: 200% center; }
+    100% { background-position: -200% center; }
+  }
+  /* Section labels with shiny effect */
+  .section-label-shiny {
+    background: linear-gradient(
+      110deg,
+      rgba(201, 169, 110, 0.6) 0%,
+      rgba(201, 169, 110, 0.6) 40%,
+      rgba(255, 240, 200, 1) 50%,
+      rgba(201, 169, 110, 0.6) 60%,
+      rgba(201, 169, 110, 0.6) 100%
+    );
+    background-size: 200% auto;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shinySweep 5s linear infinite;
   }
 
   /* ===== TYPING ANIMATION ===== */
@@ -389,25 +454,82 @@ tailwind.config = {
     .hero-headline { text-align: center; font-size: clamp(2rem, 9vw, 3rem); }
   }
 
-  /* ===== GOLD BLOB CURSOR (gooey SVG) ===== */
-  .blob-cursor {
+  /* ===== GOLD BLOB CURSOR (reactbits-style) ===== */
+  .blob-cursor-container {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
     pointer-events: none;
-    z-index: 9998;
+    z-index: 100;
+    filter: url(#blob-goo);
     mix-blend-mode: screen;
     opacity: 0;
     transition: opacity 0.5s ease;
   }
-  .blob-cursor.active { opacity: 1; }
+  .blob-cursor-container.active { opacity: 1; }
+  .blob {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 50%;
+    will-change: transform;
+    pointer-events: none;
+    background: #c9a96e;
+    box-shadow: 10px 10px 5px rgba(0,0,0,0.75);
+  }
+  .blob-1 {
+    width: 60px;
+    height: 60px;
+    opacity: 0.6;
+  }
+  .blob-2 {
+    width: 125px;
+    height: 125px;
+    opacity: 0.6;
+  }
+  .blob-3 {
+    width: 75px;
+    height: 75px;
+    opacity: 0.6;
+  }
+  .blob-inner {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 240, 200, 0.85);
+    pointer-events: none;
+  }
+  .blob-1 .blob-inner {
+    width: 20px;
+    height: 20px;
+    top: 20px;
+    left: 20px;
+  }
+  .blob-2 .blob-inner {
+    width: 35px;
+    height: 35px;
+    top: 45px;
+    left: 45px;
+  }
+  .blob-3 .blob-inner {
+    width: 25px;
+    height: 25px;
+    top: 25px;
+    left: 25px;
+  }
+  /* Hidden SVG filter for the goo */
+  .blob-svg-filter {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+  }
   @media (hover: none) {
-    .blob-cursor { display: none; }
+    .blob-cursor-container, .blob-svg-filter { display: none; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .blob-cursor { display: none; }
+    .blob-cursor-container, .blob-svg-filter { display: none; }
   }
   @keyframes glowDrift {
     0% { transform: translate(0, 0) scale(1); opacity: 0.6; }
@@ -541,26 +663,23 @@ tailwind.config = {
 </head>
 <body>
 <div class="scroll-progress" id="scrollProgress"></div>
-<svg class="blob-cursor" id="blobCursor" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet">
+<!-- Hidden SVG filter for gooey blob cursor -->
+<svg class="blob-svg-filter" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <filter id="goo-gold" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur"/>
+    <filter id="blob-goo">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="30" result="blur"/>
       <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -10" result="goo"/>
-      <feBlend in="SourceGraphic" in2="goo"/>
+      <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
     </filter>
-    <radialGradient id="blobGrad">
-      <stop offset="0%"  stop-color="#fff0c8"/>
-      <stop offset="40%" stop-color="#e8c478"/>
-      <stop offset="100%" stop-color="#c9a96e"/>
-    </radialGradient>
   </defs>
-  <g filter="url(#goo-gold)">
-    <circle id="blob1" cx="0" cy="0" r="14" fill="url(#blobGrad)"/>
-    <circle id="blob2" cx="0" cy="0" r="11" fill="#d4b074"/>
-    <circle id="blob3" cx="0" cy="0" r="8"  fill="#e5c486"/>
-    <circle id="blob4" cx="0" cy="0" r="5"  fill="#fff0c8"/>
-  </g>
 </svg>
+
+<!-- Blob cursor (3 trailing blobs that merge via goo filter) -->
+<div class="blob-cursor-container" id="blobCursor">
+  <div class="blob blob-1" id="blob-1"><div class="blob-inner"></div></div>
+  <div class="blob blob-2" id="blob-2"><div class="blob-inner"></div></div>
+  <div class="blob blob-3" id="blob-3"><div class="blob-inner"></div></div>
+</div>
 
 <!-- Navigation -->
 <nav class="nav-bar" id="navbar">
@@ -594,32 +713,34 @@ tailwind.config = {
     <div class="hero-particles"><canvas id="heroParticleCanvas"></canvas></div>
     <div class="reveal">
 
-      <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-gold mb-8 hero-load">Ranchi &rarr; Sahyadri &rarr; The World</p>
+      <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-gold mb-8 hero-load shiny-text">Ranchi &rarr; Sahyadri &rarr; The World</p>
 
-      <!-- Hero text+image with text wrapping around portrait -->
+      <!-- Side-by-side: text on left, framed portrait on right -->
       <div class="hero-wrap">
+        <div class="hero-text-col">
+          <h1 class="hero-headline font-display italic hero-load hero-load-delay" id="typingHeadline">
+            <span class="typing-text" data-text="I grew up learning to sit with things I didn&rsquo;t understand yet. "></span><span class="typing-text typing-em hero-headline-em" data-text="I still do."></span><span class="typing-caret-inline" id="typingCaret"></span>
+          </h1>
 
-        <!-- Portrait floats right, headline wraps around it -->
-        <div class="portrait-float portrait-wrap hero-load hero-load-delay2" id="portraitWrap">
-          <div class="portrait-halo"></div>
-          <img src="images/portrait.png" alt="Rachit Agrawal" loading="eager" />
+          <p class="text-lg text-text-muted leading-relaxed mb-10 mt-10 hero-load hero-load-delay2" style="font-weight: 300;">
+            I build systems, perform on stage, and try to make the complex feel human. From Ranchi, shaped by silence, working on things that matter.
+          </p>
+
+          <div class="flex flex-wrap gap-3 hero-load hero-load-delay3">
+            <span class="tag">CS Researcher</span>
+            <span class="tag">Theatre Actor</span>
+            <span class="tag">Builder</span>
+            <span class="tag">Sahyadri School KFI</span>
+          </div>
         </div>
 
-        <h1 class="hero-headline font-display italic hero-load hero-load-delay" id="typingHeadline">
-          <span class="typing-text" data-text="I grew up learning to sit with things I didn&rsquo;t understand yet. "></span><span class="typing-text typing-em hero-headline-em" data-text="I still do."></span><span class="typing-caret-inline" id="typingCaret"></span>
-        </h1>
-
-        <div class="hero-clear"></div>
-
-        <p class="text-lg text-text-muted leading-relaxed max-w-[600px] mb-10 mt-8 hero-load hero-load-delay2" style="font-weight: 300;">
-          I build systems, perform on stage, and try to make the complex feel human. From Ranchi, shaped by silence, working on things that matter.
-        </p>
-
-        <div class="flex flex-wrap gap-3 hero-load hero-load-delay3">
-          <span class="tag">CS Researcher</span>
-          <span class="tag">Theatre Actor</span>
-          <span class="tag">Builder</span>
-          <span class="tag">Sahyadri School KFI</span>
+        <!-- Circular gold-framed portrait -->
+        <div class="portrait-col hero-load hero-load-delay2" id="portraitWrap">
+          <div class="portrait-frame">
+            <div class="portrait-frame-glow"></div>
+            <div class="portrait-frame-ring"></div>
+            <img src="images/portrait.png" alt="Rachit Agrawal" loading="eager" />
+          </div>
         </div>
 
       </div>
@@ -633,7 +754,7 @@ tailwind.config = {
   <!-- =============================== -->
   <section class="py-24 md:py-32" id="origin">
     <div class="reveal">
-      <div class="section-label">01 &mdash; Origin</div>
+      <div class="section-label"><span class="shiny-text">01 &mdash; Origin</span></div>
 
       <blockquote class="font-display italic text-[clamp(1.8rem,4vw,2.8rem)] leading-[1.2] text-text-primary mb-12" style="font-weight: 300;">
         &ldquo;Most people learn in straight lines. I learned under trees.&rdquo;
@@ -712,7 +833,7 @@ tailwind.config = {
 
   <section class="tl-section" id="journey">
     <div class="tl-wrap">
-      <div class="section-label" style="margin-bottom: 4rem;">01b &mdash; The Journey</div>
+      <div class="section-label" style="margin-bottom: 4rem;"><span class="shiny-text">01b &mdash; The Journey</span></div>
 
       <div class="tl-line"></div>
       <div class="tl-progress" id="tlProgress"></div>
@@ -903,7 +1024,7 @@ tailwind.config = {
   <!-- =============================== -->
   <section class="py-24 md:py-32" id="research">
     <div class="reveal">
-      <div class="section-label">02 &mdash; Research</div>
+      <div class="section-label"><span class="shiny-text">02 &mdash; Research</span></div>
 
       <!-- Paper card -->
       <div class="bg-surface p-8 md:p-10 border border-border mb-10">
@@ -933,7 +1054,7 @@ tailwind.config = {
   <!-- =============================== -->
   <section class="py-24 md:py-32" id="projects">
     <div class="reveal">
-      <div class="section-label">03 &mdash; Projects</div>
+      <div class="section-label"><span class="shiny-text">03 &mdash; Projects</span></div>
 
       <!-- Lifeline -->
       <div class="project-card">
@@ -996,7 +1117,7 @@ tailwind.config = {
   <!-- =============================== -->
   <section class="py-24 md:py-32" id="theatre">
     <div class="reveal">
-      <div class="section-label">04 &mdash; Theatre</div>
+      <div class="section-label"><span class="shiny-text">04 &mdash; Theatre</span></div>
 
       <p class="text-text-primary text-lg mb-8" style="font-weight: 300;">
         This is not a hobby. Each play was chosen because it had something to say. The stage as a social tool &mdash; for ideas that wouldn&rsquo;t otherwise reach the people who needed to hear them.
@@ -1102,7 +1223,7 @@ tailwind.config = {
   <!-- =============================== -->
   <section class="py-24 md:py-32">
     <div class="reveal">
-      <div class="section-label">05 &mdash; School Life</div>
+      <div class="section-label"><span class="shiny-text">05 &mdash; School Life</span></div>
 
       <div class="space-y-6">
         <div class="flex gap-4 items-baseline">
@@ -1134,7 +1255,7 @@ tailwind.config = {
   <!-- =============================== -->
   <section class="py-24 md:py-32" id="beyond">
     <div class="reveal">
-      <div class="section-label">06 &mdash; Beyond the Screen</div>
+      <div class="section-label"><span class="shiny-text">06 &mdash; Beyond the Screen</span></div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 reveal-stagger">
 
@@ -1208,7 +1329,7 @@ tailwind.config = {
   <!-- =============================== -->
   <section class="py-24 md:py-32" id="currently">
     <div class="reveal">
-      <div class="section-label">07 &mdash; Currently</div>
+      <div class="section-label"><span class="shiny-text">07 &mdash; Currently</span></div>
 
       <div class="currently-box">
         <div class="thought-rotate" id="thoughtRotate">
@@ -1233,7 +1354,7 @@ tailwind.config = {
   <!-- =============================== -->
   <section class="py-24 md:py-32" id="writing">
     <div class="reveal">
-      <div class="section-label">08 &mdash; Writing</div>
+      <div class="section-label"><span class="shiny-text">08 &mdash; Writing</span></div>
 
       <div class="writing-piece" style="border-bottom: none;">
         <div>
@@ -1252,7 +1373,7 @@ tailwind.config = {
   <!-- =============================== -->
   <section class="py-24 md:py-32" id="contact">
     <div class="reveal">
-      <div class="section-label">09 &mdash; Contact</div>
+      <div class="section-label"><span class="shiny-text">09 &mdash; Contact</span></div>
 
       <h2 class="font-display italic text-[clamp(2.5rem,6vw,4rem)] leading-[1.1] text-text-primary mb-6" style="font-weight: 300;">
         Let&rsquo;s talk.
@@ -1394,25 +1515,19 @@ tailwind.config = {
     }, { passive: true });
   }
 
-  // --- Portrait parallax + GOLD BLOB CURSOR (gooey SVG) ---
+  // --- Portrait parallax + GOLD BLOB CURSOR (reactbits-style HTML divs + goo) ---
   const portraitWrap = document.getElementById('portraitWrap');
   const blobCursor = document.getElementById('blobCursor');
 
   if (!prefersReducedMotion && blobCursor) {
-    // Set viewBox to match window
-    function sizeBlob() {
-      blobCursor.setAttribute('viewBox', '0 0 ' + window.innerWidth + ' ' + window.innerHeight);
-      blobCursor.setAttribute('width',  window.innerWidth);
-      blobCursor.setAttribute('height', window.innerHeight);
-    }
-    sizeBlob();
-    window.addEventListener('resize', sizeBlob);
-
+    // Sizes from reactbits BlobCursor: [60, 125, 75]
+    // The first blob follows fastest (creates the leading edge),
+    // the others trail at progressively slower speeds, creating a
+    // single morphing blob via the SVG goo filter
     const blobs = [
-      { el: document.getElementById('blob1'), lerp: 0.28, x: 0, y: 0 },
-      { el: document.getElementById('blob2'), lerp: 0.18, x: 0, y: 0 },
-      { el: document.getElementById('blob3'), lerp: 0.12, x: 0, y: 0 },
-      { el: document.getElementById('blob4'), lerp: 0.08, x: 0, y: 0 }
+      { el: document.getElementById('blob-1'), size: 60,  lerp: 0.32, x: 0, y: 0 },
+      { el: document.getElementById('blob-2'), size: 125, lerp: 0.18, x: 0, y: 0 },
+      { el: document.getElementById('blob-3'), size: 75,  lerp: 0.10, x: 0, y: 0 }
     ];
     let mouseX = window.innerWidth / 2;
     let mouseY = window.innerHeight / 2;
@@ -1445,8 +1560,10 @@ tailwind.config = {
       blobs.forEach(function(b) {
         b.x += (mouseX - b.x) * b.lerp;
         b.y += (mouseY - b.y) * b.lerp;
-        b.el.setAttribute('cx', b.x);
-        b.el.setAttribute('cy', b.y);
+        // Center the blob on its position
+        const tx = b.x - b.size / 2;
+        const ty = b.y - b.size / 2;
+        b.el.style.transform = 'translate3d(' + tx + 'px, ' + ty + 'px, 0)';
       });
       requestAnimationFrame(renderBlob);
     }
