@@ -234,48 +234,6 @@ tailwind.config = {
   }
   .mobile-nav a:hover, .mobile-nav a.active { color: #c9a96e; }
 
-  /* ===== NAME BANNER — stacked Rachit / Agrawal, slides up on scroll ===== */
-  .name-banner {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 100vh;
-    pointer-events: none;
-    z-index: 90;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    will-change: transform, opacity;
-  }
-  .name-banner-inner {
-    text-align: center;
-  }
-  .name-banner-line {
-    display: block;
-    font-family: 'Cormorant Garamond', serif;
-    font-style: italic;
-    font-weight: 300;
-    font-size: clamp(4rem, 14vw, 10rem);
-    line-height: 0.85;
-    letter-spacing: -0.02em;
-    background: linear-gradient(180deg,
-      #c9a96e 0%,
-      #e8c478 35%,
-      #fff0c8 50%,
-      #e8c478 65%,
-      #c9a96e 100%);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-  }
-  /* Reserve top space so the hero begins below the name banner */
-  body.has-name-banner main { padding-top: 100vh; }
-  @media (prefers-reduced-motion: reduce) {
-    .name-banner { display: none; }
-    body.has-name-banner main { padding-top: 0; }
-  }
 
   /* ===== SCROLL PROGRESS BAR ===== */
   .scroll-progress {
@@ -319,11 +277,22 @@ tailwind.config = {
   }
   .hero-wrap, .hero-wrap > * { position: relative; z-index: 1; }
 
+  /* ===== HERO SECTION — wider breakout container ===== */
+  .hero-section-wide {
+    /* Break out of the 760px main container, span up to 1180px wide */
+    margin-left: calc((760px - min(1180px, 100vw - 3rem)) / 2);
+    margin-right: calc((760px - min(1180px, 100vw - 3rem)) / 2);
+  }
+  @media (max-width: 880px) {
+    .hero-section-wide { margin-left: 0; margin-right: 0; }
+  }
+
   /* ===== HERO SIDE-BY-SIDE LAYOUT ===== */
   .hero-wrap {
     display: flex;
     align-items: center;
-    gap: clamp(2rem, 5vw, 4rem);
+    justify-content: space-between;
+    gap: clamp(2.5rem, 5vw, 5rem);
     position: relative;
   }
   .hero-text-col {
@@ -332,9 +301,9 @@ tailwind.config = {
   }
   .portrait-col {
     flex-shrink: 0;
-    width: clamp(300px, 32vw, 380px);
+    width: clamp(280px, 30vw, 360px);
     padding: 36px 30px;
-    margin-left: 1.5rem;
+    margin-left: auto;
     transition: transform 0.3s ease;
     will-change: transform;
   }
@@ -490,9 +459,9 @@ tailwind.config = {
     will-change: transform;
   }
   .hero-headline {
-    font-size: clamp(2.4rem, 5.8vw, 4.2rem);
-    line-height: 1.08;
-    letter-spacing: -0.01em;
+    font-size: clamp(3rem, 6.5vw, 5.4rem);
+    line-height: 1.04;
+    letter-spacing: -0.015em;
     color: #e8e6df;
     font-weight: 300;
     margin-bottom: 0;
@@ -721,15 +690,7 @@ tailwind.config = {
   }
 </style>
 </head>
-<body class="has-name-banner">
-<!-- Big name banner — Rachit / Agrawal stacked, slides up as you scroll -->
-<div class="name-banner" id="nameBanner">
-  <div class="name-banner-inner">
-    <span class="name-banner-line">Rachit</span>
-    <span class="name-banner-line">Agrawal</span>
-  </div>
-</div>
-
+<body>
 <div class="scroll-progress" id="scrollProgress"></div>
 <!-- Hidden SVG filter for gooey blob cursor -->
 <svg class="blob-svg-filter" xmlns="http://www.w3.org/2000/svg">
@@ -777,7 +738,7 @@ tailwind.config = {
   <!-- =============================== -->
   <!-- HERO -->
   <!-- =============================== -->
-  <section class="min-h-screen flex flex-col justify-center pt-24 pb-16 relative">
+  <section class="min-h-screen flex flex-col justify-center pt-24 pb-16 relative hero-section-wide">
     <div class="hero-particles"><canvas id="heroParticleCanvas"></canvas></div>
     <div class="reveal">
 
@@ -1576,29 +1537,6 @@ tailwind.config = {
     });
   });
 
-  // --- NAME BANNER: slides up at scroll rate, fades out ---
-  const nameBanner = document.getElementById('nameBanner');
-  if (nameBanner && !prefersReducedMotion) {
-    let bannerTicking = false;
-    function updateBanner() {
-      const sy = window.scrollY;
-      const vh = window.innerHeight;
-      // Translate at 1x scroll rate so it moves naturally with the page
-      nameBanner.style.transform = 'translate3d(0,' + (-sy) + 'px,0)';
-      // Fade out so it's gone by 70% of viewport scroll
-      const opacity = Math.max(0, 1 - sy / (vh * 0.7));
-      nameBanner.style.opacity = opacity;
-      bannerTicking = false;
-    }
-    window.addEventListener('scroll', function() {
-      if (!bannerTicking) {
-        requestAnimationFrame(updateBanner);
-        bannerTicking = true;
-      }
-    }, { passive: true });
-    updateBanner();
-  }
-
   // --- Scroll progress bar ---
   const progressBar = document.getElementById('scrollProgress');
   if (progressBar) {
@@ -1744,12 +1682,12 @@ tailwind.config = {
       loop: false,
       startDelay: 800,
       onComplete: function() {
-        // Type the gold part next
+        // Hold a beat (longer pause) before typing the gold "I still do."
         createTypewriter(emEl, cursorEl, {
           text: part2,
           typeSpeed: 55,
           loop: false,
-          startDelay: 250,
+          startDelay: 1200,
           onComplete: function() {
             // Fade cursor 1.2s after the whole line is done
             setTimeout(function() {
