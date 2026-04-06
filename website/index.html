@@ -234,7 +234,7 @@ tailwind.config = {
   }
   .mobile-nav a:hover, .mobile-nav a.active { color: #c9a96e; }
 
-  /* ===== HERO NAME BANNER (slides up on scroll) ===== */
+  /* ===== NAME BANNER — stacked Rachit / Agrawal, slides up on scroll ===== */
   .name-banner {
     position: fixed;
     top: 0;
@@ -244,18 +244,20 @@ tailwind.config = {
     pointer-events: none;
     z-index: 90;
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
-    padding-top: 14vh;
     will-change: transform, opacity;
-    transition: transform 0.05s linear;
   }
-  .name-banner h2 {
+  .name-banner-inner {
+    text-align: center;
+  }
+  .name-banner-line {
+    display: block;
     font-family: 'Cormorant Garamond', serif;
     font-style: italic;
-    font-weight: 400;
-    font-size: clamp(3.5rem, 13vw, 11rem);
-    line-height: 0.9;
+    font-weight: 300;
+    font-size: clamp(4rem, 14vw, 10rem);
+    line-height: 0.85;
     letter-spacing: -0.02em;
     background: linear-gradient(180deg,
       #c9a96e 0%,
@@ -267,18 +269,12 @@ tailwind.config = {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
-    text-align: center;
-    margin: 0;
-    text-shadow: 0 0 60px rgba(201, 169, 110, 0.15);
   }
-  /* Add space at top of body so the hero starts below the banner */
-  body.has-name-banner main { padding-top: 25vh; }
-  @media (max-width: 768px) {
-    .name-banner { padding-top: 12vh; }
-    body.has-name-banner main { padding-top: 18vh; }
-  }
+  /* Reserve top space so the hero begins below the name banner */
+  body.has-name-banner main { padding-top: 100vh; }
   @media (prefers-reduced-motion: reduce) {
-    .name-banner { transition: none; }
+    .name-banner { display: none; }
+    body.has-name-banner main { padding-top: 0; }
   }
 
   /* ===== SCROLL PROGRESS BAR ===== */
@@ -336,9 +332,9 @@ tailwind.config = {
   }
   .portrait-col {
     flex-shrink: 0;
-    width: clamp(280px, 32vw, 380px);
-    padding: 30px;
-    margin-left: 1rem;
+    width: clamp(300px, 32vw, 380px);
+    padding: 36px 30px;
+    margin-left: 1.5rem;
     transition: transform 0.3s ease;
     will-change: transform;
   }
@@ -352,15 +348,20 @@ tailwind.config = {
     overflow: hidden;
     isolation: isolate;
   }
+  /*
+    Source image is 1024x1476 (aspect 0.694, taller than square).
+    With object-fit: cover in a square container, the image scales so width
+    matches container; height overflows by ~44%. object-position 50% 5% drops
+    just 5% of that overflow from the top — keeping the entire hair + face
+    visible inside the inscribed circle, with shoulders filling the bottom.
+  */
   .portrait-frame img {
-    width: 130%;
-    height: 130%;
+    width: 100%;
+    height: 100%;
     object-fit: cover;
-    object-position: 50% 22%;
+    object-position: 50% 5%;
     display: block;
-    position: absolute;
-    left: -15%;
-    top: -15%;
+    position: relative;
     z-index: 2;
   }
   /* Thin gold ring border */
@@ -399,7 +400,7 @@ tailwind.config = {
   /* Mobile: stack vertically */
   @media (max-width: 768px) {
     .hero-wrap { flex-direction: column; align-items: flex-start; gap: 2.5rem; }
-    .portrait-col { width: 220px; align-self: center; }
+    .portrait-col { width: 280px; align-self: center; padding: 30px; margin-left: 0; }
     .hero-headline { text-align: left; }
   }
 
@@ -468,6 +469,19 @@ tailwind.config = {
   }
   /* Hero headline still uses gold em color via inline class */
   .typing-em { color: #c9a96e; }
+
+  /* Hero headline: invisible placeholder reserves layout space so typing never shifts the page */
+  .hero-headline { position: relative; }
+  .hero-headline-placeholder {
+    visibility: hidden;
+    display: block;
+    pointer-events: none;
+  }
+  .hero-headline-typer {
+    position: absolute;
+    inset: 0;
+    display: block;
+  }
 
   /* ===== MAGNET HOVER ===== */
   .magnet {
@@ -708,9 +722,12 @@ tailwind.config = {
 </style>
 </head>
 <body class="has-name-banner">
-<!-- Big name banner — slides up as you scroll -->
+<!-- Big name banner — Rachit / Agrawal stacked, slides up as you scroll -->
 <div class="name-banner" id="nameBanner">
-  <h2>Rachit Agrawal</h2>
+  <div class="name-banner-inner">
+    <span class="name-banner-line">Rachit</span>
+    <span class="name-banner-line">Agrawal</span>
+  </div>
 </div>
 
 <div class="scroll-progress" id="scrollProgress"></div>
@@ -770,7 +787,12 @@ tailwind.config = {
       <div class="hero-wrap">
         <div class="hero-text-col">
           <h1 class="hero-headline font-display italic hero-load hero-load-delay" id="heroHeadline">
-            <span class="text-type" id="heroTypeWrap"><span class="text-type-text" id="heroTypeText"></span><span class="text-type-cursor" id="heroTypeCursor"></span></span>
+            <!-- Invisible placeholder reserves the final layout space so typing never causes layout shift -->
+            <span class="hero-headline-placeholder" aria-hidden="true">I grew up learning to sit with things I didn&rsquo;t understand yet. <span class="hero-headline-em">I still do.</span></span>
+            <!-- Visible typing layer overlaid on top -->
+            <span class="hero-headline-typer">
+              <span id="heroTypeText"></span><span class="hero-headline-em" id="heroTypeTextEm"></span><span class="text-type-cursor" id="heroTypeCursor"></span>
+            </span>
           </h1>
 
           <p class="text-lg text-text-muted leading-relaxed mb-10 mt-10 hero-load hero-load-delay2" style="font-weight: 300;">
@@ -1554,18 +1576,17 @@ tailwind.config = {
     });
   });
 
-  // --- NAME BANNER: slide up on scroll, fade out ---
+  // --- NAME BANNER: slides up at scroll rate, fades out ---
   const nameBanner = document.getElementById('nameBanner');
-  if (nameBanner) {
+  if (nameBanner && !prefersReducedMotion) {
     let bannerTicking = false;
     function updateBanner() {
       const sy = window.scrollY;
       const vh = window.innerHeight;
-      // Slide up at 1.6x scroll speed for parallax effect
-      const translate = -sy * 1.6;
-      // Fade out completely by 70% of viewport height
+      // Translate at 1x scroll rate so it moves naturally with the page
+      nameBanner.style.transform = 'translate3d(0,' + (-sy) + 'px,0)';
+      // Fade out so it's gone by 70% of viewport scroll
       const opacity = Math.max(0, 1 - sy / (vh * 0.7));
-      nameBanner.style.transform = 'translate3d(0,' + translate + 'px,0)';
       nameBanner.style.opacity = opacity;
       bannerTicking = false;
     }
@@ -1699,31 +1720,45 @@ tailwind.config = {
     setTimeout(tick, opts.startDelay || 0);
   }
 
-  // --- HERO: rotating idea statements with typewriter ---
+  // --- HERO: type the single static headline (gray part, then gold part) ---
+  // Layout never shifts because there's an invisible placeholder reserving the full text space
   (function() {
     const textEl = document.getElementById('heroTypeText');
+    const emEl = document.getElementById('heroTypeTextEm');
     const cursorEl = document.getElementById('heroTypeCursor');
-    if (!textEl || !cursorEl) return;
+    if (!textEl || !emEl || !cursorEl) return;
 
-    const ideas = [
-      'I grew up learning to sit with things I didn\u2019t understand yet. I still do.',
-      'Most systems don\u2019t fail because people act irrationally \u2014 they fail because rational choices don\u2019t lead to good outcomes.',
-      'I study how cooperation breaks \u2014 and how to design it back.'
-    ];
+    const part1 = 'I grew up learning to sit with things I didn\u2019t understand yet. ';
+    const part2 = 'I still do.';
 
     if (prefersReducedMotion) {
-      textEl.textContent = ideas[0];
+      textEl.textContent = part1;
+      emEl.textContent = part2;
       cursorEl.style.display = 'none';
       return;
     }
 
     createTypewriter(textEl, cursorEl, {
-      texts: ideas,
-      typeSpeed: 42,
-      deleteSpeed: 22,
-      pauseAfter: 3200,
-      loop: true,
-      startDelay: 800
+      text: part1,
+      typeSpeed: 38,
+      loop: false,
+      startDelay: 800,
+      onComplete: function() {
+        // Type the gold part next
+        createTypewriter(emEl, cursorEl, {
+          text: part2,
+          typeSpeed: 55,
+          loop: false,
+          startDelay: 250,
+          onComplete: function() {
+            // Fade cursor 1.2s after the whole line is done
+            setTimeout(function() {
+              cursorEl.style.transition = 'opacity 1.2s ease';
+              cursorEl.style.opacity = '0';
+            }, 1200);
+          }
+        });
+      }
     });
   })();
 
