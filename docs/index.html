@@ -325,6 +325,215 @@ tailwind.config = {
     </div>
   </section>
 
+
+  <!-- =============================== -->
+  <!-- 01b — THE JOURNEY (Scroll Timeline) -->
+  <!-- =============================== -->
+  <style>
+    .tl-section { position: relative; padding: 6rem 0; }
+    .tl-wrap { position: relative; max-width: 760px; margin: 0 auto; padding: 0 1.5rem; }
+
+    /* The vertical line */
+    .tl-line { position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: rgba(255,255,255,0.07); transform: translateX(-50%); }
+    .tl-progress { position: absolute; left: 50%; top: 0; width: 1px; height: 0; background: #c9a96e; transform: translateX(-50%); transition: height 0.1s linear; z-index: 1; }
+
+    /* Each timeline item */
+    .tl-item { position: relative; display: flex; align-items: flex-start; margin-bottom: 4rem; }
+    .tl-item:last-child { margin-bottom: 0; }
+
+    /* Alternating sides */
+    .tl-item:nth-child(odd) { flex-direction: row; }
+    .tl-item:nth-child(even) { flex-direction: row-reverse; }
+    .tl-item:nth-child(odd) .tl-content { text-align: right; padding-right: 3rem; padding-left: 0; }
+    .tl-item:nth-child(even) .tl-content { text-align: left; padding-left: 3rem; padding-right: 0; }
+
+    .tl-content { flex: 1; opacity: 0.15; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+
+    /* The node dot */
+    .tl-node { position: absolute; left: 50%; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: #4a4844; transform: translateX(-50%); z-index: 2; transition: background 0.4s ease, box-shadow 0.4s ease; }
+
+    /* Active state */
+    .tl-item.tl-active .tl-content { opacity: 1; transform: translateY(0); }
+    .tl-item.tl-active .tl-node { background: #c9a96e; box-shadow: 0 0 12px rgba(201,169,110,0.5); }
+
+    /* Visited (scrolled past) */
+    .tl-item.tl-visited .tl-content { opacity: 0.5; transform: translateY(0); }
+    .tl-item.tl-visited .tl-node { background: #c9a96e; box-shadow: none; }
+
+    /* Typography inside timeline */
+    .tl-year { font-family: "DM Mono", monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 0.25em; color: #c9a96e; margin-bottom: 0.4rem; }
+    .tl-title { font-family: "Cormorant Garamond", serif; font-size: 1.35rem; font-weight: 400; font-style: italic; color: #e8e6df; line-height: 1.25; margin-bottom: 0.3rem; }
+    .tl-detail { font-family: "Inter", sans-serif; font-size: 0.8rem; font-weight: 300; color: #8a887f; line-height: 1.5; }
+
+    /* Mobile: line on the left */
+    @media (max-width: 768px) {
+      .tl-line, .tl-progress { left: 16px; transform: none; }
+      .tl-node { left: 16px; transform: translateX(-50%); }
+      .tl-item, .tl-item:nth-child(odd), .tl-item:nth-child(even) { flex-direction: row; }
+      .tl-item:nth-child(odd) .tl-content, .tl-item:nth-child(even) .tl-content { text-align: left; padding-left: 2.5rem; padding-right: 0; }
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      .tl-content { opacity: 1 !important; transform: none !important; transition: none !important; }
+      .tl-node { transition: none !important; }
+      .tl-item .tl-content { opacity: 0.5; }
+      .tl-item.tl-active .tl-content { opacity: 1; }
+    }
+  </style>
+
+  <section class="tl-section" id="journey">
+    <div class="tl-wrap">
+      <div class="section-label" style="margin-bottom: 4rem;">01b &mdash; The Journey</div>
+
+      <div class="tl-line"></div>
+      <div class="tl-progress" id="tlProgress"></div>
+
+      <div class="tl-item" data-tl>
+        <div class="tl-content"><div class="tl-year">2009</div><div class="tl-title">Born in Ranchi</div><div class="tl-detail">Jharkhand, India</div></div>
+        <div class="tl-node"></div>
+        <div style="flex:1"></div>
+      </div>
+
+      <div class="tl-item" data-tl>
+        <div class="tl-content"><div class="tl-year">2019</div><div class="tl-title">Left home at nine</div><div class="tl-detail">Joined Sahyadri School (KFI), Pune &mdash; Grade 4. Built on the philosophy of Jiddu Krishnamurti.</div></div>
+        <div class="tl-node"></div>
+        <div style="flex:1"></div>
+      </div>
+
+      <div class="tl-item" data-tl>
+        <div class="tl-content"><div class="tl-year">2023</div><div class="tl-title">First high-altitude trek</div><div class="tl-detail">Pandav Patthar &mdash; 12,500 ft. The same attention Astachal trains is required at altitude.</div></div>
+        <div class="tl-node"></div>
+        <div style="flex:1"></div>
+      </div>
+
+      <div class="tl-item" data-tl>
+        <div class="tl-content"><div class="tl-year">2023</div><div class="tl-title">Community immersion</div><div class="tl-detail">Lok Biradari Prakalp, Hemalkasa &middot; Anandvan Ashram &mdash; teaching without assumptions.</div></div>
+        <div class="tl-node"></div>
+        <div style="flex:1"></div>
+      </div>
+
+      <div class="tl-item" data-tl>
+        <div class="tl-content"><div class="tl-year">2024</div><div class="tl-title">Became &ldquo;the old man&rdquo;</div><div class="tl-detail">Cast as an old man in a school play. In one rehearsal, the character clicked. My teacher started crying too.</div></div>
+        <div class="tl-node"></div>
+        <div style="flex:1"></div>
+      </div>
+
+      <div class="tl-item" data-tl>
+        <div class="tl-content"><div class="tl-year">2024</div><div class="tl-title">Vriksha</div><div class="tl-detail">Lead role as Pandya Ji. Half the audience was in tears. Does greed get in the way of human connection?</div></div>
+        <div class="tl-node"></div>
+        <div style="flex:1"></div>
+      </div>
+
+      <div class="tl-item" data-tl>
+        <div class="tl-content"><div class="tl-year">2024</div><div class="tl-title">Lifeline wins Hilltop Entrepreneur</div><div class="tl-detail">Refugee communication app &mdash; won Sahyadri&rsquo;s school Shark Tank. Presented before the entire assembly.</div></div>
+        <div class="tl-node"></div>
+        <div style="flex:1"></div>
+      </div>
+
+      <div class="tl-item" data-tl>
+        <div class="tl-content"><div class="tl-year">2024</div><div class="tl-title">Bali Pass</div><div class="tl-detail">16,000 ft, Uttarakhand.</div></div>
+        <div class="tl-node"></div>
+        <div style="flex:1"></div>
+      </div>
+
+      <div class="tl-item" data-tl>
+        <div class="tl-content"><div class="tl-year">2024</div><div class="tl-title">ICSE: 99%</div><div class="tl-detail">Physics 100 &middot; Biology 100 &middot; Maths 99 &middot; CS 99</div></div>
+        <div class="tl-node"></div>
+        <div style="flex:1"></div>
+      </div>
+
+      <div class="tl-item" data-tl>
+        <div class="tl-content"><div class="tl-year">2024</div><div class="tl-title">Lead Editor</div><div class="tl-detail">Tiwai Tales (newsletter) &amp; Ninad &rsquo;26 (annual magazine). Content, design, publication.</div></div>
+        <div class="tl-node"></div>
+        <div style="flex:1"></div>
+      </div>
+
+      <div class="tl-item" data-tl>
+        <div class="tl-content"><div class="tl-year">2024</div><div class="tl-title">Research begins</div><div class="tl-detail">Polygence &mdash; game-theoretic trust modelling in multi-agent systems.</div></div>
+        <div class="tl-node"></div>
+        <div style="flex:1"></div>
+      </div>
+
+      <div class="tl-item" data-tl>
+        <div class="tl-content"><div class="tl-year">2025</div><div class="tl-title">Ashoka Young Scholars</div><div class="tl-detail">Ten days in Gurgaon. Met Prof. Sudheendra Hangal (Stanford CS). Reframed how I think about problem-solving.</div></div>
+        <div class="tl-node"></div>
+        <div style="flex:1"></div>
+      </div>
+
+      <div class="tl-item" data-tl>
+        <div class="tl-content"><div class="tl-year">2025</div><div class="tl-title">Paper published</div><div class="tl-detail">&ldquo;From Game-Theoretic Poker to the Collapse of Trust: Modelling Strategic Behaviour in Multi-Agent Systems&rdquo;</div></div>
+        <div class="tl-node"></div>
+        <div style="flex:1"></div>
+      </div>
+
+      <div class="tl-item" data-tl>
+        <div class="tl-content"><div class="tl-year">2025</div><div class="tl-title">Game Algorithms Engine</div><div class="tl-detail">Interactive visualisers, empirical benchmarks, and the finding that changed how I think about efficiency.</div></div>
+        <div class="tl-node"></div>
+        <div style="flex:1"></div>
+      </div>
+
+    </div>
+  </section>
+
+  <script>
+  (function() {
+    var items = document.querySelectorAll('[data-tl]');
+    var progress = document.getElementById('tlProgress');
+    var section = document.getElementById('journey');
+    if (!items.length || !progress || !section) return;
+
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Intersection Observer — activates items near viewport center
+    var activeIndex = -1;
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        var idx = Array.prototype.indexOf.call(items, entry.target);
+        if (entry.isIntersecting) {
+          // Mark this and all above as at least visited
+          for (var i = 0; i <= idx; i++) {
+            items[i].classList.add('tl-visited');
+            items[i].classList.remove('tl-active');
+          }
+          // Mark current as active
+          entry.target.classList.add('tl-active');
+          entry.target.classList.remove('tl-visited');
+          activeIndex = idx;
+          // Items below: remove classes
+          for (var j = idx + 1; j < items.length; j++) {
+            items[j].classList.remove('tl-visited', 'tl-active');
+          }
+        }
+      });
+    }, { threshold: 0.3, rootMargin: '-20% 0px -40% 0px' });
+
+    items.forEach(function(item) { observer.observe(item); });
+
+    // Scroll-linked progress line
+    var ticking = false;
+    function updateProgress() {
+      var rect = section.getBoundingClientRect();
+      var sectionTop = rect.top + window.scrollY;
+      var sectionHeight = rect.height;
+      var scrollY = window.scrollY + window.innerHeight * 0.4;
+      var ratio = Math.max(0, Math.min(1, (scrollY - sectionTop) / sectionHeight));
+      progress.style.height = (ratio * 100) + '%';
+      ticking = false;
+    }
+
+    window.addEventListener('scroll', function() {
+      if (!ticking) { requestAnimationFrame(updateProgress); ticking = true; }
+    }, { passive: true });
+    updateProgress();
+
+    // If reduced motion, show all
+    if (reduced) {
+      items.forEach(function(item) { item.classList.add('tl-visited'); });
+    }
+  })();
+  </script>
+
   <hr class="section-divider" />
 
   <!-- Credentials — understated, woven into narrative flow -->
