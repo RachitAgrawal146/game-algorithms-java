@@ -8,7 +8,7 @@
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
 
   <!-- Shared Design System -->
   <link rel="stylesheet" href="../shared/styles.css" />
@@ -18,14 +18,14 @@
 
     /* Use shared design system variables with local fallbacks */
     :root {
-      --bg:        var(--color-bg, #0a0a0f);
-      --surface:   var(--color-bg-card, #1a1a25);
-      --card-bg:   var(--color-bg-card, #1a1a25);
+      --bg:        var(--color-bg, #0c0c0b);
+      --surface:   var(--color-bg-card, #141413);
+      --card-bg:   var(--color-bg-card, #141413);
       --border:    var(--color-border, rgba(255,255,255,0.08));
-      --text:      var(--color-text, #e4e4e7);
-      --muted:     var(--color-text-muted, #71717a);
+      --text:      var(--color-text, #e8e6df);
+      --muted:     var(--color-text-muted, #8a887f);
       --hint:      #555a72;
-      --blue:      var(--color-blue, #3b82f6);
+      --blue:      var(--color-blue, #c9a96e);
       --blue-bg:   rgba(59,130,246,0.12);
       --amber:     var(--color-amber, #f59e0b);
       --amber-bg:  rgba(245,158,11,0.12);
@@ -36,7 +36,7 @@
       --gold:      var(--color-gold, #c9a96e);
       --radius:    var(--radius-sm, 6px);
       --radius-lg: var(--radius-md, 10px);
-      --mono:      var(--font-mono, 'JetBrains Mono', ui-monospace, monospace);
+      --mono:      var(--font-mono, 'DM Mono', ui-monospace, monospace);
     }
 
     .page-wrapper {
@@ -61,7 +61,7 @@
       margin-bottom: 8px;
     }
     .page-title h1 {
-      font-family: var(--font-heading, 'Space Grotesk', system-ui, sans-serif);
+      font-family: var(--font-heading, 'Cormorant Garamond', system-ui, sans-serif);
       font-size: clamp(1.8rem, 4vw, 2.4rem);
       font-weight: 700;
       letter-spacing: -0.02em;
@@ -239,7 +239,7 @@
     .edu-section { margin-bottom: 20px; }
     .edu-section:last-child { margin-bottom: 0; }
     .edu-section h4 {
-      font-family: var(--font-heading, 'Space Grotesk', system-ui, sans-serif);
+      font-family: var(--font-heading, 'Cormorant Garamond', system-ui, sans-serif);
       font-size: 0.95rem;
       font-weight: 700;
       color: var(--color-text-heading, #fff);

@@ -2,44 +2,63 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>N-Queens Algorithm Visualizer</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:        #0f1117;
-      --surface:   #1a1d27;
-      --card:      #22263a;
-      --border:    rgba(255,255,255,0.08);
-      --text:      #e8eaf0;
-      --muted:     #8b90a8;
-      --hint:      #555a72;
-      --blue:      #4f8ef7;
-      --blue-bg:   rgba(79,142,247,0.12);
-      --amber:     #f5a623;
-      --amber-bg:  rgba(245,166,35,0.12);
-      --green:     #3ecf8e;
-      --green-bg:  rgba(62,207,142,0.10);
-      --red:       #f25f5c;
-      --red-bg:    rgba(242,95,92,0.12);
-      --radius:    8px;
-      --radius-lg: 12px;
-      --mono:      'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+      --bg:        #0c0c0b;
+      --surface:   #141413;
+      --card:      #1c1c1a;
+      --border:    rgba(255,255,255,0.07);
+      --text:      #e8e6df;
+      --muted:     #8a887f;
+      --hint:      #4a4844;
+      --blue:      #7ab0a8;
+      --blue-bg:   rgba(122,176,168,0.08);
+      --amber:     #c9a96e;
+      --amber-bg:  rgba(201,169,110,0.08);
+      --green:     #8fb28a;
+      --green-bg:  rgba(143,178,138,0.08);
+      --red:       #c97b6e;
+      --red-bg:    rgba(201,123,110,0.08);
+      --radius:    3px;
+      --radius-lg: 4px;
+      --mono:      'DM Mono', ui-monospace, monospace;
+      --serif:     'Cormorant Garamond', Georgia, serif;
     }
 
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: var(--mono);
+      font-family: 'Inter', sans-serif; font-weight: 300;
       font-size: 13px;
       min-height: 100vh;
       padding: 24px 20px 48px;
     }
 
     .header { text-align: center; margin-bottom: 28px; }
-    .header h1 { font-size: 22px; font-weight: 600; letter-spacing: 0.5px; }
-    .header p  { margin-top: 6px; color: var(--muted); font-size: 12px; }
+    .header h1 {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: clamp(2rem, 4vw, 2.8rem);
+      font-weight: 300;
+      letter-spacing: -0.01em;
+      line-height: 1.1;
+      color: var(--text);
+    }
+    .header p  {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 300;
+      line-height: 1.7;
+    }
     .tag {
       display: inline-block;
       background: var(--blue-bg); color: var(--blue);
@@ -135,6 +154,19 @@
       font-size: 13px; font-weight: 600; margin-top: 10px;
     }
     .solved-banner.show { display: block; }
+  
+    /* Noise texture overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 256px 256px;
+    }
   </style>
 </head>
 <body>
@@ -330,10 +362,10 @@
   const SPEEDS = { slow: 500, medium: 80, fast: 10 };
   const TYPE_META =
   {
-    try:     { lbl: 'Trying position',          col: '#4f8ef7' },
+    try:     { lbl: 'Trying position',          col: '#7ab0a8' },
     place:   { lbl: 'Queen placed',             col: '#f5a623' },
-    back:    { lbl: 'Backtracking',             col: '#f25f5c' },
-    prune:   { lbl: 'Domain empty — pruning',   col: '#f25f5c' },
+    back:    { lbl: 'Backtracking',             col: '#c97b6e' },
+    prune:   { lbl: 'Domain empty — pruning',   col: '#c97b6e' },
     solved:  { lbl: 'Solution found',           col: '#3ecf8e' },
     mc_init: { lbl: 'Random initial placement', col: '#8b90a8' },
     mc_move: { lbl: 'Moving queen',             col: '#f5a623' },
@@ -388,13 +420,13 @@
         const pruned = algo === 'FC' && domains && queens[col] === -1 && !domains[col][row];
 
         let bg;
-        if (hasQ)       bg = solved ? 'rgba(62,207,142,0.15)' : isBack ? 'rgba(242,95,92,0.15)' : 'rgba(79,142,247,0.15)';
-        else if (isTry) bg = 'rgba(79,142,247,0.07)';
-        else if (pruned)bg = 'rgba(242,95,92,0.06)';
+        if (hasQ)       bg = solved ? 'rgba(62,207,142,0.15)' : isBack ? 'rgba(201,123,110,0.15)' : 'rgba(122,176,168,0.15)';
+        else if (isTry) bg = 'rgba(122,176,168,0.07)';
+        else if (pruned)bg = 'rgba(201,123,110,0.06)';
         else            bg = (row + col) % 2 === 0 ? 'var(--surface)' : 'var(--card)';
 
         cell.style.background   = bg;
-        cell.style.outline      = isTry ? '2px solid rgba(79,142,247,0.5)' : 'none';
+        cell.style.outline      = isTry ? '2px solid rgba(122,176,168,0.5)' : 'none';
         cell.style.outlineOffset = '-2px';
 
         if (hasQ)

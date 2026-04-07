@@ -7,7 +7,7 @@
 <meta name="description" content="Side-by-side performance analysis of game algorithms across problem domains." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="../shared/styles.css" />
 <style>
 /* ---- Page-specific styles ---- */
@@ -87,7 +87,7 @@
   left: 50%;
   transform: translateX(-50%);
   background: #222;
-  color: #fff;
+  color: #e8e6df;
   font-family: var(--font-mono);
   font-size: 0.65rem;
   padding: 3px 7px;
@@ -735,7 +735,7 @@
       text.setAttribute('text-anchor', 'middle');
       text.setAttribute('fill', '#f59e0b');
       text.setAttribute('font-size', '6');
-      text.setAttribute('font-family', 'JetBrains Mono, monospace');
+      text.setAttribute('font-family', 'DM Mono, monospace');
       text.textContent = d.pct + '%';
       svg.appendChild(text);
     });
@@ -824,7 +824,7 @@
       text.setAttribute('text-anchor', 'middle');
       text.setAttribute('fill', '#f59e0b');
       text.setAttribute('font-size', '6');
-      text.setAttribute('font-family', 'JetBrains Mono, monospace');
+      text.setAttribute('font-family', 'DM Mono, monospace');
       text.textContent = d.cum + '%';
       svg.appendChild(text);
     });

@@ -3,43 +3,49 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>N-Queens Algorithm Visualizer</title>
+  <title>N-Queens — Constraint Satisfaction</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../shared/styles.css" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:        #0f1117;
-      --surface:   #1a1d27;
-      --card:      #22263a;
-      --border:    rgba(255,255,255,0.08);
-      --text:      #e8eaf0;
-      --muted:     #8b90a8;
-      --hint:      #555a72;
-      --blue:      #4f8ef7;
-      --blue-bg:   rgba(79,142,247,0.12);
-      --amber:     #f5a623;
-      --amber-bg:  rgba(245,166,35,0.12);
-      --green:     #3ecf8e;
-      --green-bg:  rgba(62,207,142,0.10);
-      --red:       #f25f5c;
-      --red-bg:    rgba(242,95,92,0.12);
+      --bg:        #0c0c0b;
+      --surface:   #141413;
+      --card:      #1c1c1a;
+      --border:    rgba(255,255,255,0.07);
+      --text:      #e8e6df;
+      --muted:     #8a887f;
+      --hint:      #4a4844;
+      --blue:      #7ab0a8;
+      --blue-bg:   rgba(122,176,168,0.08);
+      --amber:     #c9a96e;
+      --amber-bg:  rgba(201,169,110,0.08);
+      --green:     #8fb28a;
+      --green-bg:  rgba(143,178,138,0.08);
+      --red:       #c97b6e;
+      --red-bg:    rgba(201,123,110,0.12);
       --radius:    8px;
       --radius-lg: 12px;
-      --mono:      'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+      --mono:      'DM Mono', 'Fira Code', 'Courier New', monospace;
     }
 
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: var(--mono);
+      font-family: 'Inter', sans-serif;
+      font-weight: 300;
       font-size: 13px;
       min-height: 100vh;
-      padding: 24px 20px 48px;
+      padding: 110px 20px 48px;
     }
 
-    .header { text-align: center; margin-bottom: 28px; }
-    .header h1 { font-size: 22px; font-weight: 600; letter-spacing: 0.5px; }
-    .header p  { margin-top: 6px; color: var(--muted); font-size: 12px; }
+    .header { text-align: center; margin-bottom: 40px; max-width: 680px; margin-left: auto; margin-right: auto; }
+    .header .eyebrow { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.3em; color: #c9a96e; margin-bottom: 16px; display: block; }
+    .header h1 { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 300; letter-spacing: -0.01em; line-height: 1.1; color: var(--text); }
+    .header p  { margin-top: 14px; color: var(--muted); font-size: 13px; font-family: 'Inter', sans-serif; font-weight: 300; line-height: 1.7; }
     .tag {
       display: inline-block;
       background: var(--blue-bg); color: var(--blue);
@@ -139,21 +145,20 @@
 </head>
 <body>
 <div style="padding: 90px 20px 0; max-width: 900px; margin: 0 auto; text-align: center;">
-  <p style="font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 0.25em; color: #c9a96e; margin-bottom: 8px;">CONSTRAINT SATISFACTION</p>
-  <h1 style="font-family: 'Space Grotesk', sans-serif; font-size: 2.5rem; font-weight: 700; color: #fff; margin: 0 0 8px;">N-Queens Solver</h1>
-  <p style="font-family: 'Inter', sans-serif; font-size: 1rem; color: #71717a; margin-bottom: 24px;">Comparing backtracking, forward checking, and local search</p>
+  <p style="font-family: 'DM Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 0.25em; color: #c9a96e; margin-bottom: 8px;">CONSTRAINT SATISFACTION</p>
+  <h1 style="font-family: 'Cormorant Garamond', sans-serif; font-size: 2.5rem; font-weight: 700; color: #e8e6df; margin: 0 0 8px;">N-Queens Solver</h1>
+  <p style="font-family: 'Inter', sans-serif; font-size: 1rem; color: #8a887f; margin-bottom: 24px;">Comparing backtracking, forward checking, and local search</p>
 </div>
 
 
 <div class="header">
-  <h1>N-Queens Algorithm Visualizer</h1>
-  <p>
-    <span class="tag">Backtracking</span>
+    <span class="eyebrow">Constraint Satisfaction</span>
+    <h1>N-Queens Algorithm Visualizer</h1>
+    <p><span class="tag">Backtracking</span>
     <span class="tag">Forward Checking</span>
     <span class="tag">Min-Conflicts</span>
-    &nbsp;— step through each algorithm and watch it work
-  </p>
-</div>
+    &nbsp;— step through each algorithm and watch it work</p>
+  </div>
 
 <div class="ctrl-row" id="ctrl-row"></div>
 
@@ -336,10 +341,10 @@
   const SPEEDS = { slow: 500, medium: 80, fast: 10 };
   const TYPE_META =
   {
-    try:     { lbl: 'Trying position',          col: '#4f8ef7' },
+    try:     { lbl: 'Trying position',          col: '#7ab0a8' },
     place:   { lbl: 'Queen placed',             col: '#f5a623' },
-    back:    { lbl: 'Backtracking',             col: '#f25f5c' },
-    prune:   { lbl: 'Domain empty — pruning',   col: '#f25f5c' },
+    back:    { lbl: 'Backtracking',             col: '#c97b6e' },
+    prune:   { lbl: 'Domain empty — pruning',   col: '#c97b6e' },
     solved:  { lbl: 'Solution found',           col: '#3ecf8e' },
     mc_init: { lbl: 'Random initial placement', col: '#8b90a8' },
     mc_move: { lbl: 'Moving queen',             col: '#f5a623' },
@@ -394,13 +399,13 @@
         const pruned = algo === 'FC' && domains && queens[col] === -1 && !domains[col][row];
 
         let bg;
-        if (hasQ)       bg = solved ? 'rgba(62,207,142,0.15)' : isBack ? 'rgba(242,95,92,0.15)' : 'rgba(79,142,247,0.15)';
-        else if (isTry) bg = 'rgba(79,142,247,0.07)';
-        else if (pruned)bg = 'rgba(242,95,92,0.06)';
+        if (hasQ)       bg = solved ? 'rgba(62,207,142,0.15)' : isBack ? 'rgba(201,123,110,0.15)' : 'rgba(122,176,168,0.15)';
+        else if (isTry) bg = 'rgba(122,176,168,0.07)';
+        else if (pruned)bg = 'rgba(201,123,110,0.06)';
         else            bg = (row + col) % 2 === 0 ? 'var(--surface)' : 'var(--card)';
 
         cell.style.background   = bg;
-        cell.style.outline      = isTry ? '2px solid rgba(79,142,247,0.5)' : 'none';
+        cell.style.outline      = isTry ? '2px solid rgba(122,176,168,0.5)' : 'none';
         cell.style.outlineOffset = '-2px';
 
         if (hasQ)
@@ -660,27 +665,27 @@
 
 <div style="max-width: 900px; margin: 40px auto; padding: 0 20px;">
   <div class="educational-panel" style="border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; overflow: hidden;">
-    <button onclick="this.parentElement.classList.toggle('is-open'); this.querySelector('span').textContent = this.parentElement.classList.contains('is-open') ? '▲' : '▼'" style="width: 100%; padding: 16px 20px; background: #1a1a25; border: none; color: #e4e4e7; font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; justify-content: space-between; align-items: center; text-align: left;">
+    <button onclick="this.parentElement.classList.toggle('is-open'); this.querySelector('span').textContent = this.parentElement.classList.contains('is-open') ? '▲' : '▼'" style="width: 100%; padding: 16px 20px; background: #141413; border: none; color: #e8e6df; font-family: 'Cormorant Garamond', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; justify-content: space-between; align-items: center; text-align: left;">
       Learn About These Algorithms <span style="font-size: 12px;">▼</span>
     </button>
-    <div class="educational-panel-body" style="display: none; padding: 24px; background: #12121a; font-family: 'Inter', sans-serif; color: #a1a1aa; font-size: 14px; line-height: 1.7;">
-      <h3 style="font-family: 'Space Grotesk', sans-serif; color: #fff; font-size: 16px; margin: 0 0 8px;">Problem Definition</h3>
+    <div class="educational-panel-body" style="display: none; padding: 24px; background: #141413; font-family: 'Inter', sans-serif; color: #a1a1aa; font-size: 14px; line-height: 1.7;">
+      <h3 style="font-family: 'Cormorant Garamond', sans-serif; color: #e8e6df; font-size: 16px; margin: 0 0 8px;">Problem Definition</h3>
       <p style="margin: 0 0 20px;">Place N queens on an N&times;N chessboard such that no two queens threaten each other. No two queens can share the same row, column, or diagonal.</p>
 
-      <h3 style="font-family: 'Space Grotesk', sans-serif; color: #3b82f6; font-size: 16px; margin: 0 0 8px;">Algorithm 1: Backtracking</h3>
+      <h3 style="font-family: 'Cormorant Garamond', sans-serif; color: #c9a96e; font-size: 16px; margin: 0 0 8px;">Algorithm 1: Backtracking</h3>
       <p style="margin: 0 0 6px;">Assigns one queen per column, left to right. For each column, tries every row. If no safe row exists, backtracks to the previous column and tries the next row.</p>
-      <p style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #71717a; margin: 0 0 20px;">Time: O(n!) &middot; Space: O(n) &middot; Trade-off: Simple but explores many dead-end branches</p>
+      <p style="font-family: 'DM Mono', monospace; font-size: 12px; color: #8a887f; margin: 0 0 20px;">Time: O(n!) &middot; Space: O(n) &middot; Trade-off: Simple but explores many dead-end branches</p>
 
-      <h3 style="font-family: 'Space Grotesk', sans-serif; color: #a855f7; font-size: 16px; margin: 0 0 8px;">Algorithm 2: Forward Checking</h3>
+      <h3 style="font-family: 'Cormorant Garamond', sans-serif; color: #a896c8; font-size: 16px; margin: 0 0 8px;">Algorithm 2: Forward Checking</h3>
       <p style="margin: 0 0 6px;">Backtracking enhanced with constraint propagation. After placing each queen, immediately eliminates conflicting rows from all future columns&rsquo; domains. If any column&rsquo;s domain becomes empty, backtracks immediately.</p>
-      <p style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #71717a; margin: 0 0 20px;">Time: O(n!) &middot; Space: O(n&sup2;) &middot; Trade-off: 58% fewer nodes but 3&times; overhead from domain copying</p>
+      <p style="font-family: 'DM Mono', monospace; font-size: 12px; color: #8a887f; margin: 0 0 20px;">Time: O(n!) &middot; Space: O(n&sup2;) &middot; Trade-off: 58% fewer nodes but 3&times; overhead from domain copying</p>
 
-      <h3 style="font-family: 'Space Grotesk', sans-serif; color: #22c55e; font-size: 16px; margin: 0 0 8px;">Algorithm 3: Minimum Conflicts (Local Search)</h3>
+      <h3 style="font-family: 'Cormorant Garamond', sans-serif; color: #8fb28a; font-size: 16px; margin: 0 0 8px;">Algorithm 3: Minimum Conflicts (Local Search)</h3>
       <p style="margin: 0 0 6px;">Starts with a random placement, then iteratively moves the most-conflicted queen to the row with fewest conflicts. Uses random restarts to escape local minima.</p>
-      <p style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #71717a; margin: 0 0 20px;">Time: O(n) avg &middot; Space: O(n) &middot; Trade-off: Probabilistic but remarkably fast in practice</p>
+      <p style="font-family: 'DM Mono', monospace; font-size: 12px; color: #8a887f; margin: 0 0 20px;">Time: O(n) avg &middot; Space: O(n) &middot; Trade-off: Probabilistic but remarkably fast in practice</p>
 
       <div style="padding: 16px; background: rgba(201,169,110,0.08); border-left: 3px solid #c9a96e; margin-top: 8px;">
-        <h3 style="font-family: 'Space Grotesk', sans-serif; color: #c9a96e; font-size: 14px; margin: 0 0 8px;">Key Insight</h3>
+        <h3 style="font-family: 'Cormorant Garamond', sans-serif; color: #c9a96e; font-size: 14px; margin: 0 0 8px;">Key Insight</h3>
         <p style="margin: 0;">Forward Checking explores 58% fewer nodes than Backtracking but runs 3&times; slower. The overhead of copying domain arrays at each step exceeds the search savings. This demonstrates that node count alone doesn&rsquo;t predict real-world performance &mdash; the cost per node matters.</p>
       </div>
     </div>
@@ -691,5 +696,6 @@
 </style>
 <script src="../shared/nav.js"></script>
 
+  <script src="../shared/nav.js"></script>
 </body>
 </html>

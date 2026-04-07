@@ -3,45 +3,75 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mastermind — Constraint Elimination Visualizer</title>
+  <title>Mastermind — Information-Theoretic Search</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../shared/styles.css" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:        #0f1117;
-      --surface:   #1a1d27;
-      --card:      #22263a;
-      --border:    rgba(255,255,255,0.08);
-      --text:      #e8eaf0;
-      --muted:     #8b90a8;
-      --hint:      #555a72;
-      --blue:      #4f8ef7;
-      --blue-bg:   rgba(79,142,247,0.12);
-      --amber:     #f5a623;
-      --amber-bg:  rgba(245,166,35,0.12);
-      --green:     #3ecf8e;
-      --green-bg:  rgba(62,207,142,0.10);
-      --red:       #f25f5c;
-      --red-bg:    rgba(242,95,92,0.12);
-      --purple:    #a78bfa;
-      --purple-bg: rgba(167,139,250,0.12);
-      --radius:    8px;
-      --radius-lg: 12px;
-      --mono:      'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+      --bg:        #0c0c0b;
+      --surface:   #141413;
+      --card:      #1c1c1a;
+      --border:    rgba(255,255,255,0.07);
+      --text:      #e8e6df;
+      --muted:     #8a887f;
+      --hint:      #4a4844;
+      --blue:      #7ab0a8;
+      --blue-bg:   rgba(122,176,168,0.08);
+      --amber:     #c9a96e;
+      --amber-bg:  rgba(201,169,110,0.08);
+      --green:     #8fb28a;
+      --green-bg:  rgba(143,178,138,0.08);
+      --red:       #c97b6e;
+      --red-bg:    rgba(201,123,110,0.08);
+      --purple:    #a896c8;
+      --purple-bg: rgba(168,150,200,0.08);
+      --radius:    3px;
+      --radius-lg: 4px;
+      --mono:      'DM Mono', ui-monospace, monospace;
+      --serif:     'Cormorant Garamond', Georgia, serif;
     }
 
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: var(--mono);
+      font-family: 'Inter', sans-serif;
+      font-weight: 300;
       font-size: 13px;
       min-height: 100vh;
-      padding: 24px 20px 48px;
+      padding: 110px 20px 48px;
     }
 
-    .header { text-align: center; margin-bottom: 28px; }
-    .header h1 { font-size: 22px; font-weight: 600; letter-spacing: 0.5px; }
-    .header p  { margin-top: 6px; color: var(--muted); font-size: 12px; }
+    .header { text-align: center; margin-bottom: 40px; max-width: 680px; margin-left: auto; margin-right: auto; }
+    .header .eyebrow {
+      font-family: var(--mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      color: var(--amber);
+      margin-bottom: 16px;
+      display: block;
+    }
+    .header h1 {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: clamp(2rem, 4vw, 2.8rem);
+      font-weight: 300;
+      letter-spacing: -0.01em;
+      line-height: 1.1;
+      color: var(--text);
+    }
+    .header p  {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 300;
+      line-height: 1.7;
+    }
     .tag {
       display: inline-block;
       border-radius: 4px; padding: 2px 8px; font-size: 11px; margin: 0 2px;
@@ -96,7 +126,7 @@
       cursor: pointer; transition: all 0.15s;
       border: 2px solid transparent;
       display: flex; align-items: center; justify-content: center;
-      font-size: 16px; font-weight: 700; color: #fff;
+      font-size: 16px; font-weight: 700; color: #e8e6df;
     }
     .peg:hover { transform: scale(1.15); }
     .peg.selected { border-color: var(--text); box-shadow: 0 0 12px rgba(255,255,255,0.3); }
@@ -144,14 +174,14 @@
     .board-row .peg-sm {
       width: 32px; height: 32px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-size: 13px; font-weight: 700; color: #fff;
+      font-size: 13px; font-weight: 700; color: #e8e6df;
     }
     .board-row .feedback { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; margin-left: 8px; }
     .fb-dot {
       width: 14px; height: 14px; border-radius: 50%;
       border: 1px solid var(--hint);
     }
-    .fb-dot.black { background: #fff; border-color: #fff; }
+    .fb-dot.black { background: #fff; border-color: #e8e6df; }
     .fb-dot.white { background: var(--hint); border-color: var(--muted); }
     .fb-dot.empty { background: transparent; }
 
@@ -197,21 +227,20 @@
 </head>
 <body>
 <div style="padding: 90px 20px 0; max-width: 900px; margin: 0 auto; text-align: center;">
-  <p style="font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 0.25em; color: #c9a96e; margin-bottom: 8px;">INFORMATION THEORY</p>
-  <h1 style="font-family: 'Space Grotesk', sans-serif; font-size: 2.5rem; font-weight: 700; color: #fff; margin: 0 0 8px;">Mastermind Solver</h1>
-  <p style="font-family: 'Inter', sans-serif; font-size: 1rem; color: #71717a; margin-bottom: 24px;">Constraint elimination with 82% candidate reduction per guess</p>
+  <p style="font-family: 'DM Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 0.25em; color: #c9a96e; margin-bottom: 8px;">INFORMATION THEORY</p>
+  <h1 style="font-family: 'Cormorant Garamond', serif; font-size: 2.5rem; font-weight: 700; color: #e8e6df; margin: 0 0 8px;">Mastermind Solver</h1>
+  <p style="font-family: 'Inter', sans-serif; font-size: 1rem; color: #8a887f; margin-bottom: 24px;">Constraint elimination with 82% candidate reduction per guess</p>
 </div>
 
 
 <div class="header">
-  <h1>Mastermind &mdash; Constraint Elimination</h1>
-  <p>
-    <span class="tag tag-blue">Human Play</span>
+    <span class="eyebrow">Information Theory</span>
+    <h1>Mastermind &mdash; Constraint Elimination</h1>
+    <p><span class="tag tag-blue">Human Play</span>
     <span class="tag tag-purple">AI Solver</span>
     <span class="tag tag-green">360 Permutations</span>
-    &nbsp;&mdash; crack the code or watch the AI eliminate candidates
-  </p>
-</div>
+    &nbsp;&mdash; crack the code or watch the AI eliminate candidates</p>
+  </div>
 
 <div class="mode-row">
   <button id="mode-human" class="act-mode" onclick="setMode('human')">Human Play</button>
@@ -544,24 +573,24 @@
 
 <div style="max-width: 900px; margin: 40px auto; padding: 0 20px;">
   <div class="educational-panel" style="border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; overflow: hidden;">
-    <button onclick="this.parentElement.classList.toggle('is-open'); this.querySelector('span').textContent = this.parentElement.classList.contains('is-open') ? String.fromCharCode(9650) : String.fromCharCode(9660)" style="width: 100%; padding: 16px 20px; background: #1a1a25; border: none; color: #e4e4e7; font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; justify-content: space-between; align-items: center; text-align: left;">
+    <button onclick="this.parentElement.classList.toggle('is-open'); this.querySelector('span').textContent = this.parentElement.classList.contains('is-open') ? String.fromCharCode(9650) : String.fromCharCode(9660)" style="width: 100%; padding: 16px 20px; background: #141413; border: none; color: #e8e6df; font-family: 'Cormorant Garamond', serif; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; justify-content: space-between; align-items: center; text-align: left;">
       Learn About Constraint Elimination <span style="font-size: 12px;">&#9660;</span>
     </button>
-    <div class="educational-panel-body" style="display: none; padding: 24px; background: #12121a; font-family: 'Inter', sans-serif; color: #a1a1aa; font-size: 14px; line-height: 1.7;">
-      <h3 style="font-family: 'Space Grotesk', sans-serif; color: #fff; font-size: 16px; margin: 0 0 8px;">Problem Definition</h3>
+    <div class="educational-panel-body" style="display: none; padding: 24px; background: #141413; font-family: 'Inter', sans-serif; color: #a1a1aa; font-size: 14px; line-height: 1.7;">
+      <h3 style="font-family: 'Cormorant Garamond', serif; color: #e8e6df; font-size: 16px; margin: 0 0 8px;">Problem Definition</h3>
       <p style="margin: 0 0 20px;">Guess a secret code of 4 distinct colours from 6. After each guess, receive feedback: black peg = right colour, right position; white peg = right colour, wrong position. Goal: crack the code in as few guesses as possible.</p>
 
-      <h3 style="font-family: 'Space Grotesk', sans-serif; color: #ef4444; font-size: 16px; margin: 0 0 8px;">Algorithm: Constraint Elimination</h3>
+      <h3 style="font-family: 'Cormorant Garamond', serif; color: #c97b6e; font-size: 16px; margin: 0 0 8px;">Algorithm: Constraint Elimination</h3>
       <p style="margin: 0 0 20px;">Inspired by Donald Knuth&rsquo;s 1977 algorithm: (1) Generate all 360 possible codes. (2) Make a guess. (3) Receive feedback. (4) Eliminate all codes that wouldn&rsquo;t produce the same feedback. (5) Pick the first remaining candidate. (6) Repeat until solved.</p>
 
-      <h3 style="font-family: 'Space Grotesk', sans-serif; color: #f59e0b; font-size: 16px; margin: 0 0 8px;">Information Theory</h3>
+      <h3 style="font-family: 'Cormorant Garamond', serif; color: #c9a96e; font-size: 16px; margin: 0 0 8px;">Information Theory</h3>
       <p style="margin: 0 0 20px;">Each guess carries information. First guess eliminates ~82% of candidates (360 &rarr; ~65). By guess 3, most codes are nearly solved. Average: 4.15 guesses. Maximum: 6 guesses. Theoretical optimal (Knuth&rsquo;s minimax): &le;5 guaranteed.</p>
 
-      <h3 style="font-family: 'Space Grotesk', sans-serif; color: #a855f7; font-size: 16px; margin: 0 0 8px;">Two-Pass Feedback Scoring</h3>
+      <h3 style="font-family: 'Cormorant Garamond', serif; color: #a896c8; font-size: 16px; margin: 0 0 8px;">Two-Pass Feedback Scoring</h3>
       <p style="margin: 0 0 20px;">Pass 1: Count exact matches (black pegs). Pass 2: Count colour matches (white pegs) using boolean arrays to prevent double-counting. This prevents a colour being scored as both exact and misplaced.</p>
 
       <div style="padding: 16px; background: rgba(201,169,110,0.08); border-left: 3px solid #c9a96e; margin-top: 8px;">
-        <h3 style="font-family: 'Space Grotesk', sans-serif; color: #c9a96e; font-size: 14px; margin: 0 0 8px;">Key Insight</h3>
+        <h3 style="font-family: 'Cormorant Garamond', serif; color: #c9a96e; font-size: 14px; margin: 0 0 8px;">Key Insight</h3>
         <p style="margin: 0;">The simple &ldquo;first candidate&rdquo; strategy averages 4.15 guesses vs Knuth&rsquo;s optimal 4.34 &mdash; counterintuitively, the simpler strategy has a better average because it&rsquo;s optimistic, while Knuth&rsquo;s minimax optimizes for worst-case.</p>
       </div>
     </div>
@@ -572,5 +601,6 @@
 </style>
 <script src="../shared/nav.js"></script>
 
+  <script src="../shared/nav.js"></script>
 </body>
 </html>

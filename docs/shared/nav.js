@@ -35,7 +35,7 @@
     document.head.appendChild(cssLink);
   }
 
-  // Google Fonts (Space Grotesk, Inter, JetBrains Mono)
+  // Google Fonts (Cormorant Garamond, Inter, DM Mono)
   if (!document.querySelector('link[href*="fonts.googleapis.com"]')) {
     var preconnect1 = document.createElement('link');
     preconnect1.rel = 'preconnect';
@@ -51,7 +51,7 @@
     var fontsLink = document.createElement('link');
     fontsLink.rel = 'stylesheet';
     fontsLink.href =
-      'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap';
+      'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap';
     document.head.appendChild(fontsLink);
   }
 

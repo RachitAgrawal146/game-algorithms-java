@@ -6,22 +6,22 @@
   <title>Pathfinding Visualizer — A*, Dijkstra, BFS, DFS</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../shared/styles.css" />
   <style>
     :root {
-      --bg: var(--color-bg, #0a0a0f);
-      --surface: var(--color-bg-card, #1a1a25);
+      --bg: var(--color-bg, #0c0c0b);
+      --surface: var(--color-bg-card, #141413);
       --border: var(--color-border, rgba(255,255,255,0.08));
-      --text: var(--color-text, #e4e4e7);
-      --muted: var(--color-text-muted, #71717a);
-      --blue: var(--color-blue, #3b82f6);
+      --text: var(--color-text, #e8e6df);
+      --muted: var(--color-text-muted, #8a887f);
+      --blue: var(--color-blue, #c9a96e);
       --green: var(--color-green, #22c55e);
       --amber: var(--color-amber, #f59e0b);
       --red: var(--color-red, #ef4444);
       --gold: var(--color-gold, #c9a96e);
-      --mono: var(--font-mono, 'JetBrains Mono', ui-monospace, monospace);
-      --cell-empty: #12121a;
+      --mono: var(--font-mono, 'DM Mono', ui-monospace, monospace);
+      --cell-empty: #141413;
       --cell-wall: #3b3b4a;
       --cell-open: rgba(59,130,246,0.4);
       --cell-closed: #1e293b;
@@ -36,8 +36,8 @@
       padding: 4px 14px; margin-bottom: 12px;
     }
     .page-header h1 {
-      font-family: 'Space Grotesk', sans-serif; font-size: 2rem;
-      font-weight: 700; color: #fff; margin: 0 0 8px;
+      font-family: 'Cormorant Garamond', sans-serif; font-size: 2rem;
+      font-weight: 700; color: #e8e6df; margin: 0 0 8px;
     }
     .page-header p { color: var(--muted); font-size: 0.95rem; margin: 0; }
 
@@ -49,7 +49,7 @@
     }
     .controls label { color: var(--muted); font-size: 0.75rem; font-family: var(--mono); }
     .controls select, .controls input[type=range] {
-      background: #12121a; color: var(--text); border: 1px solid var(--border);
+      background: #141413; color: var(--text); border: 1px solid var(--border);
       border-radius: 6px; padding: 5px 8px; font-size: 0.82rem; font-family: inherit;
     }
     .ctrl-group { display: flex; flex-direction: column; gap: 3px; }
@@ -57,10 +57,10 @@
     .draw-modes button, .controls .btn {
       font-family: var(--mono); font-size: 0.75rem; padding: 6px 12px;
       border: 1px solid var(--border); border-radius: 6px;
-      background: #12121a; color: var(--text); cursor: pointer; transition: all 0.15s;
+      background: #141413; color: var(--text); cursor: pointer; transition: all 0.15s;
     }
-    .draw-modes button:hover, .controls .btn:hover { border-color: var(--blue); color: #fff; }
-    .draw-modes button.active { background: var(--blue); border-color: var(--blue); color: #fff; }
+    .draw-modes button:hover, .controls .btn:hover { border-color: var(--blue); color: #e8e6df; }
+    .draw-modes button.active { background: var(--blue); border-color: var(--blue); color: #e8e6df; }
     .controls .btn-run { background: var(--green); border-color: var(--green); color: #000; font-weight: 600; }
     .controls .btn-run:hover { opacity: 0.85; }
     .controls .btn-run:disabled { opacity: 0.4; cursor: not-allowed; }
@@ -86,7 +86,7 @@
     }
     .cell.wall { background: var(--cell-wall); }
     .cell.start { background: var(--green); color: #000; }
-    .cell.end { background: var(--red); color: #fff; }
+    .cell.end { background: var(--red); color: #e8e6df; }
     .cell.open { background: var(--cell-open); animation: pulse 0.6s ease-in-out; }
     .cell.closed { background: var(--cell-closed); }
     .cell.path { background: var(--cell-path); animation: glow 0.3s ease-out; }
@@ -109,7 +109,7 @@
       font-family: var(--mono); font-size: 0.82rem;
     }
     .stat-item span:first-child { color: var(--muted); margin-right: 6px; }
-    .stat-item span:last-child { color: #fff; font-weight: 600; }
+    .stat-item span:last-child { color: #e8e6df; font-weight: 600; }
     .no-path-msg {
       text-align: center; color: var(--red); font-family: var(--mono);
       font-weight: 600; padding: 8px; display: none;
@@ -122,10 +122,10 @@
     }
     .edu-toggle {
       width: 100%; padding: 14px 20px; background: none; border: none;
-      color: var(--text); font-family: 'Space Grotesk', sans-serif;
+      color: var(--text); font-family: 'Cormorant Garamond', sans-serif;
       font-size: 0.95rem; font-weight: 600; cursor: pointer; text-align: left;
     }
-    .edu-toggle:hover { color: #fff; }
+    .edu-toggle:hover { color: #e8e6df; }
     .edu-content {
       max-height: 0; overflow: hidden; transition: max-height 0.35s ease;
       padding: 0 20px;
