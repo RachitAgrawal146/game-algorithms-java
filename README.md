@@ -7,8 +7,8 @@ Independent research project exploring algorithm behaviour across three classes
 of combinatorial problems. Each project implements multiple solving strategies, 
 runs controlled experiments, and measures performance quantitatively.
 
-**[Live Algorithm Visualizer →](https://rachitagrawal146.github.io/game-algorithms-java/Visualizer/NQueensVisualizer.html)** | **[Research Dashboard →](https://rachitagrawal146.github.io/game-algorithms-java/Visualizer/ResearchDashboard.html)**  
-*Step through algorithms in real time, or explore the benchmark data across all three problem classes.*
+**[Live Algorithm Engine →](https://rachitagrawal146.github.io/game-algorithms-java/)** | **[Research Comparison →](https://rachitagrawal146.github.io/game-algorithms-java/compare/)**  
+*Step through algorithms in real time, or explore benchmark data across all three problem classes.*
 
 ---
 
@@ -75,7 +75,7 @@ different algorithms are compared.
    and restarts. Deterministic solvers always find a solution; stochastic solvers 
    are usually faster but never certain. This is the fundamental tradeoff.
 
-**[→ Interactive Visualizer](https://rachitagrawal146.github.io/game-algorithms-java/Visualizer/NQueensVisualizer.html)**
+**[→ Interactive N-Queens Visualizer](https://rachitagrawal146.github.io/game-algorithms-java/nqueens/)**
 
 ---
 
@@ -114,6 +114,8 @@ affect the final decision.
    late game: 67.1%. As the board fills, fewer branches exist to prune, 
    reducing alpha-beta's advantage.
 
+**[→ Interactive Connect 4 AI](https://rachitagrawal146.github.io/game-algorithms-java/connect4/)**
+
 ---
 
 ### 3. Mastermind — Information-Theoretic Search
@@ -146,6 +148,8 @@ Average: **4.15 guesses**. Each guess eliminates ~82% of remaining candidates.
    candidates (360→65), but later guesses yield diminishing returns as the 
    remaining candidates become increasingly similar to each other.
 
+**[→ Interactive Mastermind Solver](https://rachitagrawal146.github.io/game-algorithms-java/mastermind/)**
+
 ---
 
 ### 4. 21-Card Trick — Deterministic Algorithm
@@ -153,6 +157,8 @@ Average: **4.15 guesses**. Each guess eliminates ~82% of remaining candidates.
 A mathematical card trick that always identifies a chosen card in 3 rounds via 
 systematic column rearrangement — showing how deterministic structure can replace 
 what appears to be random guessing.
+
+**[→ Interactive 21-Card Trick](https://rachitagrawal146.github.io/game-algorithms-java/cardtrick/)**
 
 ---
 
@@ -232,3 +238,9 @@ research.
 (modelling trust emergence and collapse across behavioural archetypes in Kuhn Poker 
 environments), which explores related questions about how rational agents behave 
 under uncertainty and incomplete information.*
+
+---
+
+Built by **[Rachit Agrawal](https://rachitagrawal146.github.io/)** — Grade 11, 
+Sahyadri School (KFI), Pune. Part of a broader portfolio exploring decision-making 
+in artificial intelligence.
