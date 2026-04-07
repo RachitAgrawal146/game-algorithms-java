@@ -61,11 +61,10 @@
 
   var NAV_LINKS = [
     { label: 'Home', href: '/game-algorithms-java/' },
-    { label: 'Tic Tac Toe', href: '/game-algorithms-java/tictactoe/' },
     { label: 'N-Queens', href: '/game-algorithms-java/nqueens/' },
     { label: 'Connect 4', href: '/game-algorithms-java/connect4/' },
-    { label: 'Pathfinding', href: '/game-algorithms-java/pathfinding/' },
     { label: 'Mastermind', href: '/game-algorithms-java/mastermind/' },
+    { label: 'Card Trick', href: '/game-algorithms-java/cardtrick/' },
     { label: 'Compare', href: '/game-algorithms-java/compare/' }
   ];
 

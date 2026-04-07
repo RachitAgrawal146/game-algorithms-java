@@ -6,7 +6,7 @@
 <title>Game Algorithms Engine</title>
 <meta name="description" content="Exploring decision-making algorithms in artificial intelligence through interactive game demos, empirical benchmarks, and comparative analysis." />
 <meta property="og:title" content="Game Algorithms Engine" />
-<meta property="og:description" content="Interactive research project exploring minimax, constraint satisfaction, pathfinding, and more through playable game demos." />
+<meta property="og:description" content="Interactive research project exploring minimax, constraint satisfaction, and adversarial search through playable game demos." />
 <meta property="og:type" content="website" />
 <meta name="twitter:card" content="summary" />
 <meta name="twitter:title" content="Game Algorithms Engine" />
@@ -461,7 +461,7 @@
 
       <!-- Minimax + Alpha-Beta -->
       <div class="card algo-card algo-card--blue reveal">
-        <div class="card-problem">Tic Tac Toe &middot; Connect 4</div>
+        <div class="card-problem">Connect 4</div>
         <h3>Minimax + Alpha-Beta Pruning</h3>
         <p>Exhaustive game-tree search with intelligent branch elimination. Explores optimal play in two-player zero-sum games.</p>
         <div class="card-tags">
@@ -469,7 +469,7 @@
           <span class="tag">Tree Search</span>
           <span class="tag">Pruning</span>
         </div>
-        <a href="/game-algorithms-java/tictactoe/" class="card-link">Try Demo &rarr;</a>
+        <a href="/game-algorithms-java/connect4/" class="card-link">Try Demo &rarr;</a>
       </div>
 
       <!-- Backtracking CSP -->
@@ -509,19 +509,6 @@
           <span class="tag">Stochastic</span>
         </div>
         <a href="/game-algorithms-java/nqueens/" class="card-link">Try Demo &rarr;</a>
-      </div>
-
-      <!-- A* Pathfinding -->
-      <div class="card algo-card algo-card--amber reveal">
-        <div class="card-problem">Grid Navigation</div>
-        <h3>A* Pathfinding</h3>
-        <p>Optimal pathfinding using heuristic-guided search. Balances exploration and exploitation with admissible heuristics.</p>
-        <div class="card-tags">
-          <span class="tag">Graph Search</span>
-          <span class="tag">Heuristic</span>
-          <span class="tag">Optimal</span>
-        </div>
-        <a href="/game-algorithms-java/pathfinding/" class="card-link">Try Demo &rarr;</a>
       </div>
 
       <!-- Constraint Elimination -->
@@ -579,18 +566,6 @@
 
     <div class="demos-scroll">
 
-      <!-- Tic Tac Toe -->
-      <a href="/game-algorithms-java/tictactoe/" class="demo-card reveal">
-        <div class="demo-ascii"> X | O | X
----+---+---
- O | X |
----+---+---
-   | O | X</div>
-        <h4>Tic Tac Toe</h4>
-        <p class="demo-desc">Watch the minimax tree expand in real-time as AI makes decisions</p>
-        <span class="card-link">Launch Demo &rarr;</span>
-      </a>
-
       <!-- N-Queens -->
       <a href="/game-algorithms-java/nqueens/" class="demo-card reveal">
         <div class="demo-ascii">. Q . . .
@@ -613,19 +588,6 @@ Q . . . .
 O X X O . O .</div>
         <h4>Connect 4</h4>
         <p class="demo-desc">Play against alpha-beta AI with live evaluation scoring</p>
-        <span class="card-link">Launch Demo &rarr;</span>
-      </a>
-
-      <!-- A* Pathfinding -->
-      <a href="/game-algorithms-java/pathfinding/" class="demo-card reveal">
-        <div class="demo-ascii">S . . # . . .
-. # . # . # .
-. # . . . # .
-. . # # . . .
-# . . . # . G
-</div>
-        <h4>A* Pathfinding</h4>
-        <p class="demo-desc">Draw walls, generate mazes, and watch algorithms find the path</p>
         <span class="card-link">Launch Demo &rarr;</span>
       </a>
 
@@ -653,7 +615,7 @@ R Y G B  | ****</div>
     <div class="section-label reveal">04 &mdash; The Question</div>
 
     <div class="narrative reveal">
-      <p>Every game encodes a decision problem. Tic Tac Toe asks: can you see far enough ahead? N-Queens asks: can you eliminate contradictions early enough? Connect 4 asks: can you prune the irrelevant? Mastermind asks: can you extract maximum information from minimum data?</p>
+      <p>Every game encodes a decision problem. N-Queens asks: can you eliminate contradictions early enough? Connect 4 asks: can you prune the irrelevant? Mastermind asks: can you extract maximum information from minimum data?</p>
       <p>This project doesn't just implement algorithms&nbsp;&mdash; it asks when each approach breaks down, and why. The central finding: an algorithm's real-world efficiency depends not on theoretical complexity alone, but on the ratio between the cost of its optimization strategy and the savings that strategy produces.</p>
       <p>Alpha-beta pruning costs almost nothing and saves exponentially. Forward checking costs a lot per step and saves only linearly. The math looks different. The truth is in the benchmarks.</p>
     </div>
