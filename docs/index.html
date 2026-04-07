@@ -3,2157 +3,769 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Rachit Agrawal</title>
-<meta name="description" content="I build systems, perform on stage, and try to make the complex feel human. CS researcher, theatre actor, builder." />
-<meta property="og:title" content="Rachit Agrawal" />
-<meta property="og:description" content="I build systems, perform on stage, and try to make the complex feel human. From Ranchi, shaped by silence, working on things that matter." />
+<title>Game Algorithms Engine</title>
+<meta name="description" content="Exploring decision-making algorithms in artificial intelligence through interactive game demos, empirical benchmarks, and comparative analysis." />
+<meta property="og:title" content="Game Algorithms Engine" />
+<meta property="og:description" content="Interactive research project exploring minimax, constraint satisfaction, pathfinding, and more through playable game demos." />
 <meta property="og:type" content="website" />
 <meta name="twitter:card" content="summary" />
-<meta name="twitter:title" content="Rachit Agrawal" />
-<meta name="twitter:description" content="CS researcher, theatre actor, builder. Shaped by silence, working on things that matter." />
+<meta name="twitter:title" content="Game Algorithms Engine" />
+<meta name="twitter:description" content="Interactive research project exploring decision-making algorithms in AI." />
+
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-tailwind.config = {
-  darkMode: "class",
-  theme: {
-    extend: {
-      colors: {
-        bg: "#0c0c0b",
-        surface: "#141413",
-        surface2: "#1c1c1a",
-        border: "rgba(255,255,255,0.07)",
-        "border-active": "rgba(255,255,255,0.12)",
-        "text-primary": "#e8e6df",
-        "text-muted": "#8a887f",
-        "text-dim": "#4a4844",
-        gold: "#c9a96e",
-        teal: "#7ab0a8",
-      },
-      fontFamily: {
-        display: ["Cormorant Garamond", "serif"],
-        mono: ["DM Mono", "monospace"],
-        body: ["Inter", "sans-serif"],
-      },
-      maxWidth: {
-        content: "760px",
-      },
-    },
-  },
-};
-</script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="shared/styles.css" />
+
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-  body {
-    background-color: #0c0c0b;
-    color: #e8e6df;
-    font-family: 'Inter', sans-serif;
-    font-weight: 300;
-    line-height: 1.7;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
+/* ===== Page-specific styles ===== */
 
-  /* Noise texture overlay */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    z-index: 9999;
-    pointer-events: none;
-    opacity: 0.035;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    background-repeat: repeat;
-    background-size: 256px 256px;
-  }
+/* Hero overrides */
+.hero {
+  padding: var(--space-24) var(--space-6) var(--space-12);
+  margin-top: 0;
+}
 
-  /* Section label with extending line */
-  .section-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.25em;
-    color: #c9a96e;
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    margin-bottom: 3rem;
-  }
-  .section-label::after {
-    content: '';
-    flex: 1;
-    height: 0.5px;
-    background: rgba(255,255,255,0.07);
-  }
+.hero-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--color-gold);
+  margin-bottom: var(--space-6);
+  display: block;
+}
 
-  /* Section divider */
-  .section-divider {
-    border: none;
-    border-top: 0.5px solid rgba(255,255,255,0.07);
-  }
+.hero h1 {
+  font-family: var(--font-heading);
+  font-size: clamp(2.6rem, 5.5vw, 4rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin-bottom: var(--space-4);
+  line-height: 1.1;
+}
 
-  /* Scroll reveal */
+.hero-subtitle {
+  font-family: var(--font-heading);
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
+  font-weight: 400;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-6);
+}
+
+.hero-desc {
+  font-family: var(--font-body);
+  font-size: clamp(0.95rem, 1.5vw, 1.05rem);
+  color: var(--color-text-muted);
+  max-width: 640px;
+  margin: 0 auto var(--space-8);
+  line-height: 1.75;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: var(--space-4);
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: var(--space-10);
+}
+
+.hero .stats-bar {
+  justify-content: center;
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-8);
+  margin-top: var(--space-4);
+}
+
+/* Sections */
+.section {
+  padding: var(--space-20) 0;
+}
+
+.section + .section {
+  border-top: 1px solid var(--color-border);
+}
+
+/* Algorithm cards */
+.algo-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.algo-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+}
+
+.algo-card--blue::before { background: var(--color-blue); }
+.algo-card--purple::before { background: var(--color-purple); }
+.algo-card--green::before { background: var(--color-green); }
+.algo-card--amber::before { background: var(--color-amber); }
+.algo-card--red::before { background: var(--color-red); }
+
+.algo-card .card-problem {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: var(--space-3);
+}
+
+.algo-card .card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.algo-card .card-link {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--color-blue);
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.algo-card .card-link:hover {
+  color: #60a5fa;
+}
+
+/* Findings section */
+.findings-wrapper {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-10) var(--space-8);
+}
+
+.pull-quote {
+  font-family: var(--font-heading);
+  font-size: clamp(1.15rem, 2.2vw, 1.5rem);
+  font-style: italic;
+  font-weight: 500;
+  color: var(--color-text-heading);
+  line-height: 1.5;
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto var(--space-10);
+  position: relative;
+  padding: 0 var(--space-6);
+}
+
+.pull-quote::before {
+  content: '\201C';
+  position: absolute;
+  top: -0.35em;
+  left: -0.1em;
+  font-size: 3rem;
+  color: var(--color-gold);
+  opacity: 0.4;
+  font-style: normal;
+  line-height: 1;
+}
+
+.findings-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-6);
+}
+
+.finding-card {
+  padding: var(--space-6);
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.finding-card h4 {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-heading);
+  margin-bottom: var(--space-3);
+}
+
+.finding-card p {
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+  line-height: 1.65;
+}
+
+/* Demo preview cards */
+.demos-scroll {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-5);
+}
+
+.demo-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  transition:
+    transform var(--duration-base) var(--ease-out),
+    border-color var(--duration-base) var(--ease-out),
+    box-shadow var(--duration-base) var(--ease-out);
+}
+
+.demo-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--color-border-hover);
+  box-shadow: var(--shadow-lift);
+}
+
+.demo-ascii {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: var(--color-text-muted);
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: var(--radius-sm);
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
+  text-align: center;
+  white-space: pre;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.demo-card h4 {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-heading);
+  margin-bottom: var(--space-2);
+}
+
+.demo-card .demo-desc {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  line-height: 1.55;
+  margin-bottom: auto;
+  padding-bottom: var(--space-4);
+}
+
+.demo-card .card-link {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-blue);
+  transition: color var(--duration-fast) var(--ease-out);
+  margin-top: auto;
+}
+
+.demo-card .card-link:hover {
+  color: #60a5fa;
+}
+
+/* Narrative section */
+.narrative {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.narrative p {
+  font-size: 1.02rem;
+  color: var(--color-text-muted);
+  line-height: 1.8;
+  margin-bottom: var(--space-6);
+}
+
+.narrative p:last-child {
+  margin-bottom: 0;
+}
+
+/* Methodology */
+.method-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
+}
+
+.method-item {
+  padding: var(--space-5);
+  border-left: 2px solid var(--color-border);
+}
+
+.method-item h4 {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text-heading);
+  margin-bottom: var(--space-2);
+}
+
+.method-item p {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  line-height: 1.55;
+}
+
+.source-link {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--color-blue);
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.source-link:hover {
+  color: #60a5fa;
+}
+
+/* Footer */
+.site-footer {
+  border-top: 1px solid var(--color-border);
+  padding: var(--space-10) 0;
+  text-align: center;
+}
+
+.site-footer p {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  line-height: 1.7;
+}
+
+.site-footer a {
+  color: var(--color-text-muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.site-footer a:hover {
+  color: var(--color-text);
+}
+
+/* Scroll reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Responsive: demo grid */
+@media (max-width: 1024px) {
+  .demos-scroll {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .findings-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .method-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .demos-scroll {
+    grid-template-columns: 1fr 1fr;
+    overflow-x: auto;
+  }
+  .findings-grid {
+    grid-template-columns: 1fr;
+  }
+  .findings-wrapper {
+    padding: var(--space-6) var(--space-5);
+  }
+  .method-grid {
+    grid-template-columns: 1fr;
+  }
+  .hero {
+    padding: var(--space-16) var(--space-4) var(--space-10);
+  }
+}
+
+@media (max-width: 480px) {
+  .demos-scroll {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
   .reveal {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.7s ease, transform 0.7s ease;
-  }
-  .reveal.visible {
     opacity: 1;
-    transform: translateY(0);
-  }
-
-  /* Reduced motion */
-  @media (prefers-reduced-motion: reduce) {
-    .reveal { opacity: 1; transform: none; transition: none; }
-    html { scroll-behavior: auto; }
-  }
-
-  /* Nav */
-  .nav-bar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 100;
-    background: rgba(12, 12, 11, 0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 0.5px solid rgba(255,255,255,0.05);
-    transition: transform 0.4s ease;
-  }
-  .nav-bar.hidden { transform: translateY(-100%); }
-
-  /* Links */
-  a { color: inherit; text-decoration: none; }
-
-  /* Selection */
-  ::selection { background: rgba(201, 169, 110, 0.3); color: #e8e6df; }
-
-  /* Tag pill */
-  .tag {
-    font-family: 'DM Mono', monospace;
-    font-size: 9px;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    padding: 0.35rem 0.75rem;
-    border: 0.5px solid rgba(255,255,255,0.1);
-    color: #8a887f;
-    display: inline-block;
-  }
-
-  /* Project card */
-  .project-card {
-    padding: 2.5rem 0;
-    border-bottom: 0.5px solid rgba(255,255,255,0.07);
-    transition: background 0.4s ease;
-  }
-  .project-card:hover {
-    background: rgba(255,255,255,0.015);
-  }
-
-  /* Theatre table */
-  .theatre-table { width: 100%; border-collapse: collapse; }
-  .theatre-table th {
-    font-family: 'DM Mono', monospace;
-    font-size: 9px;
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
-    color: #4a4844;
-    text-align: left;
-    padding: 0.75rem 0;
-    border-bottom: 0.5px solid rgba(255,255,255,0.07);
-  }
-  .theatre-table td {
-    padding: 1rem 0;
-    border-bottom: 0.5px solid rgba(255,255,255,0.04);
-    vertical-align: top;
-  }
-  .theatre-table tr:hover td { color: #c9a96e; }
-
-  /* Currently section — highlighted, brighter */
-  .currently-box {
-    border: 1px solid rgba(201, 169, 110, 0.45);
-    padding: 3rem 3.25rem;
-    position: relative;
-    background: linear-gradient(135deg, rgba(201, 169, 110, 0.045) 0%, rgba(201, 169, 110, 0.015) 100%);
-    box-shadow:
-      0 0 0 1px rgba(201, 169, 110, 0.05),
-      0 8px 30px rgba(201, 169, 110, 0.06),
-      inset 0 0 60px rgba(201, 169, 110, 0.025);
-  }
-  .currently-box::before {
-    content: 'pinned';
-    position: absolute;
-    top: -8px;
-    left: 1.75rem;
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.25em;
-    color: #c9a96e;
-    background: #0c0c0b;
-    padding: 0 0.6rem;
-  }
-  /* Subtle gold corner accents */
-  .currently-box::after {
-    content: '';
-    position: absolute;
-    top: -1px; right: -1px;
-    width: 24px; height: 24px;
-    border-top: 1px solid #c9a96e;
-    border-right: 1px solid #c9a96e;
-    pointer-events: none;
-  }
-
-  /* Writing piece */
-  .writing-piece {
-    padding: 1.5rem 0;
-    border-bottom: 0.5px solid rgba(255,255,255,0.05);
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 2rem;
-  }
-
-  /* Mobile nav */
-  .mobile-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 100;
-    background: rgba(12, 12, 11, 0.92);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-top: 0.5px solid rgba(255,255,255,0.07);
-    padding: 0.75rem 0;
-    display: none;
-  }
-  @media (max-width: 768px) {
-    .mobile-nav { display: flex; justify-content: space-around; }
-    .desktop-nav { display: none; }
-    .nav-name { font-size: 1.125rem; }
-  }
-  .mobile-nav a {
-    font-family: 'DM Mono', monospace;
-    font-size: 9px;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: #8a887f;
-    padding: 0.5rem;
-    transition: color 0.3s;
-  }
-  .mobile-nav a:hover, .mobile-nav a.active { color: #c9a96e; }
-
-
-  /* ===== SCROLL PROGRESS BAR ===== */
-  .scroll-progress {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 2px;
-    width: 0%;
-    background: linear-gradient(90deg, #c9a96e, #e8d5b0);
-    z-index: 200;
+    transform: none;
     transition: none;
   }
-
-  /* ===== HERO AMBIENT GOLD PARTICLES ===== */
-  .hero-particles {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    overflow: hidden;
-    z-index: 0;
-  }
-  .hero-particles canvas {
-    width: 100%;
-    height: 100%;
-    display: block;
-  }
-  /* Subtle directional gold light from the upper-right (like Equinox reference) */
-  .hero-particles::before {
-    content: '';
-    position: absolute;
-    top: -10%;
-    right: -15%;
-    width: 65%;
-    height: 90%;
-    background: radial-gradient(ellipse at center,
-      rgba(201, 169, 110, 0.07) 0%,
-      rgba(201, 169, 110, 0.025) 35%,
-      transparent 65%);
-    filter: blur(50px);
-    pointer-events: none;
-  }
-  .hero-wrap, .hero-wrap > * { position: relative; z-index: 1; }
-
-  /* ===== HERO SECTION — wider breakout container ===== */
-  .hero-section-wide {
-    /* Break out of the 760px main container, span up to 1180px wide */
-    margin-left: calc((760px - min(1180px, 100vw - 3rem)) / 2);
-    margin-right: calc((760px - min(1180px, 100vw - 3rem)) / 2);
-  }
-  @media (max-width: 880px) {
-    .hero-section-wide { margin-left: 0; margin-right: 0; }
-  }
-
-  /* ===== HERO SIDE-BY-SIDE LAYOUT ===== */
-  .hero-wrap {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: clamp(2.5rem, 5vw, 5rem);
-    position: relative;
-  }
-  .hero-text-col {
-    flex: 1 1 0;
-    min-width: 0;
-  }
-  .portrait-col {
-    flex-shrink: 0;
-    width: clamp(360px, 40vw, 500px);
-    padding: 40px 36px;
-    margin-left: auto;
-    transition: transform 0.3s ease;
-    will-change: transform;
-  }
-
-  /* Circular gold-framed portrait */
-  .portrait-frame {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    border-radius: 50%;
-    overflow: hidden;
-    isolation: isolate;
-  }
-  /*
-    Source image is 1024x1536 (aspect 0.667, taller 2:3 portrait).
-    With object-fit: cover in a square container, the image scales so width
-    matches container; height overflows by ~50%. object-position 50% 0%
-    aligns the top of the image to the top of the container — keeping the
-    entire hair + face fully visible inside the inscribed circle.
-    Verified at 500/400/320px containers — hair top fits with 80+px chord margin.
-  */
-  .portrait-frame img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: 50% 0%;
-    display: block;
-    position: relative;
-    z-index: 2;
-  }
-  /* Thin gold ring border */
-  .portrait-frame-ring {
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    border: 1.5px solid rgba(201, 169, 110, 0.55);
-    box-shadow:
-      inset 0 0 0 1px rgba(255, 220, 150, 0.15),
-      0 0 30px rgba(201, 169, 110, 0.18),
-      0 0 60px rgba(201, 169, 110, 0.10);
-    z-index: 3;
-    pointer-events: none;
-  }
-  /* Soft outer halo glow that extends beyond the ring */
-  .portrait-frame-glow {
-    position: absolute;
-    inset: -22%;
-    border-radius: 50%;
-    background: radial-gradient(circle at center,
-      rgba(255, 230, 170, 0.28) 0%,
-      rgba(201, 169, 110, 0.16) 28%,
-      rgba(201, 169, 110, 0.06) 50%,
-      transparent 72%);
-    filter: blur(20px);
-    z-index: 1;
-    pointer-events: none;
-    animation: haloBreath 6s ease-in-out infinite alternate;
-  }
-  @keyframes haloBreath {
-    0%   { opacity: 0.85; transform: scale(1); }
-    100% { opacity: 1;    transform: scale(1.06); }
-  }
-
-  /* Mobile: stack vertically */
-  @media (max-width: 768px) {
-    .hero-wrap { flex-direction: column; align-items: flex-start; gap: 2.5rem; }
-    .portrait-col { width: 320px; align-self: center; padding: 30px; margin-left: 0; }
-    .hero-headline { text-align: left; }
-  }
-
-  /* ===== PHOTO PLACEHOLDERS (gold-framed, ready for upload) ===== */
-  .photo-slot {
-    position: relative;
-    width: 100%;
-    background: #141413;
-    border: 1px solid rgba(201, 169, 110, 0.25);
-    overflow: hidden;
-    transition: border-color 0.3s ease, transform 0.3s ease;
-  }
-  .photo-slot::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    box-shadow: inset 0 0 0 1px rgba(255, 220, 150, 0.06);
-    pointer-events: none;
-  }
-  .photo-slot:hover {
-    border-color: rgba(201, 169, 110, 0.5);
-    transform: translateY(-2px);
-  }
-  .photo-slot img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-  .photo-slot-placeholder {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    color: #4a4844;
-  }
-  .photo-slot-placeholder span {
-    font-family: 'DM Mono', monospace;
-    font-size: 9px;
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
-    color: #4a4844;
-    text-align: center;
-    padding: 0 1rem;
-  }
-  .photo-slot-placeholder svg {
-    width: 24px;
-    height: 24px;
-    opacity: 0.4;
-  }
-  /* Aspect ratios */
-  .photo-slot.ratio-16-9 { aspect-ratio: 16 / 9; }
-  .photo-slot.ratio-4-3  { aspect-ratio: 4 / 3; }
-  .photo-slot.ratio-3-4  { aspect-ratio: 3 / 4; }
-  .photo-slot.ratio-1-1  { aspect-ratio: 1 / 1; }
-
-  /* Photo grid */
-  .photo-grid-3 {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-  }
-  @media (max-width: 720px) {
-    .photo-grid-3 { grid-template-columns: 1fr; }
-  }
-
-  /* ===== SHINY TEXT (gradient sweep) ===== */
-  .shiny-text {
-    background: linear-gradient(
-      110deg,
-      rgba(201, 169, 110, 0.5) 0%,
-      rgba(201, 169, 110, 0.5) 35%,
-      rgba(255, 240, 200, 1) 50%,
-      rgba(201, 169, 110, 0.5) 65%,
-      rgba(201, 169, 110, 0.5) 100%
-    );
-    background-size: 200% auto;
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-    animation: shinySweep 4s linear infinite;
-  }
-  @keyframes shinySweep {
-    0%   { background-position: 200% center; }
-    100% { background-position: -200% center; }
-  }
-  /* Section labels with shiny effect */
-  .section-label-shiny {
-    background: linear-gradient(
-      110deg,
-      rgba(201, 169, 110, 0.6) 0%,
-      rgba(201, 169, 110, 0.6) 40%,
-      rgba(255, 240, 200, 1) 50%,
-      rgba(201, 169, 110, 0.6) 60%,
-      rgba(201, 169, 110, 0.6) 100%
-    );
-    background-size: 200% auto;
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: shinySweep 5s linear infinite;
-  }
-
-  /* ===== TEXT-TYPE (reactbits-style) =====
-     - Uses an "invisible" full-text placeholder so layout never shifts
-     - A second visible layer types out / deletes characters
-     - Caret follows the visible text */
-  .text-type {
-    display: inline;
-    position: relative;
-  }
-  .text-type-text {
-    display: inline;
-  }
-  .text-type-cursor {
-    display: inline-block;
-    width: 0.05em;
-    height: 0.85em;
-    background: #c9a96e;
-    margin-left: 0.05em;
-    vertical-align: text-bottom;
-    border-radius: 1px;
-    animation: ttBlink 0.85s steps(2, start) infinite;
-  }
-  @keyframes ttBlink {
-    0%, 50%   { opacity: 1; }
-    51%, 100% { opacity: 0; }
-  }
-  /* Hero headline still uses gold em color via inline class */
-  .typing-em { color: #c9a96e; }
-
-  /* Hero headline: invisible placeholder reserves layout space so typing never shifts the page */
-  .hero-headline { position: relative; }
-  .hero-headline-placeholder {
-    visibility: hidden;
-    display: block;
-    pointer-events: none;
-  }
-  .hero-headline-typer {
-    position: absolute;
-    inset: 0;
-    display: block;
-  }
-
-  /* ===== MAGNET HOVER ===== */
-  .magnet {
-    display: inline-block;
-    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-    will-change: transform;
-  }
-  .hero-headline {
-    font-size: clamp(3rem, 6.5vw, 5.4rem);
-    line-height: 1.04;
-    letter-spacing: -0.015em;
-    color: #e8e6df;
-    font-weight: 300;
-    margin-bottom: 0;
-  }
-  .hero-headline-em {
-    color: #c9a96e;
-    font-style: italic;
-  }
-  .hero-clear { clear: both; }
-
-  /* Mobile: stack vertically, no float */
-  @media (max-width: 720px) {
-    .portrait-float {
-      float: none;
-      width: 200px;
-      margin: 0 auto 2rem;
-      shape-outside: none;
-    }
-    .hero-headline { text-align: center; font-size: clamp(2rem, 9vw, 3rem); }
-  }
-
-  /* ===== GOLD BLOB CURSOR (reactbits-style) ===== */
-  .blob-cursor-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    pointer-events: none;
-    z-index: 100;
-    filter: url(#blob-goo);
-    mix-blend-mode: screen;
-    opacity: 0;
-    transition: opacity 0.5s ease;
-  }
-  .blob-cursor-container.active { opacity: 1; }
-  .blob {
-    position: absolute;
-    top: 0;
-    left: 0;
-    border-radius: 50%;
-    will-change: transform;
-    pointer-events: none;
-    background: #c9a96e;
-    box-shadow: 4px 4px 3px rgba(0,0,0,0.4);
-  }
-  .blob-1 {
-    width: 22px;
-    height: 22px;
-    opacity: 0.35;
-  }
-  .blob-2 {
-    width: 42px;
-    height: 42px;
-    opacity: 0.28;
-  }
-  .blob-3 {
-    width: 28px;
-    height: 28px;
-    opacity: 0.32;
-  }
-  .blob-inner {
-    position: absolute;
-    border-radius: 50%;
-    background: rgba(255, 240, 200, 0.7);
-    pointer-events: none;
-  }
-  .blob-1 .blob-inner {
-    width: 8px;
-    height: 8px;
-    top: 7px;
-    left: 7px;
-  }
-  .blob-2 .blob-inner {
-    width: 12px;
-    height: 12px;
-    top: 15px;
-    left: 15px;
-  }
-  .blob-3 .blob-inner {
-    width: 9px;
-    height: 9px;
-    top: 9px;
-    left: 9px;
-  }
-  /* Hidden SVG filter for the goo */
-  .blob-svg-filter {
-    position: absolute;
-    width: 0;
-    height: 0;
-    overflow: hidden;
-  }
-  @media (hover: none) {
-    .blob-cursor-container, .blob-svg-filter { display: none; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .blob-cursor-container, .blob-svg-filter { display: none; }
-  }
-  @keyframes glowDrift {
-    0% { transform: translate(0, 0) scale(1); opacity: 0.6; }
-    100% { transform: translate(40px, -30px) scale(1.15); opacity: 1; }
-  }
-
-  /* ===== PORTRAIT EFFECTS ===== */
-  .portrait-wrap {
-    position: relative;
-    transition: transform 0.3s ease;
-  }
-  .portrait-wrap img {
-    mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
-  }
-
-  /* ===== STAGGER CHILDREN REVEAL ===== */
-  .reveal-stagger > * {
-    opacity: 0;
-    transform: translateY(16px);
-    transition: opacity 0.5s ease, transform 0.5s ease;
-  }
-  .reveal-stagger.visible > * { opacity: 1; transform: translateY(0); }
-  .reveal-stagger.visible > *:nth-child(1) { transition-delay: 0s; }
-  .reveal-stagger.visible > *:nth-child(2) { transition-delay: 0.08s; }
-  .reveal-stagger.visible > *:nth-child(3) { transition-delay: 0.16s; }
-  .reveal-stagger.visible > *:nth-child(4) { transition-delay: 0.24s; }
-  .reveal-stagger.visible > *:nth-child(5) { transition-delay: 0.32s; }
-  .reveal-stagger.visible > *:nth-child(6) { transition-delay: 0.4s; }
-
-  /* ===== PROJECT CARD UPGRADES ===== */
-  .project-card {
-    padding: 2.5rem 0;
-    border-bottom: 0.5px solid rgba(255,255,255,0.07);
-    transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-    position: relative;
-  }
-  .project-card:hover {
-    background: rgba(255,255,255,0.02);
-    transform: translateY(-2px);
-  }
-
-  /* Featured project card (Game Algorithms) */
-  .project-featured {
-    padding: 2rem 2.5rem !important;
-    border: 0.5px solid rgba(201,169,110,0.15) !important;
-    border-bottom: 0.5px solid rgba(201,169,110,0.15) !important;
-    border-radius: 4px;
-    transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-  }
-  .project-featured:hover {
-    background: rgba(201,169,110,0.04);
-    border-color: rgba(201,169,110,0.3) !important;
-    box-shadow: 0 4px 30px rgba(201,169,110,0.06);
-    transform: translateY(-3px);
-  }
-  .featured-badge {
-    font-family: 'DM Mono', monospace;
-    font-size: 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
-    color: #c9a96e;
-    background: rgba(201,169,110,0.1);
-    padding: 3px 8px;
-    border: 0.5px solid rgba(201,169,110,0.2);
-    display: inline-block;
-    margin-bottom: 1rem;
-  }
-
-  /* ===== LINK ANIMATED UNDERLINE ===== */
-  .link-anim {
-    position: relative;
-    display: inline;
-  }
-  .link-anim::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    width: 0;
-    height: 1px;
-    background: #c9a96e;
-    transition: width 0.3s ease;
-  }
-  .link-anim:hover::after { width: 100%; }
-
-  /* ===== TAG HOVER ===== */
-  .tag {
-    transition: border-color 0.3s ease, color 0.3s ease;
-  }
-  .tag:hover {
-    border-color: rgba(201,169,110,0.3);
-    color: #c9a96e;
-  }
-
-  /* ===== CURRENTLY: THOUGHT ROTATION ===== */
-  .thought-rotate {
-    position: relative;
-    min-height: 3rem;
-  }
-  .thought-rotate { min-height: 4.5rem; }
-  .thought-item {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    transition: opacity 0.8s ease;
-    font-family: 'Cormorant Garamond', serif;
-    font-style: italic;
-    font-weight: 400;
-    font-size: clamp(1.15rem, 1.6vw, 1.4rem);
-    line-height: 1.55;
-    color: #f0ede4;
-    letter-spacing: -0.005em;
-  }
-  .thought-item.thought-active { opacity: 1; position: relative; }
-  .thought-mark {
-    color: #c9a96e;
-    font-size: 1.3em;
-    line-height: 0;
-    position: relative;
-    top: 0.18em;
-    margin: 0 0.05em;
-  }
-
-  /* ===== HERO LOAD ANIMATION ===== */
-  .hero-load { opacity: 0; transform: translateY(20px); animation: heroIn 1s ease 0.2s forwards; }
-  .hero-load-delay { animation-delay: 0.5s; }
-  .hero-load-delay2 { animation-delay: 0.8s; }
-  .hero-load-delay3 { animation-delay: 1.1s; }
-  @keyframes heroIn { to { opacity: 1; transform: translateY(0); } }
-
-  /* ===== THEATRE TABLE ROW TRANSITION ===== */
-  .theatre-table td { transition: color 0.3s ease; }
-
-  /* ===== REDUCED MOTION ===== */
-  @media (prefers-reduced-motion: reduce) {
-    .scroll-progress { display: none; }
-    .hero-particles canvas { display: none; }
-    .hero-load { opacity: 1; transform: none; animation: none; }
-    .reveal-stagger > * { opacity: 1; transform: none; transition: none; }
-    .thought-item { transition: none; }
-    .project-card, .project-featured { transition: none; }
-    .link-anim::after { transition: none; }
-    .portrait-wrap { transition: none; }
-  }
+}
 </style>
 </head>
 <body>
-<div class="scroll-progress" id="scrollProgress"></div>
-<!-- Hidden SVG filter for gooey blob cursor -->
-<svg class="blob-svg-filter" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <filter id="blob-goo">
-      <feGaussianBlur in="SourceGraphic" stdDeviation="30" result="blur"/>
-      <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -10" result="goo"/>
-      <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
-    </filter>
-  </defs>
-</svg>
 
-<!-- Blob cursor (3 trailing blobs that merge via goo filter) -->
-<div class="blob-cursor-container" id="blobCursor">
-  <div class="blob blob-1" id="blob-1"><div class="blob-inner"></div></div>
-  <div class="blob blob-2" id="blob-2"><div class="blob-inner"></div></div>
-  <div class="blob blob-3" id="blob-3"><div class="blob-inner"></div></div>
-</div>
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<section class="hero" id="top">
+  <div class="container">
+    <span class="hero-eyebrow reveal">Interactive Research Project</span>
+    <h1 class="reveal">Game Algorithms Engine</h1>
+    <p class="hero-subtitle reveal">Exploring Decision-Making in Artificial Intelligence</p>
+    <p class="hero-desc reveal">How do machines make decisions in adversarial environments? This project explores the algorithms behind game-playing AI&nbsp;&mdash; from minimax trees to constraint satisfaction&nbsp;&mdash; through interactive visualizations, empirical benchmarks, and comparative analysis.</p>
 
-<!-- Navigation -->
-<nav class="nav-bar" id="navbar">
-  <div class="max-w-content mx-auto px-6 py-5 flex justify-between items-center">
-    <a href="#" class="nav-name font-display italic text-xl text-text-primary tracking-tight">Rachit Agrawal</a>
-    <div class="desktop-nav flex items-center gap-10">
-      <a href="#research" class="font-mono text-[10px] uppercase tracking-[0.2em] text-text-muted hover:text-gold transition-colors duration-300">Research</a>
-      <a href="#projects" class="font-mono text-[10px] uppercase tracking-[0.2em] text-text-muted hover:text-gold transition-colors duration-300">Projects</a>
-      <a href="#theatre" class="font-mono text-[10px] uppercase tracking-[0.2em] text-text-muted hover:text-gold transition-colors duration-300">Theatre</a>
-      <a href="#writing" class="font-mono text-[10px] uppercase tracking-[0.2em] text-text-muted hover:text-gold transition-colors duration-300">Writing</a>
-      <a href="#contact" class="font-mono text-[10px] uppercase tracking-[0.2em] text-text-muted hover:text-gold transition-colors duration-300">Contact</a>
+    <div class="hero-buttons reveal">
+      <a href="#algorithms" class="btn btn-primary">Explore Algorithms &rarr;</a>
+      <a href="/game-algorithms-java/compare/" class="btn btn-ghost">View Research &nearr;</a>
+    </div>
+
+    <div class="stats-bar reveal">
+      <div class="stat-item">
+        <span class="stat-number">6</span>
+        <span class="stat-label">Algorithms</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">5</span>
+        <span class="stat-label">Interactive Demos</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">4</span>
+        <span class="stat-label">Problem Classes</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">2,300+</span>
+        <span class="stat-label">Lines of Code</span>
+      </div>
     </div>
   </div>
-</nav>
+</section>
 
-<!-- Mobile bottom nav -->
-<div class="mobile-nav" id="mobilenav">
-  <a href="#research">Research</a>
-  <a href="#projects">Projects</a>
-  <a href="#theatre">Theatre</a>
-  <a href="#writing">Writing</a>
-  <a href="#contact">Contact</a>
+
+<!-- ============================================================
+     01 — ALGORITHMS
+     ============================================================ -->
+<section class="section" id="algorithms">
+  <div class="container">
+    <div class="section-label reveal">01 &mdash; Algorithms</div>
+
+    <div class="card-grid">
+
+      <!-- Minimax + Alpha-Beta -->
+      <div class="card algo-card algo-card--blue reveal">
+        <div class="card-problem">Tic Tac Toe &middot; Connect 4</div>
+        <h3>Minimax + Alpha-Beta Pruning</h3>
+        <p>Exhaustive game-tree search with intelligent branch elimination. Explores optimal play in two-player zero-sum games.</p>
+        <div class="card-tags">
+          <span class="tag">Adversarial</span>
+          <span class="tag">Tree Search</span>
+          <span class="tag">Pruning</span>
+        </div>
+        <a href="/game-algorithms-java/tictactoe/" class="card-link">Try Demo &rarr;</a>
+      </div>
+
+      <!-- Backtracking CSP -->
+      <div class="card algo-card algo-card--purple reveal">
+        <div class="card-problem">N-Queens</div>
+        <h3>Constraint Satisfaction (Backtracking)</h3>
+        <p>Systematic variable assignment with constraint checking. Guaranteed to find a solution through exhaustive search.</p>
+        <div class="card-tags">
+          <span class="tag">CSP</span>
+          <span class="tag">Backtracking</span>
+          <span class="tag">O(n!)</span>
+        </div>
+        <a href="/game-algorithms-java/nqueens/" class="card-link">Try Demo &rarr;</a>
+      </div>
+
+      <!-- Forward Checking -->
+      <div class="card algo-card algo-card--purple reveal">
+        <div class="card-problem">N-Queens</div>
+        <h3>Forward Checking</h3>
+        <p>Backtracking enhanced with domain propagation. Eliminates 58% more nodes but at 3&times; the overhead cost.</p>
+        <div class="card-tags">
+          <span class="tag">CSP</span>
+          <span class="tag">Propagation</span>
+          <span class="tag">Domain Reduction</span>
+        </div>
+        <a href="/game-algorithms-java/nqueens/" class="card-link">Try Demo &rarr;</a>
+      </div>
+
+      <!-- Minimum Conflicts -->
+      <div class="card algo-card algo-card--green reveal">
+        <div class="card-problem">N-Queens</div>
+        <h3>Minimum Conflicts (Local Search)</h3>
+        <p>Heuristic local search with random restarts. Achieves O(n) average-case on N-Queens&nbsp;&mdash; the fastest solver.</p>
+        <div class="card-tags">
+          <span class="tag">Local Search</span>
+          <span class="tag">Heuristic</span>
+          <span class="tag">Stochastic</span>
+        </div>
+        <a href="/game-algorithms-java/nqueens/" class="card-link">Try Demo &rarr;</a>
+      </div>
+
+      <!-- A* Pathfinding -->
+      <div class="card algo-card algo-card--amber reveal">
+        <div class="card-problem">Grid Navigation</div>
+        <h3>A* Pathfinding</h3>
+        <p>Optimal pathfinding using heuristic-guided search. Balances exploration and exploitation with admissible heuristics.</p>
+        <div class="card-tags">
+          <span class="tag">Graph Search</span>
+          <span class="tag">Heuristic</span>
+          <span class="tag">Optimal</span>
+        </div>
+        <a href="/game-algorithms-java/pathfinding/" class="card-link">Try Demo &rarr;</a>
+      </div>
+
+      <!-- Constraint Elimination -->
+      <div class="card algo-card algo-card--red reveal">
+        <div class="card-problem">Mastermind</div>
+        <h3>Constraint Elimination</h3>
+        <p>Information-theoretic approach: each guess eliminates ~82% of candidates. Solves any code in &le;6 guesses.</p>
+        <div class="card-tags">
+          <span class="tag">Information Theory</span>
+          <span class="tag">Filtering</span>
+        </div>
+        <a href="/game-algorithms-java/mastermind/" class="card-link">Try Demo &rarr;</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     02 — KEY FINDINGS
+     ============================================================ -->
+<section class="section" id="findings">
+  <div class="container">
+    <div class="section-label reveal">02 &mdash; Key Findings</div>
+
+    <div class="findings-wrapper reveal">
+      <p class="pull-quote">Algorithm efficiency depends on the pruning cost-to-benefit ratio, not just branch reduction.</p>
+
+      <div class="findings-grid">
+        <div class="finding-card">
+          <h4>Alpha-Beta Pruning</h4>
+          <p>Near-zero overhead &rarr; 94.2% node reduction at depth 10. The pruning cost is negligible relative to the exponential search savings.</p>
+        </div>
+        <div class="finding-card">
+          <h4>Forward Checking Paradox</h4>
+          <p>58% fewer nodes explored, but 3&times; slower than basic backtracking. Domain copying overhead exceeds the search savings.</p>
+        </div>
+        <div class="finding-card">
+          <h4>Constraint Elimination</h4>
+          <p>82% candidate elimination per guess. Expensive per-step computation is justified by the small, finite search space (360 codes).</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     03 — INTERACTIVE DEMOS
+     ============================================================ -->
+<section class="section" id="demos">
+  <div class="container">
+    <div class="section-label reveal">03 &mdash; Interactive Demos</div>
+
+    <div class="demos-scroll">
+
+      <!-- Tic Tac Toe -->
+      <a href="/game-algorithms-java/tictactoe/" class="demo-card reveal">
+        <div class="demo-ascii"> X | O | X
+---+---+---
+ O | X |
+---+---+---
+   | O | X</div>
+        <h4>Tic Tac Toe</h4>
+        <p class="demo-desc">Watch the minimax tree expand in real-time as AI makes decisions</p>
+        <span class="card-link">Launch Demo &rarr;</span>
+      </a>
+
+      <!-- N-Queens -->
+      <a href="/game-algorithms-java/nqueens/" class="demo-card reveal">
+        <div class="demo-ascii">. Q . . .
+. . . Q .
+Q . . . .
+. . Q . .
+. . . . Q</div>
+        <h4>N-Queens</h4>
+        <p class="demo-desc">Step through backtracking, forward checking, and local search</p>
+        <span class="card-link">Launch Demo &rarr;</span>
+      </a>
+
+      <!-- Connect 4 -->
+      <a href="/game-algorithms-java/connect4/" class="demo-card reveal">
+        <div class="demo-ascii">. . . . . . .
+. . . . . . .
+. . . O . . .
+. . O X . . .
+. O X X . . .
+O X X O . O .</div>
+        <h4>Connect 4</h4>
+        <p class="demo-desc">Play against alpha-beta AI with live evaluation scoring</p>
+        <span class="card-link">Launch Demo &rarr;</span>
+      </a>
+
+      <!-- A* Pathfinding -->
+      <a href="/game-algorithms-java/pathfinding/" class="demo-card reveal">
+        <div class="demo-ascii">S . . # . . .
+. # . # . # .
+. # . . . # .
+. . # # . . .
+# . . . # . G
 </div>
+        <h4>A* Pathfinding</h4>
+        <p class="demo-desc">Draw walls, generate mazes, and watch algorithms find the path</p>
+        <span class="card-link">Launch Demo &rarr;</span>
+      </a>
 
-<main class="max-w-content mx-auto px-6">
-
-  <!-- =============================== -->
-  <!-- HERO -->
-  <!-- =============================== -->
-  <section class="min-h-screen flex flex-col justify-center pt-24 pb-16 relative hero-section-wide">
-    <div class="hero-particles"><canvas id="heroParticleCanvas"></canvas></div>
-    <div class="reveal">
-
-      <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-gold mb-8 hero-load shiny-text">Ranchi &rarr; Sahyadri &rarr; The World</p>
-
-      <!-- Side-by-side: text on left, framed portrait on right -->
-      <div class="hero-wrap">
-        <div class="hero-text-col">
-          <h1 class="hero-headline font-display italic hero-load hero-load-delay" id="heroHeadline">
-            <!-- Invisible placeholder reserves the final layout space so typing never causes layout shift -->
-            <span class="hero-headline-placeholder" aria-hidden="true">I grew up learning to sit with things I didn&rsquo;t understand yet. <span class="hero-headline-em">I still do.</span></span>
-            <!-- Visible typing layer overlaid on top -->
-            <span class="hero-headline-typer">
-              <span id="heroTypeText"></span><span class="hero-headline-em" id="heroTypeTextEm"></span><span class="text-type-cursor" id="heroTypeCursor"></span>
-            </span>
-          </h1>
-
-          <p class="text-lg text-text-muted leading-relaxed mb-10 mt-10 hero-load hero-load-delay2" style="font-weight: 300;">
-            I build systems, perform on stage, and try to make the complex feel human. From Ranchi, shaped by silence, working on things that matter.
-          </p>
-
-          <div class="flex flex-wrap gap-3 hero-load hero-load-delay3">
-            <span class="tag">CS Researcher</span>
-            <span class="tag">Theatre Actor</span>
-            <span class="tag">Builder</span>
-            <span class="tag">Sahyadri School KFI</span>
-          </div>
-        </div>
-
-        <!-- Circular gold-framed portrait -->
-        <div class="portrait-col hero-load hero-load-delay2" id="portraitWrap">
-          <div class="portrait-frame">
-            <div class="portrait-frame-glow"></div>
-            <div class="portrait-frame-ring"></div>
-            <img src="images/portrait-bw.png" alt="Rachit Agrawal" loading="eager" />
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <hr class="section-divider" />
-
-  <!-- =============================== -->
-  <!-- 01 — ABOUT -->
-  <!-- =============================== -->
-  <section class="py-24 md:py-32" id="about">
-    <div class="reveal">
-      <div class="section-label"><span class="shiny-text">01 &mdash; About</span></div>
-
-      <blockquote class="font-display italic text-[clamp(1.8rem,4vw,2.8rem)] leading-[1.2] text-text-primary mb-12" style="font-weight: 300;">
-        <span class="text-type quote-typewriter" data-text="&ldquo;Most people learn in straight lines. I learned under trees.&rdquo;"><span class="text-type-text"></span><span class="text-type-cursor"></span></span>
-      </blockquote>
-
-      <div class="space-y-6 text-text-muted" style="font-weight: 300;">
-        <p>
-          I&rsquo;m a Grade 11 student at Sahyadri School (KFI), Pune &mdash; a boarding school built on the philosophy of Jiddu Krishnamurti, where learning isn&rsquo;t confined to syllabi and growth isn&rsquo;t measured only in grades.
-        </p>
-        <p>
-          My interest in computer science isn&rsquo;t about technology for its own sake. It&rsquo;s about systems &mdash; how they&rsquo;re structured, how decisions propagate through them, and why they break. Game algorithms were my entry point: small enough to fully understand, rich enough to reveal fundamental principles. My research on trust dynamics in multi-agent systems is the natural extension: what happens when the agents inside the system are themselves adaptive, strategic, and potentially deceptive?
-        </p>
-        <p>
-          I think best when I can visualise what&rsquo;s happening. Every project I build includes infrastructure for observation &mdash; not because it&rsquo;s required, but because I don&rsquo;t trust my understanding until I&rsquo;ve watched the system run. Theory describes the map. Empirics show the territory.
-        </p>
-        <p>
-          Outside CS: I act in theatre (lead roles in dramatic Hindi productions), captain my school&rsquo;s handball team, trek at high altitude, and edit two school publications. These aren&rsquo;t separate from my technical work &mdash; they&rsquo;re parallel expressions of the same interest: making complex systems feel human.
-        </p>
-        <p>
-          I&rsquo;m applying to study Computer Science and Mathematics at universities where I can pursue both rigorous theory and hands-on research. I want to work on problems that matter &mdash; and I&rsquo;ve learned that the problems worth solving are rarely the ones that yield quickly.
-        </p>
-      </div>
-
-      <!-- Photo: Sahyadri / Astachal hill -->
-      <div class="mt-12">
-        <div class="photo-slot ratio-16-9">
-          <div class="photo-slot-placeholder">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-            <span>Sahyadri / Astachal</span>
-          </div>
-        </div>
-        <p class="font-mono text-[9px] uppercase tracking-[0.2em] text-text-dim mt-3">Sahyadri School (KFI), Pune</p>
-      </div>
-    </div>
-  </section>
-
-
-  <!-- =============================== -->
-  <!-- 01b — THE JOURNEY (Scroll Timeline) -->
-  <!-- =============================== -->
-  <style>
-    .tl-section { position: relative; padding: 6rem 0; }
-    .tl-wrap { position: relative; max-width: 760px; margin: 0 auto; padding: 0 1.5rem; }
-
-    /* The vertical line */
-    .tl-line { position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: rgba(255,255,255,0.07); transform: translateX(-50%); }
-    .tl-progress { position: absolute; left: 50%; top: 0; width: 1px; height: 0; background: #c9a96e; transform: translateX(-50%); transition: height 0.1s linear; z-index: 1; }
-
-    /* Each timeline item */
-    .tl-item { position: relative; display: flex; align-items: flex-start; margin-bottom: 4rem; }
-    .tl-item:last-child { margin-bottom: 0; }
-
-    /* Alternating sides */
-    .tl-item:nth-child(odd) { flex-direction: row; }
-    .tl-item:nth-child(even) { flex-direction: row-reverse; }
-    .tl-item:nth-child(odd) .tl-content { text-align: right; padding-right: 3rem; padding-left: 0; }
-    .tl-item:nth-child(even) .tl-content { text-align: left; padding-left: 3rem; padding-right: 0; }
-
-    .tl-content { flex: 1; opacity: 0.15; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
-
-    /* The node dot */
-    .tl-node { position: absolute; left: 50%; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: #4a4844; transform: translateX(-50%); z-index: 2; transition: background 0.4s ease, box-shadow 0.4s ease; }
-
-    /* Active state */
-    .tl-item.tl-active .tl-content { opacity: 1; transform: translateY(0); }
-    .tl-item.tl-active .tl-node { background: #c9a96e; box-shadow: 0 0 12px rgba(201,169,110,0.5); }
-
-    /* Visited (scrolled past) */
-    .tl-item.tl-visited .tl-content { opacity: 0.5; transform: translateY(0); }
-    .tl-item.tl-visited .tl-node { background: #c9a96e; box-shadow: none; }
-
-    /* Typography inside timeline */
-    .tl-year { font-family: "DM Mono", monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 0.25em; color: #c9a96e; margin-bottom: 0.4rem; }
-    .tl-title { font-family: "Cormorant Garamond", serif; font-size: 1.35rem; font-weight: 400; font-style: italic; color: #e8e6df; line-height: 1.25; margin-bottom: 0.3rem; }
-    .tl-detail { font-family: "Inter", sans-serif; font-size: 0.8rem; font-weight: 300; color: #8a887f; line-height: 1.5; }
-
-    /* Mobile: line on the left */
-    @media (max-width: 768px) {
-      .tl-line, .tl-progress { left: 16px; transform: none; }
-      .tl-node { left: 16px; transform: translateX(-50%); }
-      .tl-item, .tl-item:nth-child(odd), .tl-item:nth-child(even) { flex-direction: row; }
-      .tl-item:nth-child(odd) .tl-content, .tl-item:nth-child(even) .tl-content { text-align: left; padding-left: 2.5rem; padding-right: 0; }
-    }
-
-    /* Reduced motion */
-    @media (prefers-reduced-motion: reduce) {
-      .tl-content { opacity: 1 !important; transform: none !important; transition: none !important; }
-      .tl-node { transition: none !important; }
-      .tl-item .tl-content { opacity: 0.5; }
-      .tl-item.tl-active .tl-content { opacity: 1; }
-    }
-  </style>
-
-  <section class="tl-section" id="journey">
-    <div class="tl-wrap">
-      <div class="section-label" style="margin-bottom: 4rem;"><span class="shiny-text">02 &mdash; The Journey</span></div>
-
-      <div class="tl-line"></div>
-      <div class="tl-progress" id="tlProgress"></div>
-
-      <div class="tl-item" data-tl>
-        <div class="tl-content"><div class="tl-year">2009</div><div class="tl-title">Born in Ranchi</div><div class="tl-detail">Jharkhand, India</div></div>
-        <div class="tl-node"></div>
-        <div style="flex:1"></div>
-      </div>
-
-      <div class="tl-item" data-tl>
-        <div class="tl-content"><div class="tl-year">2019</div><div class="tl-title">Left home at nine</div><div class="tl-detail">Joined Sahyadri School (KFI), Pune &mdash; Grade 4. Built on the philosophy of Jiddu Krishnamurti.</div></div>
-        <div class="tl-node"></div>
-        <div style="flex:1"></div>
-      </div>
-
-      <div class="tl-item" data-tl>
-        <div class="tl-content"><div class="tl-year">2023</div><div class="tl-title">First high-altitude trek</div><div class="tl-detail">Pandav Patthar &mdash; 12,500 ft. The same attention Astachal trains is required at altitude.</div></div>
-        <div class="tl-node"></div>
-        <div style="flex:1"></div>
-      </div>
-
-      <div class="tl-item" data-tl>
-        <div class="tl-content"><div class="tl-year">2023</div><div class="tl-title">Community immersion</div><div class="tl-detail">Lok Biradari Prakalp, Hemalkasa &middot; Anandvan Ashram &mdash; teaching without assumptions.</div></div>
-        <div class="tl-node"></div>
-        <div style="flex:1"></div>
-      </div>
-
-      <div class="tl-item" data-tl>
-        <div class="tl-content"><div class="tl-year">2024</div><div class="tl-title">Became &ldquo;the old man&rdquo;</div><div class="tl-detail">Cast as an old man in a school play. In one rehearsal, the character clicked. My teacher started crying too.</div></div>
-        <div class="tl-node"></div>
-        <div style="flex:1"></div>
-      </div>
-
-      <div class="tl-item" data-tl>
-        <div class="tl-content"><div class="tl-year">2024</div><div class="tl-title">Vriksha</div><div class="tl-detail">Lead role as Pandya Ji. Half the audience was in tears. Does greed get in the way of human connection?</div></div>
-        <div class="tl-node"></div>
-        <div style="flex:1"></div>
-      </div>
-
-      <div class="tl-item" data-tl>
-        <div class="tl-content"><div class="tl-year">2024</div><div class="tl-title">Lifeline wins Hilltop Entrepreneur</div><div class="tl-detail">Refugee communication app &mdash; won Sahyadri&rsquo;s school Shark Tank. Presented before the entire assembly.</div></div>
-        <div class="tl-node"></div>
-        <div style="flex:1"></div>
-      </div>
-
-      <div class="tl-item" data-tl>
-        <div class="tl-content"><div class="tl-year">2024</div><div class="tl-title">Bali Pass</div><div class="tl-detail">16,000 ft, Uttarakhand.</div></div>
-        <div class="tl-node"></div>
-        <div style="flex:1"></div>
-      </div>
-
-      <div class="tl-item" data-tl>
-        <div class="tl-content"><div class="tl-year">2024</div><div class="tl-title">ICSE: 99%</div><div class="tl-detail">Physics 100 &middot; Biology 100 &middot; Maths 99 &middot; CS 99</div></div>
-        <div class="tl-node"></div>
-        <div style="flex:1"></div>
-      </div>
-
-      <div class="tl-item" data-tl>
-        <div class="tl-content"><div class="tl-year">2024</div><div class="tl-title">Lead Editor</div><div class="tl-detail">Tiwai Tales (newsletter) &amp; Ninad &rsquo;26 (annual magazine). Content, design, publication.</div></div>
-        <div class="tl-node"></div>
-        <div style="flex:1"></div>
-      </div>
-
-      <div class="tl-item" data-tl>
-        <div class="tl-content"><div class="tl-year">2024</div><div class="tl-title">Research begins</div><div class="tl-detail">Polygence &mdash; game-theoretic trust modelling in multi-agent systems.</div></div>
-        <div class="tl-node"></div>
-        <div style="flex:1"></div>
-      </div>
-
-      <div class="tl-item" data-tl>
-        <div class="tl-content"><div class="tl-year">2025</div><div class="tl-title">Ashoka Young Scholars</div><div class="tl-detail">Ten days in Gurgaon. Met Prof. Sudheendra Hangal (Stanford CS). Reframed how I think about problem-solving.</div></div>
-        <div class="tl-node"></div>
-        <div style="flex:1"></div>
-      </div>
-
-      <div class="tl-item" data-tl>
-        <div class="tl-content"><div class="tl-year">2025</div><div class="tl-title">Paper published</div><div class="tl-detail">&ldquo;From Game-Theoretic Poker to the Collapse of Trust: Modelling Strategic Behaviour in Multi-Agent Systems&rdquo;</div></div>
-        <div class="tl-node"></div>
-        <div style="flex:1"></div>
-      </div>
-
-      <div class="tl-item" data-tl>
-        <div class="tl-content"><div class="tl-year">2025</div><div class="tl-title">Game Algorithms Engine</div><div class="tl-detail">Interactive visualisers, empirical benchmarks, and the finding that changed how I think about efficiency.</div></div>
-        <div class="tl-node"></div>
-        <div style="flex:1"></div>
-      </div>
+      <!-- Mastermind -->
+      <a href="/game-algorithms-java/mastermind/" class="demo-card reveal">
+        <div class="demo-ascii">R G B Y  | ** .
+B Y R G  | *  ..
+G R Y B  | *** .
+R Y G B  | ****</div>
+        <h4>Mastermind</h4>
+        <p class="demo-desc">Break codes or watch the AI eliminate 82% of candidates per guess</p>
+        <span class="card-link">Launch Demo &rarr;</span>
+      </a>
 
     </div>
-  </section>
+  </div>
+</section>
 
-  <script>
-  (function() {
-    var items = document.querySelectorAll('[data-tl]');
-    var progress = document.getElementById('tlProgress');
-    var section = document.getElementById('journey');
-    if (!items.length || !progress || !section) return;
 
-    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+<!-- ============================================================
+     04 — THE QUESTION
+     ============================================================ -->
+<section class="section" id="question">
+  <div class="container">
+    <div class="section-label reveal">04 &mdash; The Question</div>
 
-    // Intersection Observer — activates items near viewport center
-    var activeIndex = -1;
-    var observer = new IntersectionObserver(function(entries) {
-      entries.forEach(function(entry) {
-        var idx = Array.prototype.indexOf.call(items, entry.target);
-        if (entry.isIntersecting) {
-          // Mark this and all above as at least visited
-          for (var i = 0; i <= idx; i++) {
-            items[i].classList.add('tl-visited');
-            items[i].classList.remove('tl-active');
-          }
-          // Mark current as active
-          entry.target.classList.add('tl-active');
-          entry.target.classList.remove('tl-visited');
-          activeIndex = idx;
-          // Items below: remove classes
-          for (var j = idx + 1; j < items.length; j++) {
-            items[j].classList.remove('tl-visited', 'tl-active');
-          }
-        }
-      });
-    }, { threshold: 0.3, rootMargin: '-20% 0px -40% 0px' });
+    <div class="narrative reveal">
+      <p>Every game encodes a decision problem. Tic Tac Toe asks: can you see far enough ahead? N-Queens asks: can you eliminate contradictions early enough? Connect 4 asks: can you prune the irrelevant? Mastermind asks: can you extract maximum information from minimum data?</p>
+      <p>This project doesn't just implement algorithms&nbsp;&mdash; it asks when each approach breaks down, and why. The central finding: an algorithm's real-world efficiency depends not on theoretical complexity alone, but on the ratio between the cost of its optimization strategy and the savings that strategy produces.</p>
+      <p>Alpha-beta pruning costs almost nothing and saves exponentially. Forward checking costs a lot per step and saves only linearly. The math looks different. The truth is in the benchmarks.</p>
+    </div>
+  </div>
+</section>
 
-    items.forEach(function(item) { observer.observe(item); });
 
-    // Scroll-linked progress line
-    var ticking = false;
-    function updateProgress() {
-      var rect = section.getBoundingClientRect();
-      var sectionTop = rect.top + window.scrollY;
-      var sectionHeight = rect.height;
-      var scrollY = window.scrollY + window.innerHeight * 0.4;
-      var ratio = Math.max(0, Math.min(1, (scrollY - sectionTop) / sectionHeight));
-      progress.style.height = (ratio * 100) + '%';
-      ticking = false;
-    }
+<!-- ============================================================
+     05 — METHODOLOGY
+     ============================================================ -->
+<section class="section" id="methodology">
+  <div class="container">
+    <div class="section-label reveal">05 &mdash; Methodology</div>
 
-    window.addEventListener('scroll', function() {
-      if (!ticking) { requestAnimationFrame(updateProgress); ticking = true; }
-    }, { passive: true });
-    updateProgress();
-
-    // If reduced motion, show all
-    if (reduced) {
-      items.forEach(function(item) { item.classList.add('tl-visited'); });
-    }
-  })();
-  </script>
-
-  <hr class="section-divider" />
-
-  <!-- =============================== -->
-  <!-- 03 — WHY GAME ALGORITHMS? -->
-  <!-- =============================== -->
-  <section class="py-24 md:py-32" id="why">
-    <div class="reveal">
-      <div class="section-label"><span class="shiny-text">03 &mdash; Why Game Algorithms?</span></div>
-
-      <h2 class="font-display italic text-[clamp(1.8rem,4vw,2.6rem)] leading-[1.2] text-text-primary mb-10" style="font-weight: 300;">
-        Games are the smallest environments where the hardest problems in computer science appear in their purest form.
-      </h2>
-
-      <div class="space-y-6 text-text-muted" style="font-weight: 300;">
-        <p>
-          A chess engine doesn&rsquo;t just play chess &mdash; it makes sequential decisions under uncertainty, optimises across exponentially large search spaces, and manages the fundamental tradeoff between exploration and exploitation. These are the same problems that power autonomous vehicles, trading algorithms, and AI systems operating in the real world.
-        </p>
-        <p>
-          I use games as laboratories. The goal isn&rsquo;t entertainment &mdash; it&rsquo;s to study decision-making, constraint satisfaction, and adversarial reasoning in environments where I can control every variable, measure every outcome, and actually understand what&rsquo;s happening inside the system.
-        </p>
-        <p class="text-text-primary italic" style="font-style: italic;">
-          The most interesting findings rarely come from theory alone. They come from running the algorithm, watching it behave, and asking: <span class="text-gold not-italic" style="font-style: normal;">why did that happen?</span>
-        </p>
+    <div class="method-grid reveal">
+      <div class="method-item">
+        <h4>Java</h4>
+        <p>Algorithm implementations with empirical benchmarks</p>
+      </div>
+      <div class="method-item">
+        <h4>Vanilla JavaScript</h4>
+        <p>Interactive visualizations, no frameworks</p>
+      </div>
+      <div class="method-item">
+        <h4>HTML5 Canvas / DOM</h4>
+        <p>Real-time algorithm animation</p>
+      </div>
+      <div class="method-item">
+        <h4>Empirical Analysis</h4>
+        <p>Stochastic averaging, controlled experiments</p>
       </div>
     </div>
-  </section>
 
-  <hr class="section-divider" />
+    <a href="https://github.com/rachit-agrawal/game-algorithms-java" target="_blank" rel="noopener noreferrer" class="source-link reveal">View Source on GitHub &rarr;</a>
+  </div>
+</section>
 
-  <!-- =============================== -->
-  <!-- 04 — PROJECTS -->
-  <!-- =============================== -->
-  <section class="py-24 md:py-32" id="projects">
-    <div class="reveal">
-      <div class="section-label"><span class="shiny-text">04 &mdash; Projects</span></div>
 
-      <p class="text-text-primary text-lg mb-12" style="font-weight: 300;">
-        Three projects exploring how decision-making works &mdash; and where it breaks &mdash; through games used as controlled environments.
-      </p>
-
-      <!-- Featured spike: Game Algorithms Engine -->
-      <div class="bg-surface p-8 md:p-10 border border-border my-2 project-featured mb-12">
-        <span class="featured-badge">Featured Project</span>
-        <div class="flex flex-wrap gap-2 mb-4">
-          <span class="tag">Java</span>
-          <span class="tag">Algorithms</span>
-          <span class="tag">AI</span>
-          <span class="tag">Interactive Demos</span>
-        </div>
-        <h3 class="font-display text-2xl text-text-primary mb-3" style="font-weight: 400;">Game Algorithms Engine</h3>
-        <p class="text-text-muted text-sm mb-4" style="font-weight: 300;">
-          Implementations of minimax with alpha-beta pruning (Connect 4), constraint satisfaction solvers (N-Queens), and entropy-based search (Mastermind) &mdash; each with interactive HTML visualisers and empirical benchmarks. Built to explore how strategic decision-making emerges in constrained systems &mdash; and how it breaks.
-        </p>
-        <p class="text-text-muted text-sm mb-6" style="font-weight: 300;">
-          The most interesting finding: an algorithm&rsquo;s real-world efficiency depends not on theoretical complexity alone, but on the ratio between the cost of its optimisation strategy and the savings that strategy produces.
-        </p>
-        <div class="flex flex-wrap gap-4">
-          <a href="projects.html" class="font-mono text-[10px] uppercase tracking-[0.2em] text-gold hover:text-text-primary transition-colors duration-300 link-anim">Read Full Project Details &rarr;</a>
-          <a href="https://github.com/RachitAgrawal146/game-algorithms-java" target="_blank" rel="noopener noreferrer" class="font-mono text-[10px] uppercase tracking-[0.2em] text-gold hover:text-text-primary transition-colors duration-300 link-anim">Source Code &nearr;</a>
-          <a href="/game-algorithms-java/algorithms/" target="_blank" rel="noopener noreferrer" class="font-mono text-[10px] uppercase tracking-[0.2em] text-gold hover:text-text-primary transition-colors duration-300 link-anim">Interactive Demos &rarr;</a>
-        </div>
-      </div>
-
-      <!-- Three sub-projects (brief intros) -->
-      <div class="space-y-1">
-        <div class="project-card">
-          <div class="flex flex-wrap gap-2 mb-3">
-            <span class="tag">Adversarial Search</span>
-            <span class="tag">Minimax</span>
-            <span class="tag">Alpha-Beta</span>
-          </div>
-          <h3 class="font-display text-xl text-text-primary mb-2" style="font-weight: 400;">Connect 4 &mdash; Adversarial Search</h3>
-          <p class="text-text-muted text-sm" style="font-weight: 300;">
-            Minimax with alpha-beta pruning reduces a 282-billion-node search tree to ~530,000 nodes at depth 10. The interesting question wasn&rsquo;t whether pruning works &mdash; it was where the cost of being clever exceeds its savings.
-          </p>
-        </div>
-
-        <div class="project-card">
-          <div class="flex flex-wrap gap-2 mb-3">
-            <span class="tag">Constraint Satisfaction</span>
-            <span class="tag">Backtracking</span>
-            <span class="tag">Forward Checking</span>
-          </div>
-          <h3 class="font-display text-xl text-text-primary mb-2" style="font-weight: 400;">N-Queens &mdash; Constraint Propagation</h3>
-          <p class="text-text-muted text-sm" style="font-weight: 300;">
-            Forward-checking constraint propagation collapses a 14.2-million-configuration search into 8,400 evaluations &mdash; a 1,700&times; reduction. The visualiser revealed how early placements create bottlenecks that aren&rsquo;t in any textbook.
-          </p>
-        </div>
-
-        <div class="project-card" style="border-bottom: none;">
-          <div class="flex flex-wrap gap-2 mb-3">
-            <span class="tag">Information Theory</span>
-            <span class="tag">Entropy Search</span>
-          </div>
-          <h3 class="font-display text-xl text-text-primary mb-2" style="font-weight: 400;">Mastermind &mdash; Entropy-Based Search</h3>
-          <p class="text-text-muted text-sm" style="font-weight: 300;">
-            Two strategies compared: simple constraint filtering (avg 4.5 guesses) versus Knuth-style entropy maximisation (avg 4.2 guesses, worst case 5). The entropy approach often produces &ldquo;non-obvious&rdquo; guesses &mdash; objectively optimal but counterintuitive to humans.
-          </p>
-        </div>
-      </div>
-
-      <div class="mt-10">
-        <a href="projects.html" class="font-mono text-[10px] uppercase tracking-[0.2em] text-gold hover:text-text-primary transition-colors duration-300 link-anim">Read all three projects in detail &rarr;</a>
-      </div>
-    </div>
-  </section>
-
-  <hr class="section-divider" />
-
-  <!-- =============================== -->
-  <!-- 05 — HOW I APPROACH PROBLEMS -->
-  <!-- =============================== -->
-  <section class="py-24 md:py-32" id="approach">
-    <div class="reveal">
-      <div class="section-label"><span class="shiny-text">05 &mdash; How I Approach Problems</span></div>
-
-      <div class="space-y-10">
-        <div>
-          <h3 class="font-display italic text-2xl text-text-primary mb-3" style="font-weight: 400;">Start with the structure, not the code.</h3>
-          <p class="text-text-muted" style="font-weight: 300;">
-            Before writing any implementation, I map the problem space: What are the constraints? What&rsquo;s the branching factor? Where does complexity actually come from? The code is the last step &mdash; understanding is the first.
-          </p>
-        </div>
-
-        <div>
-          <h3 class="font-display italic text-2xl text-text-primary mb-3" style="font-weight: 400;">Build to observe, not just to solve.</h3>
-          <p class="text-text-muted" style="font-weight: 300;">
-            Every project includes visualisation infrastructure: not as a feature, but as a debugging and understanding tool. I&rsquo;ve learned more from watching algorithms behave unexpectedly than from reading about how they should behave.
-          </p>
-        </div>
-
-        <div>
-          <h3 class="font-display italic text-2xl text-text-primary mb-3" style="font-weight: 400;">Measure, don&rsquo;t assume.</h3>
-          <p class="text-text-muted" style="font-weight: 300;">
-            Theoretical complexity tells you the shape of a problem. Empirical benchmarking tells you what actually happens. I build measurement into every system: nodes evaluated, time elapsed, pruning rates, convergence behaviour. The numbers often contradict expectations &mdash; and that&rsquo;s where learning happens.
-          </p>
-        </div>
-
-        <div>
-          <h3 class="font-display italic text-2xl text-text-primary mb-3" style="font-weight: 400;">Look for cross-system patterns.</h3>
-          <p class="text-text-muted" style="font-weight: 300;">
-            The most useful insight from this project didn&rsquo;t come from any single algorithm &mdash; it came from comparing all three. Each used a different optimisation strategy (pruning, propagation, entropy-based search), and each demonstrated the same principle: optimisation has overhead, and overhead must be justified by savings.
-          </p>
-          <p class="text-gold mt-4 italic" style="font-weight: 300;">
-            This meta-pattern &mdash; that the cost of being clever is itself a variable to optimise &mdash; now shapes how I think about every system I design.
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <hr class="section-divider" />
-
-  <!-- =============================== -->
-  <!-- 06 — WHERE THIS COULD GO -->
-  <!-- =============================== -->
-  <section class="py-24 md:py-32" id="extension">
-    <div class="reveal">
-      <div class="section-label"><span class="shiny-text">06 &mdash; Where This Could Go</span></div>
-
-      <p class="text-text-primary text-lg mb-12" style="font-weight: 300;">
-        These implementations are complete as learning tools. If I were to scale them into production-grade systems, here&rsquo;s what would change.
-      </p>
-
-      <div class="space-y-12">
-        <div>
-          <p class="font-mono text-[9px] uppercase tracking-[0.25em] text-gold mb-4">Performance Layer</p>
-          <ul class="space-y-3 text-text-muted text-sm" style="font-weight: 300;">
-            <li class="flex gap-3"><span class="text-gold">&rsaquo;</span><span>Move core algorithms to C++ or Rust for memory-efficient game tree traversal</span></li>
-            <li class="flex gap-3"><span class="text-gold">&rsaquo;</span><span>Implement iterative deepening with transposition tables for Connect 4 (cache repeated positions across search branches)</span></li>
-            <li class="flex gap-3"><span class="text-gold">&rsaquo;</span><span>Parallelise N-Queens constraint propagation across multiple workers for N &gt; 20</span></li>
-          </ul>
-        </div>
-
-        <div>
-          <p class="font-mono text-[9px] uppercase tracking-[0.25em] text-gold mb-4">Architecture Layer</p>
-          <ul class="space-y-3 text-text-muted text-sm" style="font-weight: 300;">
-            <li class="flex gap-3"><span class="text-gold">&rsaquo;</span><span>Decouple game logic from visualisation into a proper MVC structure</span></li>
-            <li class="flex gap-3"><span class="text-gold">&rsaquo;</span><span>Build a unified benchmark harness that compares algorithms across games using standardised metrics (nodes/second, pruning efficiency, solve time)</span></li>
-            <li class="flex gap-3"><span class="text-gold">&rsaquo;</span><span>Expose algorithms via API for integration into larger systems</span></li>
-          </ul>
-        </div>
-
-        <div>
-          <p class="font-mono text-[9px] uppercase tracking-[0.25em] text-gold mb-4">AI Integration</p>
-          <ul class="space-y-3 text-text-muted text-sm" style="font-weight: 300;">
-            <li class="flex gap-3"><span class="text-gold">&rsaquo;</span><span>Replace hand-coded heuristics in Connect 4 with learned evaluation functions (supervised learning on expert games, or self-play reinforcement learning)</span></li>
-            <li class="flex gap-3"><span class="text-gold">&rsaquo;</span><span>Use Monte Carlo Tree Search (MCTS) as a comparison baseline &mdash; especially relevant since MCTS powers modern game AI (AlphaGo, MuZero)</span></li>
-            <li class="flex gap-3"><span class="text-gold">&rsaquo;</span><span>For Mastermind: experiment with neural network-based guessing policies trained on information-gain maximisation</span></li>
-          </ul>
-        </div>
-
-        <div>
-          <p class="font-mono text-[9px] uppercase tracking-[0.25em] text-gold mb-4">Multi-User &amp; Real-Time</p>
-          <ul class="space-y-3 text-text-muted text-sm" style="font-weight: 300;">
-            <li class="flex gap-3"><span class="text-gold">&rsaquo;</span><span>Real-time multiplayer Connect 4 with server-side AI opponents at selectable difficulty (depth limits)</span></li>
-            <li class="flex gap-3"><span class="text-gold">&rsaquo;</span><span>Collaborative N-Queens solver: multiple users place queens simultaneously, with live constraint visualisation showing how each placement affects others</span></li>
-            <li class="flex gap-3"><span class="text-gold">&rsaquo;</span><span>Mastermind tournaments: human vs. human, human vs. AI, AI vs. AI &mdash; with Elo-style rating to quantify strategy strength</span></li>
-          </ul>
-        </div>
-      </div>
-
-      <p class="text-text-muted italic mt-12" style="font-weight: 300;">
-        These extensions aren&rsquo;t hypothetical wish-lists &mdash; they&rsquo;re engineering steps I understand how to take. The current projects are proof of concept. The next stage is system design.
-      </p>
-    </div>
-  </section>
-
-  <hr class="section-divider" />
-
-  <!-- =============================== -->
-  <!-- 07 — ACHIEVEMENTS -->
-  <!-- =============================== -->
-  <section class="py-24 md:py-32" id="achievements">
-    <div class="reveal">
-      <div class="section-label"><span class="shiny-text">07 &mdash; Academics &amp; Recognition</span></div>
-
-      <div class="space-y-10">
-
-        <div>
-          <p class="font-mono text-[9px] uppercase tracking-[0.25em] text-gold mb-3">ICSE Board Examinations &middot; 2024</p>
-          <h3 class="font-display text-xl text-text-primary mb-2" style="font-weight: 400;">Aggregate: 99%</h3>
-          <p class="text-text-muted text-sm" style="font-weight: 300;">
-            Physics 100 &middot; Biology 100 &middot; Mathematics 99 &middot; Computer Science 99. Top academic performance in national standardised examinations.
-          </p>
-        </div>
-
-        <div>
-          <p class="font-mono text-[9px] uppercase tracking-[0.25em] text-gold mb-3">Ashoka Young Scholars Programme &middot; 2025</p>
-          <h3 class="font-display text-xl text-text-primary mb-2" style="font-weight: 400;">Selected for competitive ten-day residential programme</h3>
-          <p class="text-text-muted text-sm" style="font-weight: 300;">
-            Technology, Data &amp; Computer Science track. Engaged with faculty seminars on AI, privacy, and data-driven decision-making. Connected with Prof. Sudheendra Hangal (Stanford CS), whose recommended reading (<em class="text-text-primary not-italic">Thinking Fast and Slow</em>, <em class="text-text-primary not-italic">How to Solve It</em>) directly shaped my approach to problem decomposition.
-          </p>
-        </div>
-
-        <div>
-          <p class="font-mono text-[9px] uppercase tracking-[0.25em] text-gold mb-3">Polygence Research Publication &middot; 2025</p>
-          <h3 class="font-display italic text-xl text-text-primary mb-2" style="font-weight: 400;">From Game-Theoretic Poker to the Collapse of Trust</h3>
-          <p class="text-text-muted text-sm mb-2" style="font-weight: 300;">
-            Modelling Strategic Behaviour in Multi-Agent Systems
-          </p>
-          <p class="text-text-muted text-sm" style="font-weight: 300;">
-            Independent research using Kuhn Poker as a formal environment to study trust dynamics among adaptive agents. Connects to active questions in AI safety and multi-agent coordination.
-          </p>
-        </div>
-
-        <div>
-          <p class="font-mono text-[9px] uppercase tracking-[0.25em] text-gold mb-3">Hilltop Entrepreneur &middot; 1st Place &middot; 2024</p>
-          <h3 class="font-display text-xl text-text-primary mb-2" style="font-weight: 400;">Lifeline &mdash; AI-equipped communication app for civilians in conflict zones</h3>
-          <p class="text-text-muted text-sm" style="font-weight: 300;">
-            Won Sahyadri School&rsquo;s Shark Tank competition. Presented before the full school assembly.
-          </p>
-        </div>
-
-        <div>
-          <p class="font-mono text-[9px] uppercase tracking-[0.25em] text-gold mb-3">UNESCO ESD Certification</p>
-          <p class="text-text-muted text-sm" style="font-weight: 300;">
-            Sustainable construction training at Hunnarshala Foundation, Bhuj.
-          </p>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <hr class="section-divider" />
-
-  <!-- =============================== -->
-  <!-- 04 — THEATRE -->
-  <!-- =============================== -->
-  <section class="py-24 md:py-32" id="theatre">
-    <div class="reveal">
-      <div class="section-label"><span class="shiny-text">08 &mdash; Theatre</span></div>
-
-      <p class="text-text-primary text-lg mb-8" style="font-weight: 300;">
-        This is not a hobby. Each play was chosen because it had something to say. The stage as a social tool &mdash; for ideas that wouldn&rsquo;t otherwise reach the people who needed to hear them.
-      </p>
-
-      <div class="bg-surface p-8 md:p-10 border border-border mb-12">
-        <p class="font-mono text-[9px] uppercase tracking-[0.2em] text-text-dim mb-5">The Origin</p>
-        <p class="text-text-muted" style="font-weight: 300;">
-          In 9th grade, I was cast as an old man &mdash; partly because my Hindi was strong enough. In one rehearsal, something clicked. I realised the character was exactly like someone I&rsquo;d spent years watching closely: wise and childish at the same time. I started crying in the middle of a sad scene. My teacher, who was directing, started crying too. That was the day I became the old man of the school.
-        </p>
-      </div>
-
-      <!-- Productions table -->
-      <table class="theatre-table">
-        <thead>
-          <tr>
-            <th>Play</th>
-            <th>Role</th>
-            <th>Genre</th>
-            <th class="text-right">Watch</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="font-display text-lg text-text-primary" style="font-weight: 400;">Vriksha</td>
-            <td class="text-sm text-text-muted">Lead: Pandya Ji</td>
-            <td class="text-sm text-text-muted">Dramatic Hindi</td>
-            <td class="text-right">
-              <a href="https://youtu.be/GBrrRnUvKd4?si=LMiIi-zYoKtlLzdv" target="_blank" rel="noopener noreferrer" class="font-mono text-[10px] uppercase tracking-[0.15em] text-gold hover:text-text-primary transition-colors">YouTube &nearr;</a>
-            </td>
-          </tr>
-          <tr>
-            <td class="font-display text-lg text-text-primary" style="font-weight: 400;">Anyaay</td>
-            <td class="text-sm text-text-muted">Lead: The Farmer</td>
-            <td class="text-sm text-text-muted">Tragic Hindi</td>
-            <td class="text-right"><span class="text-text-dim text-sm">&mdash;</span></td>
-          </tr>
-          <tr>
-            <td class="font-display text-lg text-text-primary" style="font-weight: 400;">Rehearsal</td>
-            <td class="text-sm text-text-muted">Bhojpuri Farmer</td>
-            <td class="text-sm text-text-muted">Comedy Hindi</td>
-            <td class="text-right"><span class="text-text-dim text-sm">&mdash;</span></td>
-          </tr>
-          <tr>
-            <td class="font-display text-lg text-text-primary" style="font-weight: 400;">Twelve Angry Jurors</td>
-            <td class="text-sm text-text-muted">Juror #9</td>
-            <td class="text-sm text-text-muted">Bilingual Thriller</td>
-            <td class="text-right">
-              <a href="https://youtu.be/AY7zaDn7RCo" target="_blank" rel="noopener noreferrer" class="font-mono text-[10px] uppercase tracking-[0.15em] text-gold hover:text-text-primary transition-colors">YouTube &nearr;</a>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <!-- Vriksha expanded -->
-      <div class="mt-12 pl-6 border-l border-gold/20">
-        <p class="font-mono text-[9px] uppercase tracking-[0.2em] text-gold mb-4">Vriksha &mdash; The Full Story</p>
-        <p class="text-text-muted text-sm mb-4" style="font-weight: 300;">
-          A father watches his son turn into a tree. He grieves. The tree produces gold. The family gets rich. They expand their house. The building plans conflict with the tree. They cut it down. Only the granddaughter is human enough to realise what they&rsquo;ve done.
-        </p>
-        <p class="text-text-muted text-sm italic mb-6" style="font-weight: 300;">
-          Half the audience was in tears. The question they went home with: does greed get in the way of human connection?
-        </p>
-        <div class="photo-slot ratio-16-9 mb-6 max-w-[560px]">
-          <img src="images/vriksha.png" alt="Vriksha — stage performance" loading="lazy" />
-        </div>
-        <a href="https://youtu.be/GBrrRnUvKd4?si=LMiIi-zYoKtlLzdv" target="_blank" rel="noopener noreferrer" class="font-mono text-[10px] uppercase tracking-[0.2em] text-gold hover:text-text-primary transition-colors duration-300 link-anim">Watch the Full Performance &nearr;</a>
-      </div>
-
-      <!-- Twelve Angry Jurors expanded -->
-      <div class="mt-12 pl-6 border-l border-gold/20">
-        <p class="font-mono text-[9px] uppercase tracking-[0.2em] text-gold mb-4">Twelve Angry Jurors &mdash; Full Performance</p>
-        <p class="text-text-muted text-sm mb-6" style="font-weight: 300;">
-          A bilingual adaptation of Reginald Rose&rsquo;s courtroom drama. Twelve jurors deliberating a single boy&rsquo;s life &mdash; the only place in theatre where conviction and doubt are the entire stage. I played Juror #9: the old man who sees what nobody else is willing to see.
-        </p>
-        <div class="photo-slot ratio-16-9 mb-6 max-w-[560px]">
-          <img src="images/twelve-angry-jurors.png" alt="Twelve Angry Jurors — stage performance" loading="lazy" />
-        </div>
-        <a href="https://youtu.be/AY7zaDn7RCo" target="_blank" rel="noopener noreferrer" class="font-mono text-[10px] uppercase tracking-[0.2em] text-gold hover:text-text-primary transition-colors duration-300 link-anim">Watch the Full Performance &nearr;</a>
-      </div>
-    </div>
-  </section>
-
-  <hr class="section-divider" />
-
-  <!-- =============================== -->
-  <!-- LEADERSHIP — woven between theatre and beyond -->
-  <!-- =============================== -->
-  <section class="py-24 md:py-32">
-    <div class="reveal">
-      <div class="section-label"><span class="shiny-text">09 &mdash; School Life</span></div>
-
-      <div class="space-y-6">
-        <div class="flex gap-4 items-baseline">
-          <span class="font-mono text-[9px] uppercase tracking-[0.2em] text-text-dim w-20 shrink-0">Editorial</span>
-          <p class="text-text-muted text-sm" style="font-weight: 300;">
-            Lead Editor of <em class="text-text-primary not-italic">Tiwai Tales</em> (school newsletter) and <em class="text-text-primary not-italic">Ninad &rsquo;26</em> (annual magazine). Oversaw content, coordinated student editorial teams, managed design and publication.
-          </p>
-        </div>
-        <div class="flex gap-4 items-baseline">
-          <span class="font-mono text-[9px] uppercase tracking-[0.2em] text-text-dim w-20 shrink-0">Stage</span>
-          <p class="text-text-muted text-sm" style="font-weight: 300;">
-            Emcee for Farewell &rsquo;24. Interviewed <em class="text-text-primary not-italic">Master Manjunath</em> &mdash; known for his role as Swami in <em>Malgudi Days</em> &mdash; on stage before the entire school. A conversation about craft, memory, and what it means to inhabit a character for decades.
-          </p>
-        </div>
-        <div class="flex gap-4 items-baseline">
-          <span class="font-mono text-[9px] uppercase tracking-[0.2em] text-text-dim w-20 shrink-0">Community</span>
-          <p class="text-text-muted text-sm" style="font-weight: 300;">
-            Anchor of the Almabase Committee &mdash; led the initiative to build a digital platform connecting Sahyadri alumni with current students.
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <hr class="section-divider" />
-
-  <!-- =============================== -->
-  <!-- 05 — BEYOND -->
-  <!-- =============================== -->
-  <section class="py-24 md:py-32" id="beyond">
-    <div class="reveal">
-      <div class="section-label"><span class="shiny-text">10 &mdash; Beyond the Screen</span></div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 reveal-stagger">
-
-        <!-- Treks -->
-        <div>
-          <p class="font-mono text-[10px] uppercase tracking-[0.2em] text-gold mb-6">Treks</p>
-          <div class="space-y-5">
-            <div>
-              <p class="text-text-primary text-sm" style="font-weight: 400;">Bali Pass, Uttarakhand</p>
-              <p class="font-mono text-[10px] text-text-dim">16,000 ft &middot; May 2024</p>
-            </div>
-            <div>
-              <p class="text-text-primary text-sm" style="font-weight: 400;">Pandav Patthar</p>
-              <p class="font-mono text-[10px] text-text-dim">12,500 ft &middot; May 2023</p>
-            </div>
-            <div>
-              <p class="text-text-primary text-sm" style="font-weight: 400;">Inme Tons, Uttarakhand</p>
-              <p class="font-mono text-[10px] text-text-dim">April 2023</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Community -->
-        <div>
-          <p class="font-mono text-[10px] uppercase tracking-[0.2em] text-gold mb-6">Community</p>
-          <div class="space-y-5">
-            <div>
-              <p class="text-text-primary text-sm" style="font-weight: 400;">Lok Biradari Prakalp, Hemalkasa</p>
-              <p class="text-text-dim text-xs">Volunteered at tribal school</p>
-            </div>
-            <div>
-              <p class="text-text-primary text-sm" style="font-weight: 400;">Anandvan Ashram</p>
-              <p class="text-text-dim text-xs">Teaching visually impaired students forced me to rethink how I explain ideas without relying on visual intuition. It made me more aware of how much of learning is built on assumptions we don&rsquo;t question.</p>
-            </div>
-            <div>
-              <p class="text-text-primary text-sm" style="font-weight: 400;">UNESCO ESD Certification</p>
-            </div>
-            <div>
-              <p class="text-text-primary text-sm" style="font-weight: 400;">Hunnarshala Foundation, Bhuj</p>
-              <p class="text-text-dim text-xs">Sustainable earthen construction</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Sports -->
-        <div>
-          <p class="font-mono text-[10px] uppercase tracking-[0.2em] text-gold mb-6">Sports</p>
-          <div class="space-y-5">
-            <div>
-              <p class="text-text-primary text-sm" style="font-weight: 400;">Handball Team Captain</p>
-            </div>
-            <div>
-              <p class="text-text-primary text-sm" style="font-weight: 400;">Basketball Camp Conductor</p>
-              <p class="text-text-dim text-xs">Mentored younger students</p>
-            </div>
-            <div>
-              <p class="text-text-primary text-sm" style="font-weight: 400;">Volleyball &amp; Athletics</p>
-              <p class="text-text-dim text-xs">School representation</p>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Trek photo grid -->
-      <div class="mt-16">
-        <p class="font-mono text-[9px] uppercase tracking-[0.2em] text-text-dim mb-4">Mountains</p>
-        <div class="photo-grid-3">
-          <div>
-            <div class="photo-slot ratio-4-3">
-              <!-- Replace with: <img src="images/bali-pass.jpg" alt="Bali Pass" /> -->
-              <div class="photo-slot-placeholder">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-                <span>Bali Pass</span>
-              </div>
-            </div>
-            <p class="font-mono text-[9px] text-text-dim mt-2">16,000 ft</p>
-          </div>
-          <div>
-            <div class="photo-slot ratio-4-3">
-              <img src="images/pandav-patthar.jpg" alt="Pandav Patthar — 12,500 ft" loading="lazy" />
-            </div>
-            <p class="font-mono text-[9px] text-text-dim mt-2">12,500 ft</p>
-          </div>
-          <div>
-            <div class="photo-slot ratio-4-3">
-              <!-- Replace with: <img src="images/inme-tons.jpg" alt="Inme Tons" /> -->
-              <div class="photo-slot-placeholder">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-                <span>Inme Tons</span>
-              </div>
-            </div>
-            <p class="font-mono text-[9px] text-text-dim mt-2">Uttarakhand</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Community immersion photo -->
-      <div class="mt-12">
-        <p class="font-mono text-[9px] uppercase tracking-[0.2em] text-text-dim mb-4">Community</p>
-        <div class="photo-slot ratio-16-9 max-w-[640px]">
-          <!-- Replace with: <img src="images/anandvan.jpg" alt="Anandvan Ashram" /> -->
-          <div class="photo-slot-placeholder">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-            <span>Anandvan Ashram &middot; Hemalkasa</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <hr class="section-divider" />
-
-  <!-- =============================== -->
-  <!-- 06 — CURRENTLY -->
-  <!-- =============================== -->
-  <section class="py-24 md:py-32" id="currently">
-    <div class="reveal">
-      <div class="section-label"><span class="shiny-text">11 &mdash; Currently</span></div>
-
-      <div class="currently-box">
-        <div class="thought-rotate" id="thoughtRotate">
-          <p class="thought-item thought-active">
-            <span class="thought-mark">&ldquo;</span>What happens when you design AI systems to cooperate &mdash; but cooperation itself becomes the exploit?<span class="thought-mark">&rdquo;</span>
-          </p>
-          <p class="thought-item">
-            <span class="thought-mark">&ldquo;</span>I keep thinking about how Vriksha&rsquo;s audience saw greed on stage and recognised it in themselves. Theatre as a mirror, not a lesson.<span class="thought-mark">&rdquo;</span>
-          </p>
-          <p class="thought-item">
-            <span class="thought-mark">&ldquo;</span>Sahyadri taught me that slowness is not the opposite of ambition. It might be the precondition for it.<span class="thought-mark">&rdquo;</span>
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <hr class="section-divider" />
-
-  <!-- =============================== -->
-  <!-- 07 — WRITING -->
-  <!-- =============================== -->
-  <section class="py-24 md:py-32" id="writing">
-    <div class="reveal">
-      <div class="section-label"><span class="shiny-text">12 &mdash; Writing</span></div>
-
-      <div class="writing-piece" style="border-bottom: none;">
-        <div>
-          <p class="text-text-primary mb-1" style="font-weight: 400;">I spent a year studying how trust breaks down in repeated games &mdash; and why cooperation fails even when everyone knows better.</p>
-          <p class="text-text-dim text-xs">A plain-language version of the research paper</p>
-        </div>
-        <span class="font-mono text-[9px] uppercase tracking-[0.15em] text-text-dim whitespace-nowrap">Coming</span>
-      </div>
-    </div>
-  </section>
-
-  <hr class="section-divider" />
-
-  <!-- =============================== -->
-  <!-- 08 — CONTACT -->
-  <!-- =============================== -->
-  <section class="py-24 md:py-32" id="contact">
-    <div class="reveal">
-      <div class="section-label"><span class="shiny-text">13 &mdash; Contact</span></div>
-
-      <h2 class="font-display italic text-[clamp(2.5rem,6vw,4rem)] leading-[1.1] text-text-primary mb-6" style="font-weight: 300;">
-        Let&rsquo;s talk.
-      </h2>
-
-      <p class="text-text-muted text-lg mb-12" style="font-weight: 300;">
-        I&rsquo;m always interested in research collaborations, interesting problems, and conversations that don&rsquo;t have easy answers.
-      </p>
-
-      <div class="space-y-4">
-        <a href="mailto:agrawalrachit146@gmail.com" class="flex items-center gap-3 text-gold hover:text-text-primary transition-colors duration-300 group">
-          <span class="font-mono text-[9px] uppercase tracking-[0.2em] text-text-dim w-12">Email</span>
-          <span class="text-sm" style="font-weight: 300;">agrawalrachit146@gmail.com</span>
-          <span class="text-xs opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
-        </a>
-        <a href="https://youtu.be/GBrrRnUvKd4?si=LMiIi-zYoKtlLzdv" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 text-text-muted hover:text-gold transition-colors duration-300 group">
-          <span class="font-mono text-[9px] uppercase tracking-[0.2em] text-text-dim w-12">Watch</span>
-          <span class="text-sm" style="font-weight: 300;">Vriksha &middot; Twelve Angry Jurors</span>
-          <span class="text-xs opacity-0 group-hover:opacity-100 transition-opacity">&nearr;</span>
-        </a>
-      </div>
-    </div>
-  </section>
-
-</main>
-
-<!-- Footer -->
-<footer class="border-t border-border mt-8">
-  <div class="max-w-content mx-auto px-6 py-12 flex flex-col md:flex-row justify-between items-center gap-4">
-    <p class="font-display italic text-sm text-text-primary">Rachit Agrawal</p>
-    <p class="font-mono text-[9px] uppercase tracking-[0.2em] text-text-dim">&copy; 2025 &middot; All rights reserved</p>
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="site-footer">
+  <div class="container">
+    <p>Game Algorithms Engine &mdash; Built by Rachit Agrawal</p>
+    <p>Sahyadri School (KFI), Pune</p>
+    <p style="margin-top: var(--space-3);"><a href="https://github.com/rachit-agrawal/game-algorithms-java" target="_blank" rel="noopener noreferrer">GitHub</a></p>
+    <p style="margin-top: var(--space-3);">&copy; 2025</p>
   </div>
 </footer>
 
-<!-- Spacer for mobile nav -->
-<div class="h-16 md:hidden"></div>
 
-<!-- =============================== -->
-<!-- JAVASCRIPT -->
-<!-- =============================== -->
+<!-- ============================================================
+     SCRIPTS
+     ============================================================ -->
+<script src="shared/nav.js"></script>
 <script>
-(function() {
+(function () {
   'use strict';
 
-  // --- Nav hide/show on scroll ---
-  const navbar = document.getElementById('navbar');
-  let lastScroll = 0;
-  let ticking = false;
+  // ------------------------------------------------------------------
+  // 1. Scroll Reveal via IntersectionObserver
+  // ------------------------------------------------------------------
+  var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  function updateNav() {
-    const currentScroll = window.scrollY;
-    if (currentScroll <= 80) {
-      navbar.classList.remove('hidden');
-    } else if (currentScroll > lastScroll && currentScroll > 200) {
-      navbar.classList.add('hidden');
-    } else if (currentScroll < lastScroll - 5) {
-      navbar.classList.remove('hidden');
-    }
-    lastScroll = currentScroll;
-    ticking = false;
-  }
+  if (!prefersReducedMotion && 'IntersectionObserver' in window) {
+    var revealElements = document.querySelectorAll('.reveal');
 
-  window.addEventListener('scroll', function() {
-    if (!ticking) {
-      requestAnimationFrame(updateNav);
-      ticking = true;
-    }
-  }, { passive: true });
-
-  // --- Scroll reveal with IntersectionObserver ---
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  if (!prefersReducedMotion) {
-    const observer = new IntersectionObserver(function(entries) {
-      entries.forEach(function(entry) {
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
         if (entry.isIntersecting) {
           entry.target.classList.add('visible');
           observer.unobserve(entry.target);
         }
       });
     }, {
-      threshold: 0.1,
-      rootMargin: '0px 0px -60px 0px'
+      threshold: 0.12,
+      rootMargin: '0px 0px -40px 0px'
     });
 
-    document.querySelectorAll('.reveal').forEach(function(el) {
+    revealElements.forEach(function (el) {
       observer.observe(el);
     });
   } else {
-    document.querySelectorAll('.reveal').forEach(function(el) {
-      el.classList.add('visible');
-    });
-  }
-
-  // --- Active nav link highlight ---
-  const sections = document.querySelectorAll('section[id]');
-  const navLinks = document.querySelectorAll('.desktop-nav a, .mobile-nav a');
-
-  function setActiveLink() {
-    let current = '';
-    sections.forEach(function(section) {
-      const rect = section.getBoundingClientRect();
-      if (rect.top <= 200) {
-        current = section.getAttribute('id');
-      }
-    });
-    navLinks.forEach(function(link) {
-      link.style.color = '';
-      if (link.getAttribute('href') === '#' + current) {
-        link.style.color = '#c9a96e';
-      }
-    });
-  }
-
-  window.addEventListener('scroll', function() {
-    requestAnimationFrame(setActiveLink);
-  }, { passive: true });
-
-  // --- Smooth scroll for anchor links ---
-  document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
-    anchor.addEventListener('click', function(e) {
-      const target = document.querySelector(this.getAttribute('href'));
-      if (target) {
-        e.preventDefault();
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    });
-  });
-
-  // --- Scroll progress bar ---
-  const progressBar = document.getElementById('scrollProgress');
-  if (progressBar) {
-    window.addEventListener('scroll', function() {
-      requestAnimationFrame(function() {
-        const h = document.documentElement;
-        const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
-        progressBar.style.width = pct + '%';
-      });
-    }, { passive: true });
-  }
-
-  // --- Portrait parallax + GOLD BLOB CURSOR (reactbits-style HTML divs + goo) ---
-  const portraitWrap = document.getElementById('portraitWrap');
-  const blobCursor = document.getElementById('blobCursor');
-
-  if (!prefersReducedMotion && blobCursor) {
-    // Sizes from reactbits BlobCursor: [60, 125, 75]
-    // The first blob follows fastest (creates the leading edge),
-    // the others trail at progressively slower speeds, creating a
-    // single morphing blob via the SVG goo filter
-    const blobs = [
-      { el: document.getElementById('blob-1'), size: 22, lerp: 0.32, x: 0, y: 0 },
-      { el: document.getElementById('blob-2'), size: 42, lerp: 0.18, x: 0, y: 0 },
-      { el: document.getElementById('blob-3'), size: 28, lerp: 0.10, x: 0, y: 0 }
-    ];
-    let mouseX = window.innerWidth / 2;
-    let mouseY = window.innerHeight / 2;
-    let active = false;
-
-    document.addEventListener('mousemove', function(e) {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-
-      // Portrait parallax
-      if (portraitWrap) {
-        const px = (e.clientX / window.innerWidth - 0.5) * 8;
-        const py = (e.clientY / window.innerHeight - 0.5) * 8;
-        portraitWrap.style.transform = 'translate(' + px + 'px, ' + py + 'px)';
-      }
-
-      if (!active) {
-        blobCursor.classList.add('active');
-        active = true;
-        blobs.forEach(function(b) { b.x = mouseX; b.y = mouseY; });
-      }
-    });
-
-    document.addEventListener('mouseleave', function() {
-      blobCursor.classList.remove('active');
-      active = false;
-    });
-
-    function renderBlob() {
-      blobs.forEach(function(b) {
-        b.x += (mouseX - b.x) * b.lerp;
-        b.y += (mouseY - b.y) * b.lerp;
-        // Center the blob on its position
-        const tx = b.x - b.size / 2;
-        const ty = b.y - b.size / 2;
-        b.el.style.transform = 'translate3d(' + tx + 'px, ' + ty + 'px, 0)';
-      });
-      requestAnimationFrame(renderBlob);
+    // If reduced motion or no IO support, show everything immediately
+    var all = document.querySelectorAll('.reveal');
+    for (var i = 0; i < all.length; i++) {
+      all[i].classList.add('visible');
     }
-    renderBlob();
   }
 
-  // --- TEXT-TYPE: reactbits-style typewriter ---
-  // Decodes HTML entities, types char-by-char, supports rotating texts
-  function decodeHtml(html) {
-    const txt = document.createElement('textarea');
-    txt.innerHTML = html;
-    return txt.value;
-  }
+  // ------------------------------------------------------------------
+  // 2. Smooth scroll for anchor links
+  // ------------------------------------------------------------------
+  if (!prefersReducedMotion) {
+    document.addEventListener('click', function (e) {
+      var link = e.target.closest('a[href^="#"]');
+      if (!link) return;
 
-  function createTypewriter(textEl, cursorEl, opts) {
-    const texts = opts.texts || [opts.text || ''];
-    const typeSpeed = opts.typeSpeed || 45;
-    const deleteSpeed = opts.deleteSpeed || 25;
-    const pauseAfter = opts.pauseAfter || 2400;
-    const loop = opts.loop !== false;
-    const onComplete = opts.onComplete;
+      var targetId = link.getAttribute('href').slice(1);
+      var target = document.getElementById(targetId);
+      if (!target) return;
 
-    let textIdx = 0;
-    let charIdx = 0;
-    let deleting = false;
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-    function tick() {
-      const current = texts[textIdx];
-      if (!deleting) {
-        charIdx++;
-        textEl.textContent = current.slice(0, charIdx);
-        if (charIdx >= current.length) {
-          if (texts.length === 1 && !loop) {
-            // Single text, done — fade cursor and exit
-            if (onComplete) onComplete();
-            return;
-          }
-          deleting = true;
-          setTimeout(tick, pauseAfter);
-          return;
-        }
-        // Slight pause on punctuation for natural rhythm
-        const ch = current[charIdx - 1];
-        const delay = (ch === '.' || ch === ',' || ch === ';' || ch === '?') ? typeSpeed + 150 : typeSpeed;
-        setTimeout(tick, delay);
-      } else {
-        charIdx--;
-        textEl.textContent = current.slice(0, charIdx);
-        if (charIdx <= 0) {
-          deleting = false;
-          textIdx = (textIdx + 1) % texts.length;
-          setTimeout(tick, 350);
-          return;
-        }
-        setTimeout(tick, deleteSpeed);
-      }
-    }
-    setTimeout(tick, opts.startDelay || 0);
-  }
-
-  // --- HERO: type the single static headline (gray part, then gold part) ---
-  // Layout never shifts because there's an invisible placeholder reserving the full text space
-  (function() {
-    const textEl = document.getElementById('heroTypeText');
-    const emEl = document.getElementById('heroTypeTextEm');
-    const cursorEl = document.getElementById('heroTypeCursor');
-    if (!textEl || !emEl || !cursorEl) return;
-
-    const part1 = 'I grew up learning to sit with things I didn\u2019t understand yet. ';
-    const part2 = 'I still do.';
-
-    if (prefersReducedMotion) {
-      textEl.textContent = part1;
-      emEl.textContent = part2;
-      cursorEl.style.display = 'none';
-      return;
-    }
-
-    createTypewriter(textEl, cursorEl, {
-      text: part1,
-      typeSpeed: 38,
-      loop: false,
-      startDelay: 800,
-      onComplete: function() {
-        // Hold a beat (longer pause) before typing the gold "I still do."
-        createTypewriter(emEl, cursorEl, {
-          text: part2,
-          typeSpeed: 55,
-          loop: false,
-          startDelay: 1200,
-          onComplete: function() {
-            // Fade cursor 1.2s after the whole line is done
-            setTimeout(function() {
-              cursorEl.style.transition = 'opacity 1.2s ease';
-              cursorEl.style.opacity = '0';
-            }, 1200);
-          }
-        });
+      // Update URL without jumping
+      if (history.pushState) {
+        history.pushState(null, '', '#' + targetId);
       }
     });
-  })();
-
-  // --- QUOTES: typewriter triggered when scrolled into view ---
-  (function() {
-    const quotes = document.querySelectorAll('.quote-typewriter');
-    if (!quotes.length) return;
-
-    if (prefersReducedMotion) {
-      quotes.forEach(function(q) {
-        const text = decodeHtml(q.dataset.text);
-        const textEl = q.querySelector('.text-type-text');
-        const cursorEl = q.querySelector('.text-type-cursor');
-        if (textEl) textEl.textContent = text;
-        if (cursorEl) cursorEl.style.display = 'none';
-      });
-      return;
-    }
-
-    const obs = new IntersectionObserver(function(entries) {
-      entries.forEach(function(entry) {
-        if (!entry.isIntersecting) return;
-        const q = entry.target;
-        const text = decodeHtml(q.dataset.text);
-        const textEl = q.querySelector('.text-type-text');
-        const cursorEl = q.querySelector('.text-type-cursor');
-        if (!textEl || !cursorEl) return;
-        createTypewriter(textEl, cursorEl, {
-          text: text,
-          typeSpeed: 35,
-          loop: false,
-          startDelay: 200,
-          onComplete: function() {
-            // Fade out cursor 1s after typing completes
-            setTimeout(function() {
-              cursorEl.style.transition = 'opacity 1.2s ease';
-              cursorEl.style.opacity = '0';
-            }, 1000);
-          }
-        });
-        obs.unobserve(q);
-      });
-    }, { threshold: 0.4, rootMargin: '0px 0px -10% 0px' });
-
-    quotes.forEach(function(q) { obs.observe(q); });
-  })();
-
-  // --- MAGNET EFFECT on links/buttons ---
-  (function() {
-    if (prefersReducedMotion) return;
-    const magnets = document.querySelectorAll('.magnet');
-    const STRENGTH = 0.35;
-    const RADIUS = 80;
-
-    magnets.forEach(function(el) {
-      el.addEventListener('mousemove', function(e) {
-        const rect = el.getBoundingClientRect();
-        const cx = rect.left + rect.width / 2;
-        const cy = rect.top + rect.height / 2;
-        const dx = e.clientX - cx;
-        const dy = e.clientY - cy;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < RADIUS * 2) {
-          el.style.transform = 'translate(' + (dx * STRENGTH) + 'px, ' + (dy * STRENGTH) + 'px)';
-        }
-      });
-      el.addEventListener('mouseleave', function() {
-        el.style.transform = '';
-      });
-    });
-  })();
-
-  // --- Hero ambient gold particles (slow-drifting motes) ---
-  const heroCanvas = document.getElementById('heroParticleCanvas');
-  if (heroCanvas && !prefersReducedMotion) {
-    const hctx = heroCanvas.getContext('2d');
-    const heroSection = heroCanvas.parentElement.parentElement;
-    let hw = 0, hh = 0;
-    const dpr2 = Math.min(window.devicePixelRatio || 1, 2);
-
-    function sizeHero() {
-      const rect = heroSection.getBoundingClientRect();
-      hw = rect.width;
-      hh = rect.height;
-      heroCanvas.width = hw * dpr2;
-      heroCanvas.height = hh * dpr2;
-      heroCanvas.style.width = hw + 'px';
-      heroCanvas.style.height = hh + 'px';
-      hctx.setTransform(1, 0, 0, 1, 0, 0);
-      hctx.scale(dpr2, dpr2);
-    }
-
-    // Slow-drifting motes — like dust catching gold light
-    const motes = [];
-    function initMotes() {
-      motes.length = 0;
-      const count = Math.floor((hw * hh) / 22000); // density-scaled
-      for (let i = 0; i < count; i++) {
-        motes.push({
-          x: Math.random() * hw,
-          y: Math.random() * hh,
-          vx: (Math.random() - 0.5) * 0.15,
-          vy: (Math.random() - 0.3) * 0.12, // slight upward drift
-          r: Math.random() * 1.4 + 0.4,
-          alpha: Math.random() * 0.35 + 0.1,
-          flickerSpeed: Math.random() * 0.002 + 0.001,
-          flickerOffset: Math.random() * Math.PI * 2
-        });
-      }
-    }
-
-    sizeHero();
-    initMotes();
-    window.addEventListener('resize', function() { sizeHero(); initMotes(); });
-
-    function renderHero() {
-      hctx.clearRect(0, 0, hw, hh);
-      const t = performance.now();
-      for (let i = 0; i < motes.length; i++) {
-        const m = motes[i];
-        m.x += m.vx;
-        m.y += m.vy;
-        // Wrap edges
-        if (m.x < -10) m.x = hw + 10;
-        if (m.x > hw + 10) m.x = -10;
-        if (m.y < -10) m.y = hh + 10;
-        if (m.y > hh + 10) m.y = -10;
-
-        const flicker = (Math.sin(t * m.flickerSpeed + m.flickerOffset) + 1) * 0.5;
-        const a = m.alpha * (0.5 + flicker * 0.5);
-
-        const grad = hctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, m.r * 4);
-        grad.addColorStop(0,   'rgba(255, 220, 150, ' + a + ')');
-        grad.addColorStop(0.5, 'rgba(201, 169, 110, ' + (a * 0.4) + ')');
-        grad.addColorStop(1,   'rgba(201, 169, 110, 0)');
-        hctx.fillStyle = grad;
-        hctx.beginPath();
-        hctx.arc(m.x, m.y, m.r * 4, 0, Math.PI * 2);
-        hctx.fill();
-      }
-      requestAnimationFrame(renderHero);
-    }
-    renderHero();
-  }
-
-  // --- Stagger children observer ---
-  const staggerEls = document.querySelectorAll('.reveal-stagger');
-  if (staggerEls.length && !prefersReducedMotion) {
-    const staggerObs = new IntersectionObserver(function(entries) {
-      entries.forEach(function(entry) {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          staggerObs.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.15 });
-    staggerEls.forEach(function(el) { staggerObs.observe(el); });
-  } else {
-    staggerEls.forEach(function(el) { el.classList.add('visible'); });
-  }
-
-  // --- Thought rotation (Currently section) ---
-  const thoughtContainer = document.getElementById('thoughtRotate');
-  if (thoughtContainer) {
-    const thoughts = thoughtContainer.querySelectorAll('.thought-item');
-    let currentThought = 0;
-    setInterval(function() {
-      thoughts[currentThought].classList.remove('thought-active');
-      currentThought = (currentThought + 1) % thoughts.length;
-      thoughts[currentThought].classList.add('thought-active');
-    }, 5000);
   }
 })();
 </script>
-
 </body>
 </html>
