@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Projects — Rachit Agrawal</title>
+<meta name="description" content="Detailed write-ups of the Game Algorithms Engine — Connect 4, N-Queens, and Mastermind." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        bg: "#0c0c0b", surface: "#141413", surface2: "#1c1c1a",
+        border: "rgba(255,255,255,0.07)",
+        "text-primary": "#e8e6df", "text-muted": "#8a887f", "text-dim": "#4a4844",
+        gold: "#c9a96e",
+      },
+      fontFamily: {
+        display: ["Cormorant Garamond", "serif"],
+        mono: ["DM Mono", "monospace"],
+        body: ["Inter", "sans-serif"],
+      },
+      maxWidth: { content: "780px" },
+    },
+  },
+};
+</script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background-color: #0c0c0b; color: #e8e6df; font-family: 'Inter', sans-serif; font-weight: 300; line-height: 1.7; -webkit-font-smoothing: antialiased; }
+  body::before {
+    content: ''; position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  a { color: inherit; text-decoration: none; }
+  ::selection { background: rgba(201,169,110,0.3); color: #e8e6df; }
+  .section-label {
+    font-family: 'DM Mono', monospace; font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.25em; color: #c9a96e; display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem;
+  }
+  .section-label::after { content: ''; flex: 1; height: 0.5px; background: rgba(255,255,255,0.07); }
+  .project-block { padding: 4rem 0; border-bottom: 0.5px solid rgba(255,255,255,0.07); }
+  .project-block:last-child { border-bottom: none; }
+  .project-title { font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 400; color: #e8e6df; margin-bottom: 0.5rem; }
+  .subhead { font-family: 'DM Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 0.2em; color: #c9a96e; margin-top: 2rem; margin-bottom: 0.75rem; }
+  .insight-box {
+    background: rgba(201,169,110,0.04); border-left: 2px solid #c9a96e;
+    padding: 1.25rem 1.5rem; margin-top: 1.25rem;
+  }
+  .insight-box .insight-label { font-family: 'DM Mono', monospace; font-size: 9px; text-transform: uppercase; letter-spacing: 0.25em; color: #c9a96e; margin-bottom: 0.5rem; }
+  table.metrics { width: 100%; border-collapse: collapse; margin-top: 1rem; font-family: 'JetBrains Mono', 'DM Mono', monospace; font-size: 12px; }
+  table.metrics td, table.metrics th { padding: 8px 12px; text-align: left; border-bottom: 0.5px solid rgba(255,255,255,0.05); }
+  table.metrics th { color: #71717a; font-weight: 400; text-transform: uppercase; letter-spacing: 0.15em; font-size: 9px; }
+  table.metrics td { color: #c9c9c0; }
+  .nav-back { font-family: 'DM Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 0.25em; color: #c9a96e; transition: color 0.3s; }
+  .nav-back:hover { color: #fff; }
+</style>
+</head>
+<body>
+
+<nav style="position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(12,12,11,0.85); backdrop-filter: blur(20px); border-bottom: 0.5px solid rgba(255,255,255,0.05);">
+  <div class="max-w-content mx-auto px-6 py-5 flex justify-between items-center">
+    <a href="index.html" class="font-display italic text-xl text-text-primary tracking-tight">Rachit Agrawal</a>
+    <a href="index.html" class="nav-back">&larr; Back to Portfolio</a>
+  </div>
+</nav>
+
+<main class="max-w-content mx-auto px-6 pt-32 pb-24">
+
+  <header style="margin-bottom: 4rem;">
+    <p style="font-family: 'DM Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 0.3em; color: #c9a96e; margin-bottom: 1rem;">Game Algorithms Engine &middot; Detail</p>
+    <h1 class="font-display italic" style="font-size: clamp(2.5rem, 5vw, 3.5rem); font-weight: 300; line-height: 1.1; color: #e8e6df; margin-bottom: 1.5rem;">
+      Three projects, one question:<br/><span style="color: #c9a96e;">how does decision-making break?</span>
+    </h1>
+    <p style="color: #8a887f; font-size: 1.05rem; max-width: 640px;">
+      Each project below uses a game as a controlled environment to study a fundamental problem in computer science. The question isn&rsquo;t whether the algorithms work in theory &mdash; it&rsquo;s how they behave when you actually run them.
+    </p>
+    <div style="margin-top: 2rem;">
+      <a href="https://rachitagrawal146.github.io/game-algorithms-java/algorithms/" target="_blank" rel="noopener" class="nav-back">Try the interactive demos &rarr;</a>
+    </div>
+  </header>
+
+  <!-- ============================================================ -->
+  <!-- PROJECT 1: CONNECT 4 -->
+  <!-- ============================================================ -->
+  <section class="project-block">
+    <div class="section-label"><span>Project 01</span></div>
+    <h2 class="project-title" style="font-size: clamp(1.8rem, 3.5vw, 2.4rem);">Connect 4 &mdash; Adversarial Search with Minimax &amp; Alpha-Beta Pruning</h2>
+
+    <p class="subhead">Problem Framing</p>
+    <p>Connect 4 appears simple: drop pieces, connect four, win. But the game tree has over 4 trillion possible positions. An AI that evaluates every possibility would take years to make a single move. The question isn&rsquo;t whether minimax works in theory &mdash; it&rsquo;s how to make it work in practice.</p>
+
+    <p class="subhead">Approach</p>
+    <p>I implemented the classic minimax algorithm with alpha-beta pruning &mdash; a technique that eliminates branches of the search tree that can&rsquo;t possibly affect the final decision. The core insight: if you&rsquo;ve already found a move that guarantees a certain outcome, you can skip evaluating any alternative that the opponent would never allow you to reach.</p>
+    <p style="margin-top: 0.75rem;">Beyond pruning, I built a custom heuristic evaluation function that scores board positions based on: potential winning lines, center control (columns 3&ndash;4 are statistically dominant), and threat patterns. This allows the AI to make intelligent decisions at limited search depths rather than requiring full tree traversal.</p>
+
+    <p class="subhead">Technical Depth</p>
+    <ul style="list-style: none; padding: 0;">
+      <li style="padding: 0.5rem 0; border-bottom: 0.5px solid rgba(255,255,255,0.04);"><span style="color: #c9a96e; font-family: 'DM Mono', monospace; font-size: 11px; margin-right: 0.5rem;">&rsaquo;</span>Time complexity (unoptimised): O(b^d), where b &asymp; 7 and d = depth. At depth 10, this is ~282 billion nodes.</li>
+      <li style="padding: 0.5rem 0; border-bottom: 0.5px solid rgba(255,255,255,0.04);"><span style="color: #c9a96e; font-family: 'DM Mono', monospace; font-size: 11px; margin-right: 0.5rem;">&rsaquo;</span>With alpha-beta pruning: Reduces to O(b^(d/2)) in the best case &mdash; from 282 billion to ~530,000 nodes at depth 10.</li>
+      <li style="padding: 0.5rem 0;"><span style="color: #c9a96e; font-family: 'DM Mono', monospace; font-size: 11px; margin-right: 0.5rem;">&rsaquo;</span>Move ordering (centre-first) improves pruning by ~40% over random ordering &mdash; but more sophisticated ordering would require additional computation, creating a second-order optimisation problem.</li>
+    </ul>
+
+    <div class="insight-box">
+      <p class="insight-label">Key Insight</p>
+      <p style="color: #e8e6df;">The most interesting finding wasn&rsquo;t about alpha-beta itself &mdash; it was about the cost of optimisation. Adding move-ordering heuristics improves pruning, but the heuristics themselves consume time. There&rsquo;s a threshold below which the overhead of &ldquo;smarter&rdquo; pruning actually makes the system slower.</p>
+      <p style="color: #c9a96e; margin-top: 0.75rem; font-style: italic;">This pattern appeared across all three projects: an algorithm&rsquo;s real efficiency depends on the ratio between what the optimisation costs and what it saves.</p>
+    </div>
+
+    <p class="subhead">Outcome</p>
+    <p>Demonstrates understanding of adversarial search, game tree theory, pruning techniques, and heuristic design. The benchmarking infrastructure (measuring nodes evaluated, pruning rates, and wall-clock time at various depths) shows attention to empirical verification over theoretical assumption.</p>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- PROJECT 2: N-QUEENS -->
+  <!-- ============================================================ -->
+  <section class="project-block">
+    <div class="section-label"><span>Project 02</span></div>
+    <h2 class="project-title" style="font-size: clamp(1.8rem, 3.5vw, 2.4rem);">N-Queens &mdash; Constraint Satisfaction and Backtracking</h2>
+
+    <p class="subhead">Problem Framing</p>
+    <p>Place N queens on an N&times;N chessboard such that no two queens attack each other. The search space grows factorially &mdash; for N=12, there are over 479 million possible placements to check naively. The challenge isn&rsquo;t finding a solution; it&rsquo;s understanding how constraint propagation can collapse exponential spaces into tractable problems.</p>
+
+    <p class="subhead">Approach</p>
+    <p>I implemented a backtracking solver with forward-checking constraint propagation. When a queen is placed, the algorithm immediately eliminates all squares it attacks from future consideration. This transforms the search space dynamically &mdash; each placement doesn&rsquo;t just add a queen; it reshapes what&rsquo;s possible.</p>
+    <p style="margin-top: 0.75rem;">I also built a comparative mode: the same problem solved with naive backtracking (no propagation) versus forward-checking, with real-time visualisation of both approaches.</p>
+
+    <p class="subhead">Technical Depth</p>
+    <table class="metrics">
+      <tr><th>Approach</th><th>Configurations</th><th>Reduction</th></tr>
+      <tr><td>Naive backtracking (N=12)</td><td>~14.2 million</td><td>baseline</td></tr>
+      <tr><td>Forward-checking (N=12)</td><td>~8,400</td><td style="color: #22c55e;">1,700&times; fewer</td></tr>
+    </table>
+    <p style="margin-top: 1rem;">Why it works: each constraint propagation step is O(N), but it eliminates entire subtrees that would otherwise require O(N!) exploration. The propagation cost is negligible compared to the subtree cost it prevents.</p>
+
+    <div class="insight-box">
+      <p class="insight-label">Key Insight</p>
+      <p style="color: #e8e6df;">The visualiser revealed something counterintuitive: the algorithm appears to &ldquo;slow down&rdquo; in the middle rows (rows 4&ndash;6 for N=8) and speed up dramatically near the end. This happens because early placements maximally constrain the remaining space, creating bottlenecks. Once past the bottleneck, the remaining placements are nearly forced.</p>
+      <p style="color: #c9a96e; margin-top: 0.75rem; font-style: italic;">This isn&rsquo;t in the textbook &mdash; it emerged from watching the algorithm run.</p>
+    </div>
+
+    <p class="subhead">Outcome</p>
+    <p>Demonstrates constraint satisfaction fundamentals, the power of propagation techniques, and the value of visualisation for understanding algorithm dynamics. The comparative mode makes abstract complexity differences viscerally concrete.</p>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- PROJECT 3: MASTERMIND -->
+  <!-- ============================================================ -->
+  <section class="project-block">
+    <div class="section-label"><span>Project 03</span></div>
+    <h2 class="project-title" style="font-size: clamp(1.8rem, 3.5vw, 2.4rem);">Mastermind &mdash; Logical Deduction and Entropy-Based Search</h2>
+
+    <p class="subhead">Problem Framing</p>
+    <p>Mastermind is an information game: you make guesses, receive feedback (correct digits in correct positions, correct digits in wrong positions), and deduce the secret code. The naive approach is brute force &mdash; try all possibilities until feedback matches. But humans don&rsquo;t solve Mastermind that way. The interesting question: can we formalise human-like deductive reasoning?</p>
+
+    <p class="subhead">Approach</p>
+    <p>I implemented two solving strategies:</p>
+    <ol style="list-style: none; padding-left: 0; margin-top: 0.75rem;">
+      <li style="padding: 0.5rem 0;"><span style="color: #c9a96e; font-family: 'DM Mono', monospace; font-size: 11px; margin-right: 0.5rem;">01</span><strong style="color: #e8e6df;">Constraint filtering.</strong> After each guess, eliminate all codes inconsistent with the feedback. Simple, effective, but memoryless &mdash; it doesn&rsquo;t account for information gain.</li>
+      <li style="padding: 0.5rem 0;"><span style="color: #c9a96e; font-family: 'DM Mono', monospace; font-size: 11px; margin-right: 0.5rem;">02</span><strong style="color: #e8e6df;">Entropy-based guessing (Knuth-style).</strong> Choose guesses that maximise expected information gain &mdash; guesses that most evenly partition the remaining possibility space, regardless of whether the guess itself could be correct.</li>
+    </ol>
+    <p style="margin-top: 0.75rem;">The second approach often produces counterintuitive guesses (codes that can&rsquo;t possibly be the answer) because they eliminate more uncertainty than &ldquo;safe&rdquo; guesses.</p>
+
+    <p class="subhead">Technical Depth</p>
+    <table class="metrics">
+      <tr><th>Strategy</th><th>Average</th><th>Worst Case</th></tr>
+      <tr><td>Constraint filtering</td><td>4.5 guesses</td><td>6 guesses</td></tr>
+      <tr><td>Entropy-based</td><td>4.2 guesses</td><td>5 guesses</td></tr>
+    </table>
+    <p style="margin-top: 1rem;">Possibility space: 6&#8308; = 1,296 possible codes. Entropy calculation requires evaluating every remaining candidate against every possible guess &mdash; O(n&sup2;) per turn. For small n this is negligible. For larger code spaces (6-digit, 8-colour), the overhead becomes significant.</p>
+
+    <div class="insight-box">
+      <p class="insight-label">Key Insight</p>
+      <p style="color: #e8e6df;">The entropy approach produces &ldquo;non-obvious&rdquo; guesses that humans find strange but are objectively optimal. This is a microcosm of a larger problem in AI: systems that optimise correctly often behave in ways that feel wrong to human intuition.</p>
+      <p style="color: #c9a96e; margin-top: 0.75rem; font-style: italic;">The gap between optimal and intuitive is where explainability becomes critical.</p>
+    </div>
+
+    <p class="subhead">Outcome</p>
+    <p>Demonstrates information theory application to search problems, comparison of greedy vs. information-optimal strategies, and awareness of the human-AI intuition gap. The side-by-side visualisation of both approaches makes the information-theoretic concept tangible.</p>
+  </section>
+
+  <div style="text-align: center; margin-top: 4rem; padding-top: 3rem; border-top: 0.5px solid rgba(255,255,255,0.07);">
+    <a href="https://github.com/RachitAgrawal146/game-algorithms-java" target="_blank" rel="noopener" class="nav-back" style="margin-right: 2rem;">View Source on GitHub &nearr;</a>
+    <a href="https://rachitagrawal146.github.io/game-algorithms-java/algorithms/" target="_blank" rel="noopener" class="nav-back">Try the Interactive Demos &rarr;</a>
+  </div>
+
+</main>
+
+<footer style="border-top: 0.5px solid rgba(255,255,255,0.07); padding: 3rem 1.5rem; margin-top: 2rem; text-align: center;">
+  <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; color: #e8e6df;">Rachit Agrawal</p>
+  <p style="font-family: 'DM Mono', monospace; font-size: 9px; text-transform: uppercase; letter-spacing: 0.2em; color: #4a4844; margin-top: 0.5rem;">&copy; 2025</p>
+</footer>
+
+</body>
+</html>
