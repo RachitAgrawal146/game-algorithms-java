@@ -1,246 +1,118 @@
-# Game Algorithms — A Comparative Study of Search and Constraint-Solving
+# Game Algorithms Engine
 
-> *How does the structure of a problem's constraint space affect the efficiency 
-> of different search-based solvers — and can we measure this difference empirically?*
+**Implementations of adversarial search, constraint satisfaction, and information-theoretic reasoning — each with empirical benchmarks and interactive visualizers.**
 
-Independent research project exploring algorithm behaviour across three classes 
-of combinatorial problems. Each project implements multiple solving strategies, 
-runs controlled experiments, and measures performance quantitatively.
-
-**[Live Algorithm Engine →](https://rachitagrawal146.github.io/game-algorithms-java/)** | **[Research Comparison →](https://rachitagrawal146.github.io/game-algorithms-java/compare/)**  
-*Step through algorithms in real time, or explore benchmark data across all three problem classes.*
+This isn't a collection of tutorials. It's a laboratory for studying how decision-making works in constrained systems — and where it breaks.
 
 ---
 
-## Research Question
+## The Core Finding
 
-Most algorithm courses teach that Forward Checking is "better" than Backtracking, 
-and local search is "faster" than systematic search. But better and faster in what 
-sense — and under what conditions does each claim break down?
+Across all three projects, one pattern emerged: **an algorithm's real efficiency depends on the ratio between what its optimization costs and what it saves.**
 
-This project uses three combinatorial game environments as formal experimental 
-testbeds to answer that question with data rather than theory.
+- Alpha-beta pruning in Connect 4 cuts billions of nodes — but adding move-ordering heuristics has overhead. There's a depth threshold below which "smarter" pruning is actually slower.
+- Forward-checking in N-Queens reduces search space by 1,700× — but only because propagation cost (O(N) per step) is negligible compared to the subtree cost it prevents.
+- Entropy-based guessing in Mastermind is optimal — but requires O(n²) computation per turn. For larger code spaces, the overhead outweighs the information gain.
+
+This meta-pattern now shapes how I think about every system I design: **optimization has overhead, and overhead must be justified by savings.**
 
 ---
 
 ## Projects
 
-### 1. N-Queens — Constraint Satisfaction
+### Connect 4 — Adversarial Search
 
-Place N queens on an N×N board so no two attack each other. Three fundamentally 
-different algorithms are compared.
+Minimax with alpha-beta pruning, custom heuristic evaluation, and center-column weighting.
 
-**Algorithms implemented:**
-- **Backtracking** — exhaustive column-by-column search with undo on conflict
-- **Forward Checking** — backtracking + constraint propagation: after each 
-  placement, eliminate impossible rows from future columns and prune immediately 
-  if any column runs out of options
-- **Min-Conflicts** — local search: place queens randomly, then iteratively 
-  move the most-conflicted queen to the row with fewest conflicts. Averaged 
-  over 100 trials to account for stochastic variance.
+| Metric | Unoptimized | With Alpha-Beta |
+|--------|-------------|-----------------|
+| Nodes at depth 10 | ~282 billion | ~530,000 |
+| Complexity | O(b^d) | O(b^(d/2)) best case |
 
-**Benchmark Results (N = 8 to 30):**
+**Key insight:** Move ordering improves pruning by ~40% — but the ordering computation itself consumes time. The crossover point is empirically discoverable, not theoretically obvious.
 
-| N | BT Nodes | BT Time | FC Nodes | FC Time | MC Nodes (avg) | MC Time (avg) |
-|---|----------|---------|----------|---------|----------------|---------------|
-| 8 | 876 | 0ms | 396 | 0ms | ~350 | ~400μs |
-| 10 | 975 | 0ms | 485 | 0ms | ~450 | ~370μs |
-| 14 | 26,495 | 1ms | 12,159 | 2ms | ~300 | ~450μs |
-| 16 | 160,712 | 3ms | 69,928 | 8ms | ~380 | ~330μs |
-| 18 | 743,229 | 13ms | 317,097 | 37ms | ~200 | ~270μs |
-| 20 | 3,992,510 | 74ms | 1,687,810 | 218ms | ~220 | ~650μs |
-| 22 | — | — | 15,470,169 | 973ms | ~180 | ~410μs |
-| 28 | — | — | 33,652,682 | 3,950ms | ~80 | ~790μs |
-| 30 | — | — | 660,589,815 | 69,989ms | ~79 | ~895μs |
-
-**Key Findings:**
-
-1. **FC reduces nodes explored by ~58% vs BT at every N** — constraint propagation 
-   consistently prunes just over half the search space regardless of board size.
-
-2. **Despite fewer nodes, FC is 3× slower than BT at large N** — each FC node 
-   carries domain copying and propagation overhead. Node count and wall-clock time 
-   tell different stories. Asymptotic complexity and practical performance are not 
-   the same thing.
-
-3. **MC operates in a completely different performance class** — solving N=30 in 
-   under 1ms while FC takes 70 seconds. The difference is not incremental; it is 
-   structural. MC does not search in the traditional sense.
-
-4. **Both systematic solvers show irregular non-monotonic growth** — N=19 is cheaper 
-   than N=18 for both BT and FC. Algorithm performance depends not just on N but on 
-   the specific structure of the solution space at that N.
-
-5. **MC has no worst-case guarantee** — occasionally exhausts its iteration budget 
-   and restarts. Deterministic solvers always find a solution; stochastic solvers 
-   are usually faster but never certain. This is the fundamental tradeoff.
-
-**[→ Interactive N-Queens Visualizer](https://rachitagrawal146.github.io/game-algorithms-java/nqueens/)**
+[→ Interactive Connect 4 AI](https://rachitagrawal146.github.io/game-algorithms-java/connect4/) · [→ Technical deep-dive](https://rachitagrawal146.github.io/Rachitagrawal146.github.io-/projects.html)
 
 ---
 
-### 2. Connect4 — Adversarial Search
+### N-Queens — Constraint Satisfaction
 
-Two-player Connect4 with an AI opponent powered by Minimax with Alpha-Beta pruning.
+Backtracking solver with forward-checking constraint propagation. Comparative mode shows naive vs. optimized approaches running simultaneously.
 
-The AI builds a game tree to configurable depth (default: 6), assuming both 
-players play optimally. Alpha-Beta pruning eliminates branches that cannot 
-affect the final decision.
+| Approach (N=12) | Configurations Checked | Reduction |
+|-----------------|------------------------|-----------|
+| Naive backtracking | ~14.2 million | baseline |
+| Forward-checking | ~8,400 | **1,700×** |
 
-**Benchmark Results (AI vs AI, averaged over full game):**
+**Key insight:** The algorithm appears to "slow down" in middle rows and speed up near the end. Early placements maximally constrain the space; once past the bottleneck, remaining placements are nearly forced. *This emerged from watching the algorithm run — it's not in the textbook.*
 
-| Depth | Avg Nodes/Move | Avg Time/Move | Game Length |
-|-------|---------------|---------------|-------------|
-| 2 | 44 | 0.3ms | 15 moves |
-| 4 | 549 | 0.7ms | 24 moves |
-| 6 | 4,682 | 4.3ms | 39 moves |
-| 8 | 48,157 | 53.1ms | 32 moves |
-
-**Alpha-Beta Pruning Efficiency (mid-game position):**
-
-| Depth | With Pruning | Without | % Tree Pruned |
-|-------|-------------|---------|---------------|
-| 4 | 1,243 | 2,216 | 43.9% |
-| 6 | 20,542 | 77,057 | 73.3% |
-| 8 | 299,965 | 2,420,976 | 87.6% |
-| 10 | 3,968,268 | 68,890,362 | **94.2%** |
-
-**Key Findings:**
-
-6. **Pruning efficiency increases with depth** — from 0% at depth 2 to 94.2% 
-   at depth 10. Deeper search makes pruning exponentially more valuable.
-
-7. **Pruning is phase-dependent** — early game: 90.2% pruned, mid game: 88.1%, 
-   late game: 67.1%. As the board fills, fewer branches exist to prune, 
-   reducing alpha-beta's advantage.
-
-**[→ Interactive Connect 4 AI](https://rachitagrawal146.github.io/game-algorithms-java/connect4/)**
+[→ Interactive N-Queens Visualizer](https://rachitagrawal146.github.io/game-algorithms-java/nqueens/)
 
 ---
 
-### 3. Mastermind — Information-Theoretic Search
+### Mastermind — Information-Theoretic Search
 
-Human player vs a constraint-elimination AI solver. The AI maintains all codes 
-consistent with feedback received so far, eliminating candidates after each guess. 
-Core idea from Donald Knuth's 1977 minimax algorithm.
+Two solving strategies: constraint filtering (simple, memoryless) and entropy-based guessing (Knuth-style, maximizes information gain).
 
-**Exhaustive Benchmark (all 360 possible codes):**
+| Strategy | Average Guesses | Worst Case |
+|----------|-----------------|------------|
+| Constraint filtering | 4.5 | 6 |
+| Entropy-based | 4.2 | 5 |
 
-| Guesses | Codes | Percentage |
-|---------|-------|------------|
-| 1 | 1 | 0.3% |
-| 2 | 10 | 2.8% |
-| 3 | 61 | 16.9% |
-| 4 | 166 | **46.1%** |
-| 5 | 107 | 29.7% |
-| 6 | 15 | 4.2% |
+**Key insight:** The entropy approach produces "non-obvious" guesses that humans find strange but are objectively optimal. This is a microcosm of a larger problem in AI: systems that optimize correctly often behave in ways that feel wrong to human intuition.
 
-Average: **4.15 guesses**. Each guess eliminates ~82% of remaining candidates.
-
-**Key Findings:**
-
-8. **The solver cracks every code in ≤6 guesses**, averaging 4.15. The 4.2% 
-   that require 6 guesses exceed Knuth's theoretical 5-guess bound — our 
-   first-candidate strategy trades optimality for simplicity. The gap 
-   quantifies the cost of that tradeoff.
-
-9. **Information gain is front-loaded** — the first guess eliminates 82% of 
-   candidates (360→65), but later guesses yield diminishing returns as the 
-   remaining candidates become increasingly similar to each other.
-
-**[→ Interactive Mastermind Solver](https://rachitagrawal146.github.io/game-algorithms-java/mastermind/)**
+[→ Interactive Mastermind Solver](https://rachitagrawal146.github.io/game-algorithms-java/mastermind/)
 
 ---
 
-### 4. 21-Card Trick — Deterministic Algorithm
+## Why Games?
 
-A mathematical card trick that always identifies a chosen card in 3 rounds via 
-systematic column rearrangement — showing how deterministic structure can replace 
-what appears to be random guessing.
+Games are the smallest environments where the hardest problems in computer science appear in their purest form.
 
-**[→ Interactive 21-Card Trick](https://rachitagrawal146.github.io/game-algorithms-java/cardtrick/)**
+A Connect 4 engine makes sequential decisions under uncertainty, optimizes across exponentially large search spaces, and manages the exploration-exploitation tradeoff. These are the same problems that power autonomous vehicles, trading algorithms, and AI agents operating in the real world.
 
----
-
-## Cross-Project Analysis
-
-The central question — *how does constraint structure affect algorithm efficiency?* — 
-becomes clearest when comparing pruning across all three problems:
-
-| Problem | Pruning Method | Nodes Saved | Actually Faster? |
-|---------|---------------|-------------|-----------------|
-| N-Queens (FC) | Domain propagation | 58% | **No — 3x slower** |
-| Connect4 (A-B) | Alpha-Beta cutoff | 90% | **Yes — 10x faster** |
-| Mastermind | Candidate elimination | 82%/round | **Yes — 4.15 guesses** |
-
-**The unifying finding:** pruning works when its overhead is cheaper than the 
-search it eliminates. Alpha-Beta adds near-zero cost (two integer comparisons) 
-while cutting 90% of an exponential tree. Forward Checking cuts 58% of nodes 
-but adds domain copying at every surviving node — the overhead exceeds the 
-savings at large N. Mastermind's elimination is expensive per step but justified 
-because the search space is finite and small.
-
-**The efficiency of pruning depends not on how many branches it cuts, but on 
-the ratio of pruning cost to search cost.** This ratio is determined by the 
-problem's constraint structure, not by the algorithm alone.
+I use games as laboratories. The goal isn't entertainment — it's to study decision-making, constraint satisfaction, and adversarial reasoning in environments where I can control every variable, measure every outcome, and understand what's happening inside the system.
 
 ---
 
-## Methodology Notes
+## Connection to Research
 
-**Why these three problems?** N-Queens (constraint satisfaction), Connect4 
-(adversarial search), and Mastermind (information-theoretic search) each represent 
-a distinct class of combinatorial problem. Studying all three allows questions about 
-which problem properties make which algorithms effective.
+This repository is Part 1 of a larger inquiry. Part 2 is my Polygence research paper:
 
-**On stochastic benchmarking:** Min-Conflicts is averaged over 100 independent 
-trials. A single run of a randomised algorithm is not a meaningful data point.
+**"From Game-Theoretic Poker to the Collapse of Trust: Modelling Strategic Behaviour in Multi-Agent Systems"**
 
-**On the FC time anomaly:** The finding that FC is slower than BT despite fewer 
-nodes illustrates that asymptotic node count and wall-clock performance diverge 
-when per-node cost is high. This is a recurring theme across algorithm design.
+Where this repo studies algorithms playing against known rules, the paper studies what happens when the "rules" are other agents — adaptive, strategic, potentially deceptive. The progression: from deterministic games to game-theoretic environments to multi-agent trust dynamics.
 
 ---
 
-## Running the Code
+## Technical Stack
 
-```bash
-# N-Queens benchmark (compare all three solvers)
-javac NQueens/*.java
-java -cp NQueens NQueensBenchmark
-
-# Connect4 — play against the AI
-javac Connect4/*.java
-java -cp Connect4 Connect4
-
-# Mastermind — try to beat the constraint solver
-javac Mastermind/*.java
-java -cp Mastermind Mastermind
-```
-
-*In BlueJ: open the relevant folder as a project, right-click the main class, 
-select "Run main method".*
+- **Language:** Java
+- **Algorithms:** Minimax, alpha-beta pruning, backtracking, constraint propagation, entropy-based search
+- **Methodology:** Each project includes empirical benchmarking (nodes evaluated, pruning rates, wall-clock time) alongside theoretical complexity analysis
 
 ---
 
-## Built With
+## Development Notes
 
-This project was developed with [Claude Code](https://claude.ai/code) (Anthropic's 
-AI coding assistant) as a collaborative tool for implementation, benchmarking, and 
-visualizer development. The research questions, experimental design, algorithm 
-selection, and analysis of findings are my own work. Claude Code served as a 
-pair-programming partner — accelerating the engineering so I could focus on the 
-research.
+This project was built with assistance from Claude (Anthropic) as a pair-programming tool for implementation, debugging, and benchmarking infrastructure. The algorithmic design, empirical analysis, and cross-project synthesis are my own work.
 
 ---
 
-*This project sits alongside separate research on multi-agent strategic behaviour 
-(modelling trust emergence and collapse across behavioural archetypes in Kuhn Poker 
-environments), which explores related questions about how rational agents behave 
-under uncertainty and incomplete information.*
+## Where This Could Go
+
+These implementations are complete as learning tools. If scaling to production:
+
+**Performance:** Port to C++/Rust, add transposition tables, parallelize constraint propagation
+**Architecture:** Decouple into MVC, unified benchmark harness, API exposure
+**AI Integration:** Replace hand-coded heuristics with learned evaluation functions; compare against MCTS
+
+These aren't hypothetical — they're engineering steps I understand how to take.
 
 ---
 
-Built by **[Rachit Agrawal](https://rachitagrawal146.github.io/)** — Grade 11, 
-Sahyadri School (KFI), Pune. Part of a broader portfolio exploring decision-making 
-in artificial intelligence.
+## Author
+
+**Rachit Agrawal**
+Grade 11, Sahyadri School (KFI), Pune
+[Portfolio](https://rachitagrawal146.github.io/Rachitagrawal146.github.io-/) · [Email](mailto:agrawalrachit146@gmail.com)
