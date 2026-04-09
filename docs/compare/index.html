@@ -328,7 +328,7 @@
 <!-- ================================================================
      SECTION 1: N-Queens
      ================================================================ -->
-<section class="section slide-up" id="nqueens">
+<section class="section" id="nqueens">
   <span class="section-label">N-Queens</span>
   <h2 class="section-title">Algorithm Comparison</h2>
 
@@ -375,7 +375,7 @@
 <!-- ================================================================
      SECTION 2: Connect 4 — Pruning Efficiency
      ================================================================ -->
-<section class="section slide-up" id="connect4">
+<section class="section" id="connect4">
   <span class="section-label">Connect 4</span>
   <h2 class="section-title">Pruning Efficiency by Depth</h2>
 
@@ -417,7 +417,7 @@
 <!-- ================================================================
      SECTION 3: Mastermind — Guess Distribution
      ================================================================ -->
-<section class="section slide-up" id="mastermind">
+<section class="section" id="mastermind">
   <span class="section-label">Mastermind</span>
   <h2 class="section-title">Guess Distribution</h2>
 
@@ -458,7 +458,7 @@
 <!-- ================================================================
      SECTION 4: Cross-Problem Analysis
      ================================================================ -->
-<section class="section slide-up" id="thesis">
+<section class="section" id="thesis">
   <span class="section-label">Cross-Problem Analysis</span>
   <h2 class="section-title">The Pruning Cost-to-Benefit Ratio</h2>
 
@@ -500,7 +500,7 @@
 <!-- ================================================================
      SECTION 5: Complexity Summary
      ================================================================ -->
-<section class="section slide-up" id="complexity">
+<section class="section" id="complexity">
   <span class="section-label">Reference</span>
   <h2 class="section-title">Complexity Summary</h2>
 
@@ -605,21 +605,15 @@
     return bar;
   }
 
-  /* ---------- Intersection Observer for animation ---------- */
-  var observer = new IntersectionObserver(function (entries) {
-    entries.forEach(function (entry) {
-      if (entry.isIntersecting) {
-        // Animate bars within this chart
-        var bars = entry.target.querySelectorAll('.bar');
-        bars.forEach(function (b, i) {
-          setTimeout(function () { b.classList.add('animated'); }, i * 40);
-        });
-        // Also trigger slide-up
-        entry.target.classList.add('visible');
-        observer.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.15 });
+  /* ---------- Animate bars on load ---------- */
+  function animateBars(chartEl) {
+    setTimeout(function () {
+      var bars = chartEl.querySelectorAll('.bar');
+      bars.forEach(function (b, i) {
+        setTimeout(function () { b.classList.add('animated'); }, i * 40);
+      });
+    }, 300);
+  }
 
   /* ================================================================
      N-Queens Chart
@@ -658,7 +652,7 @@
     nqChart.appendChild(group);
   });
 
-  observer.observe(nqChart);
+  animateBars(nqChart);
 
   /* ================================================================
      Connect 4 Chart
@@ -738,7 +732,7 @@
     c4Chart.appendChild(svg);
   });
 
-  observer.observe(c4Chart);
+  animateBars(c4Chart);
 
   /* ================================================================
      Mastermind Histogram
@@ -827,14 +821,9 @@
     mmChart.appendChild(svg);
   });
 
-  observer.observe(mmChart);
+  animateBars(mmChart);
 
-  /* ================================================================
-     Slide-up observer for all sections
-     ================================================================ */
-  document.querySelectorAll('.slide-up').forEach(function (el) {
-    observer.observe(el);
-  });
+  /* All sections are now visible by default — no slide-up animation needed */
 
 })();
 </script>
