@@ -308,6 +308,18 @@
 }
 
 .cumulative-line svg { width: 100%; height: 100%; }
+
+/* Force all content visible — override any animation classes */
+.section, .chart-area, .insight-box, .thesis-card, .data-table-wrap,
+.central-quote, .footer-links, .section-title, .section-label {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* Bars start visible — animation is a bonus, not a requirement */
+.bar {
+  transform: scaleY(1) !important;
+}
 </style>
 </head>
 <body>
