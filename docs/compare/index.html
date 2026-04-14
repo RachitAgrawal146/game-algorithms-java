@@ -695,51 +695,17 @@
     c4Chart.appendChild(group);
   });
 
-  // Pruning % line overlay (SVG)
+  // Pruning % labels (HTML overlays instead of distorted SVG)
   requestAnimationFrame(function () {
-    var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('viewBox', '0 0 100 100');
-    svg.setAttribute('preserveAspectRatio', 'none');
-    svg.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:calc(100% - 2rem);pointer-events:none;';
-
-    var polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
-    var points = c4Data.map(function (d, i) {
-      var x = ((i + 0.5) / c4Data.length) * 100;
-      var y = 100 - d.pct;
-      return x + ',' + y;
-    }).join(' ');
-
-    polyline.setAttribute('points', points);
-    polyline.setAttribute('fill', 'none');
-    polyline.setAttribute('stroke', '#f59e0b');
-    polyline.setAttribute('stroke-width', '2');
-    polyline.setAttribute('vector-effect', 'non-scaling-stroke');
-    svg.appendChild(polyline);
-
-    // Dots with labels
+    var groups = c4Chart.querySelectorAll('.bar-group');
     c4Data.forEach(function (d, i) {
-      var cx = ((i + 0.5) / c4Data.length) * 100;
-      var cy = 100 - d.pct;
-
-      var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      circle.setAttribute('cx', cx);
-      circle.setAttribute('cy', cy);
-      circle.setAttribute('r', '1.5');
-      circle.setAttribute('fill', '#f59e0b');
-      svg.appendChild(circle);
-
-      var text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      text.setAttribute('x', cx);
-      text.setAttribute('y', cy - 3);
-      text.setAttribute('text-anchor', 'middle');
-      text.setAttribute('fill', '#f59e0b');
-      text.setAttribute('font-size', '6');
-      text.setAttribute('font-family', 'DM Mono, monospace');
-      text.textContent = d.pct + '%';
-      svg.appendChild(text);
+      if (!groups[i]) return;
+      var pctLabel = document.createElement('div');
+      pctLabel.style.cssText = 'position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-family:DM Mono,monospace;font-size:0.65rem;color:#f59e0b;white-space:nowrap;';
+      pctLabel.textContent = d.pct + '%';
+      groups[i].style.position = 'relative';
+      groups[i].appendChild(pctLabel);
     });
-
-    c4Chart.appendChild(svg);
   });
 
   animateBars(c4Chart);
@@ -785,50 +751,17 @@
     mmChart.appendChild(group);
   });
 
-  // Cumulative % line
+  // Cumulative % labels (HTML overlays instead of distorted SVG)
   requestAnimationFrame(function () {
-    var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('viewBox', '0 0 100 100');
-    svg.setAttribute('preserveAspectRatio', 'none');
-    svg.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:calc(100% - 2rem);pointer-events:none;';
-
-    var polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
-    var points = mmData.map(function (d, i) {
-      var x = ((i + 0.5) / mmData.length) * 100;
-      var y = 100 - d.cum;
-      return x + ',' + y;
-    }).join(' ');
-
-    polyline.setAttribute('points', points);
-    polyline.setAttribute('fill', 'none');
-    polyline.setAttribute('stroke', '#f59e0b');
-    polyline.setAttribute('stroke-width', '2');
-    polyline.setAttribute('vector-effect', 'non-scaling-stroke');
-    svg.appendChild(polyline);
-
+    var groups = mmChart.querySelectorAll('.bar-group');
     mmData.forEach(function (d, i) {
-      var cx = ((i + 0.5) / mmData.length) * 100;
-      var cy = 100 - d.cum;
-
-      var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      circle.setAttribute('cx', cx);
-      circle.setAttribute('cy', cy);
-      circle.setAttribute('r', '1.5');
-      circle.setAttribute('fill', '#f59e0b');
-      svg.appendChild(circle);
-
-      var text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      text.setAttribute('x', cx);
-      text.setAttribute('y', cy - 3);
-      text.setAttribute('text-anchor', 'middle');
-      text.setAttribute('fill', '#f59e0b');
-      text.setAttribute('font-size', '6');
-      text.setAttribute('font-family', 'DM Mono, monospace');
-      text.textContent = d.cum + '%';
-      svg.appendChild(text);
+      if (!groups[i]) return;
+      var cumLabel = document.createElement('div');
+      cumLabel.style.cssText = 'position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-family:DM Mono,monospace;font-size:0.65rem;color:#f59e0b;white-space:nowrap;';
+      cumLabel.textContent = d.cum + '%';
+      groups[i].style.position = 'relative';
+      groups[i].appendChild(cumLabel);
     });
-
-    mmChart.appendChild(svg);
   });
 
   animateBars(mmChart);
