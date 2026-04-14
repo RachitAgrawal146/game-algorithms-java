@@ -65,7 +65,8 @@
     { label: 'Connect 4', href: '/game-algorithms-java/connect4/' },
     { label: 'Mastermind', href: '/game-algorithms-java/mastermind/' },
     { label: 'Card Trick', href: '/game-algorithms-java/cardtrick/' },
-    { label: 'Compare', href: '/game-algorithms-java/compare/' }
+    { label: 'Compare', href: '/game-algorithms-java/compare/' },
+    { label: '\u2190 Portfolio', href: 'https://rachitagrawal146.github.io/Rachitagrawal146.github.io-/' }
   ];
 
   // Create <nav class="site-nav">
