@@ -4,17 +4,21 @@
 
 This isn't a collection of tutorials. It's a laboratory for studying how decision-making works in constrained systems — and where it breaks.
 
+**[Live Site →](https://rachitagrawal146.github.io/game-algorithms-java/)** · **[Algorithm Comparison →](https://rachitagrawal146.github.io/game-algorithms-java/compare/)**
+
 ---
 
 ## The Core Finding
 
 Across all three projects, one pattern emerged: **an algorithm's real efficiency depends on the ratio between what its optimization costs and what it saves.**
 
-- Alpha-beta pruning in Connect 4 cuts billions of nodes — but adding move-ordering heuristics has overhead. There's a depth threshold below which "smarter" pruning is actually slower.
-- Forward-checking in N-Queens reduces search space by 1,700× — but only because propagation cost (O(N) per step) is negligible compared to the subtree cost it prevents.
-- Entropy-based guessing in Mastermind is optimal — but requires O(n²) computation per turn. For larger code spaces, the overhead outweighs the information gain.
+| Problem | Pruning Method | Nodes Saved | Actually Faster? |
+|---------|---------------|-------------|-----------------|
+| N-Queens (Forward Checking) | Domain propagation | 58% | **No — 3× slower** at large N |
+| Connect 4 (Alpha-Beta) | Game-tree cutoff | 90–94% | **Yes — 10× faster** |
+| Mastermind (Constraint Elim.) | Candidate filtering | 82%/round | **Yes — 4.15 guesses avg** |
 
-This meta-pattern now shapes how I think about every system I design: **optimization has overhead, and overhead must be justified by savings.**
+Alpha-beta pruning adds near-zero overhead (two integer comparisons) while eliminating 90% of an exponential tree. Forward checking eliminates 58% of nodes but adds O(n²) domain copying at every surviving node — the overhead exceeds the savings at large N. This meta-pattern now shapes how I think about every system I design: **optimization has overhead, and overhead must be justified by savings.**
 
 ---
 
@@ -22,54 +26,68 @@ This meta-pattern now shapes how I think about every system I design: **optimiza
 
 ### Connect 4 — Adversarial Search
 
-Minimax with alpha-beta pruning, custom heuristic evaluation, and center-column weighting.
+Minimax with alpha-beta pruning, heuristic evaluation, and centre-first move ordering.
 
-| Metric | Unoptimized | With Alpha-Beta |
-|--------|-------------|-----------------|
-| Nodes at depth 10 | ~282 billion | ~530,000 |
-| Complexity | O(b^d) | O(b^(d/2)) best case |
+| Depth | Avg Nodes/Move | Avg Time/Move | Pruning % |
+|-------|---------------|---------------|-----------|
+| 2 | 44 | 0.3ms | 0% |
+| 4 | 549 | 0.7ms | 43.9% |
+| 6 | 4,682 | 4.3ms | 73.3% |
+| 8 | 48,157 | 53.1ms | 87.6% |
+| 10 | 3,968,268 | — | **94.2%** |
 
-**Key insight:** Move ordering improves pruning by ~40% — but the ordering computation itself consumes time. The crossover point is empirically discoverable, not theoretically obvious.
+**Key finding:** Pruning efficiency is phase-dependent — 90.2% in the early game, 88.1% midgame, 67.1% in the endgame. As the board fills, fewer branches exist to prune.
 
-[→ Interactive Connect 4 AI](https://rachitagrawal146.github.io/game-algorithms-java/connect4/) · [→ Technical deep-dive](https://rachitagrawal146.github.io/Rachitagrawal146.github.io-/projects.html)
+[→ Play against the AI](https://rachitagrawal146.github.io/game-algorithms-java/connect4/) · [→ Source: `Connect4/`](Connect4/)
 
 ---
 
 ### N-Queens — Constraint Satisfaction
 
-Backtracking solver with forward-checking constraint propagation. Comparative mode shows naive vs. optimized approaches running simultaneously.
+Three solvers compared across N=8 to N=30: backtracking, forward checking, and min-conflicts.
 
-| Approach (N=12) | Configurations Checked | Reduction |
-|-----------------|------------------------|-----------|
-| Naive backtracking | ~14.2 million | baseline |
-| Forward-checking | ~8,400 | **1,700×** |
+| N | BT Nodes | BT Time | FC Nodes | FC Time | MC Nodes (avg) | MC Time (avg) |
+|---|----------|---------|----------|---------|----------------|---------------|
+| 8 | 876 | 0ms | 396 | 0ms | ~350 | ~400μs |
+| 14 | 26,495 | 1ms | 12,159 | 2ms | ~300 | ~450μs |
+| 20 | 3,992,510 | 74ms | 1,687,810 | 218ms | ~220 | ~650μs |
+| 30 | — | — | 660,589,815 | 69,989ms | ~79 | ~895μs |
 
-**Key insight:** The algorithm appears to "slow down" in middle rows and speed up near the end. Early placements maximally constrain the space; once past the bottleneck, remaining placements are nearly forced. *This emerged from watching the algorithm run — it's not in the textbook.*
+**Key finding:** FC explores 58% fewer nodes than BT but is 3× slower at N=20 due to domain copying overhead. Min-Conflicts solves N=30 in under 1ms — 70,000× faster than FC. Non-monotonic growth means some N values are structurally easy regardless of algorithm.
 
-[→ Interactive N-Queens Visualizer](https://rachitagrawal146.github.io/game-algorithms-java/nqueens/)
+[→ Interactive Visualizer](https://rachitagrawal146.github.io/game-algorithms-java/nqueens/) · [→ Source: `NQueens/`](NQueens/)
 
 ---
 
 ### Mastermind — Information-Theoretic Search
 
-Two solving strategies: constraint filtering (simple, memoryless) and entropy-based guessing (Knuth-style, maximizes information gain).
+Constraint-elimination solver tested exhaustively against all 360 possible no-repeat codes.
 
-| Strategy | Average Guesses | Worst Case |
-|----------|-----------------|------------|
-| Constraint filtering | 4.5 | 6 |
-| Entropy-based | 4.2 | 5 |
+| Guesses | Codes Solved | Cumulative |
+|---------|-------------|------------|
+| 1–2 | 11 | 3.1% |
+| 3 | 61 | 19.7% |
+| 4 | 166 | **65.8%** |
+| 5 | 107 | 95.6% |
+| 6 | 15 | 100% |
 
-**Key insight:** The entropy approach produces "non-obvious" guesses that humans find strange but are objectively optimal. This is a microcosm of a larger problem in AI: systems that optimize correctly often behave in ways that feel wrong to human intuition.
+Average: **4.15 guesses**. Each guess eliminates ~82% of remaining candidates. The 4.2% requiring 6 guesses exceed Knuth's 5-guess theoretical bound — our simpler first-candidate strategy trades optimality for clarity. The gap quantifies the cost of that tradeoff.
 
-[→ Interactive Mastermind Solver](https://rachitagrawal146.github.io/game-algorithms-java/mastermind/)
+[→ Interactive Solver](https://rachitagrawal146.github.io/game-algorithms-java/mastermind/) · [→ Source: `Mastermind/`](Mastermind/)
+
+---
+
+### 21-Card Trick — Deterministic Algorithm
+
+Mathematical card trick that identifies a chosen card in exactly 3 rounds via column rearrangement. Deterministic convergence through ternary subdivision — showing how structure can completely replace randomness.
+
+[→ Interactive Demo](https://rachitagrawal146.github.io/game-algorithms-java/cardtrick/) · [→ Source: `CardTrick/`](CardTrick/)
 
 ---
 
 ## Why Games?
 
-Games are the smallest environments where the hardest problems in computer science appear in their purest form.
-
-A Connect 4 engine makes sequential decisions under uncertainty, optimizes across exponentially large search spaces, and manages the exploration-exploitation tradeoff. These are the same problems that power autonomous vehicles, trading algorithms, and AI agents operating in the real world.
+Games are the smallest environments where the hardest problems in computer science appear in their purest form. A Connect 4 engine makes sequential decisions under uncertainty, optimizes across exponentially large search spaces, and manages the exploration-exploitation tradeoff — the same problems that underpin autonomous vehicles, trading algorithms, and AI agents in the real world.
 
 I use games as laboratories. The goal isn't entertainment — it's to study decision-making, constraint satisfaction, and adversarial reasoning in environments where I can control every variable, measure every outcome, and understand what's happening inside the system.
 
@@ -81,38 +99,53 @@ This repository is Part 1 of a larger inquiry. Part 2 is my Polygence research p
 
 **"From Game-Theoretic Poker to the Collapse of Trust: Modelling Strategic Behaviour in Multi-Agent Systems"**
 
-Where this repo studies algorithms playing against known rules, the paper studies what happens when the "rules" are other agents — adaptive, strategic, potentially deceptive. The progression: from deterministic games to game-theoretic environments to multi-agent trust dynamics.
+Where this repo studies algorithms playing against known rules, the paper studies what happens when the "rules" are other agents — adaptive, strategic, potentially deceptive. The shared thread: how rational agents behave under constraint, and when their optimizations break down.
 
 ---
 
 ## Technical Stack
 
-- **Language:** Java
-- **Algorithms:** Minimax, alpha-beta pruning, backtracking, constraint propagation, entropy-based search
-- **Methodology:** Each project includes empirical benchmarking (nodes evaluated, pruning rates, wall-clock time) alongside theoretical complexity analysis
+- **Language:** Java — no external libraries. All data structures and algorithms implemented from scratch.
+- **Algorithms:** Minimax, alpha-beta pruning, backtracking, constraint propagation, local search with random restarts, entropy-based candidate elimination
+- **Methodology:** Empirical benchmarking with multi-trial averaging for stochastic solvers, controlled comparison across problem classes
+- **Interactive Demos:** Vanilla HTML/JavaScript with CSS animations — no frameworks
+
+---
+
+## Running the Code
+
+```bash
+# N-Queens benchmark (compare all three solvers, N=8–20)
+javac NQueens/*.java
+java -cp NQueens NQueensBenchmark
+
+# Connect 4 (play against the Minimax AI)
+javac Connect4/*.java
+java -cp Connect4 Connect4
+
+# Connect 4 benchmark (depth vs performance, pruning efficiency)
+java -cp Connect4 Connect4Benchmark
+
+# Mastermind (human play or AI solver mode)
+javac Mastermind/*.java
+java -cp Mastermind Mastermind
+
+# Mastermind benchmark (exhaustive test against all 360 codes)
+java -cp Mastermind MastermindBenchmark
+```
+
+*In BlueJ: open any folder as a project, right-click the main class, select "Run main method".*
 
 ---
 
 ## Development Notes
 
-This project was built with assistance from Claude (Anthropic) as a pair-programming tool for implementation, debugging, and benchmarking infrastructure. The algorithmic design, empirical analysis, and cross-project synthesis are my own work.
-
----
-
-## Where This Could Go
-
-These implementations are complete as learning tools. If scaling to production:
-
-**Performance:** Port to C++/Rust, add transposition tables, parallelize constraint propagation
-**Architecture:** Decouple into MVC, unified benchmark harness, API exposure
-**AI Integration:** Replace hand-coded heuristics with learned evaluation functions; compare against MCTS
-
-These aren't hypothetical — they're engineering steps I understand how to take.
+This project was built with assistance from [Claude Code](https://claude.ai/code) (Anthropic) as a pair-programming tool for implementation, benchmarking infrastructure, and interactive visualizer development. The research questions, experimental design, algorithm selection, and analysis of findings are my own work.
 
 ---
 
 ## Author
 
 **Rachit Agrawal**
-Grade 11, Sahyadri School (KFI), Pune
-[Portfolio](https://rachitagrawal146.github.io/Rachitagrawal146.github.io-/) · [Email](mailto:agrawalrachit146@gmail.com)
+Grade 12, Sahyadri School (KFI), Pune
+[Portfolio](https://rachitagrawal146.github.io/Rachitagrawal146.github.io-/) · [GitHub](https://github.com/RachitAgrawal146) · [Email](mailto:agrawalrachit146@gmail.com)
